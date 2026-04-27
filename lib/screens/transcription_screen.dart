@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
+import '../models/history_item.dart';
 import '../providers/app_state.dart';
+import '../services/history_service.dart';
 import '../services/openai_service.dart';
 
 enum _State { idle, recording, processing, result, error }
@@ -106,6 +108,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
       final text = await OpenAIService(apiKey).transcribeAudio(path);
       try { File(path).deleteSync(); } catch (_) {}
       if (mounted) {
+        context.read<HistoryService>().add(HistoryItem(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              type: HistoryType.transcription,
+              createdAt: DateTime.now(),
+              result: text,
+            ));
         setState(() {
           _state = _State.result;
           _resultText = text;

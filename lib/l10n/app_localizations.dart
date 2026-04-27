@@ -70,6 +70,13 @@ class AppLocalizations {
   String get interfaceLanguage => _t('interfaceLanguage');
   String get cancel => _t('cancel');
 
+  // ── Translation screen ────────────────────────────────────────────────────
+  String get translateInputHint => _t('translateInputHint');
+  String get selectLanguage => _t('selectLanguage');
+  String get translateBtn => _t('translateBtn');
+  String get translating => _t('translating');
+  String get sendingText => _t('sendingText');
+
   // ── History screen ────────────────────────────────────────────────────────
   String get historyTitle => _t('historyTitle');
   String get clearAll => _t('clearAll');
@@ -158,6 +165,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Transcr. + Translate',
       'htFullCycle': 'Full Cycle',
       'htTts': 'Text to Voice',
+      'translateInputHint': 'Enter text to translate...',
+      'selectLanguage': 'Target language',
+      'translateBtn': 'Translate',
+      'translating': 'Translating...',
+      'sendingText': 'Sending to OpenAI',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -223,6 +235,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Транскр. + Перевод',
       'htFullCycle': 'Полный цикл',
       'htTts': 'Текст в голос',
+      'translateInputHint': 'Введите текст для перевода...',
+      'selectLanguage': 'Целевой язык',
+      'translateBtn': 'Перевести',
+      'translating': 'Переводим...',
+      'sendingText': 'Отправляем запрос в OpenAI',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -289,6 +306,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Transkr. + Übersetzen',
       'htFullCycle': 'Vollzyklus',
       'htTts': 'Text zu Sprache',
+      'translateInputHint': 'Text zum Übersetzen eingeben...',
+      'selectLanguage': 'Zielsprache',
+      'translateBtn': 'Übersetzen',
+      'translating': 'Übersetzen...',
+      'sendingText': 'An OpenAI senden',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -356,6 +378,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Transcr. + Traduire',
       'htFullCycle': 'Cycle complet',
       'htTts': 'Texte en voix',
+      'translateInputHint': 'Saisir le texte à traduire...',
+      'selectLanguage': 'Langue cible',
+      'translateBtn': 'Traduire',
+      'translating': 'Traduction...',
+      'sendingText': 'Envoi à OpenAI',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -422,6 +449,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Transcr. + Traducir',
       'htFullCycle': 'Ciclo completo',
       'htTts': 'Texto a voz',
+      'translateInputHint': 'Ingresa el texto a traducir...',
+      'selectLanguage': 'Idioma destino',
+      'translateBtn': 'Traducir',
+      'translating': 'Traduciendo...',
+      'sendingText': 'Enviando a OpenAI',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -488,6 +520,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Trascr. + Tradurre',
       'htFullCycle': 'Ciclo completo',
       'htTts': 'Testo in voce',
+      'translateInputHint': 'Inserisci il testo da tradurre...',
+      'selectLanguage': 'Lingua di destinazione',
+      'translateBtn': 'Traduci',
+      'translating': 'Traduzione...',
+      'sendingText': 'Invio a OpenAI',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -554,6 +591,82 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Transcr. + Traduzir',
       'htFullCycle': 'Ciclo completo',
       'htTts': 'Texto para voz',
+      'translateInputHint': 'Digite o texto para traduzir...',
+      'selectLanguage': 'Idioma de destino',
+      'translateBtn': 'Traduzir',
+      'translating': 'Traduzindo...',
+      'sendingText': 'Enviando para OpenAI',
+    },
+
+        // ── Polish ────────────────────────────────────────────────────────────────
+    'pl': {
+      'appTitle': 'Asystent głosowy',
+      'historyTooltip': 'Historia',
+      'settingsTooltip': 'Ustawienia',
+      'apiKeyMissing':
+          'Klucz API OpenAI nie jest ustawiony. Dotknij, aby skonfigurować.',
+      'transcribeAudio': 'Transkrypcja audio',
+      'transcribeAudioSub': 'Głos → Tekst',
+      'translateText': 'Tłumaczenie tekstu',
+      'translateTextSub': 'Tekst → Tłumaczenie',
+      'transcribeAndTranslate': 'Transkrypcja + Tłumaczenie',
+      'transcribeAndTranslateSub': 'Głos → Tekst → Tłumaczenie',
+      'fullCycle': 'Pełny cykl',
+      'fullCycleSub': 'Głos → Tekst → Tłumaczenie → Głos',
+      'textToVoice': 'Tekst na głos',
+      'textToVoiceSub': 'Tekst → Audio',
+      'comingSoon': 'Zostanie dodane w następnym etapie',
+      'tapToRecord': 'Dotknij, aby rozpocząć nagrywanie',
+      'anyLanguage': 'Obsługiwane są wszystkie języki',
+      'tapToStop': 'Dotknij, aby zatrzymać',
+      'transcribing': 'Transkrypcja...',
+      'sendingAudio': 'Wysyłanie audio do OpenAI',
+      'result': 'Wynik',
+      'copy': 'Kopiuj',
+      'copyOriginal': 'Kopiuj oryginał',
+      'copyTranslation': 'Kopiuj tłumaczenie',
+      'again': 'Ponownie',
+      'copied': 'Skopiowano',
+      'errorOccurred': 'Wystąpił błąd',
+      'unknownError': 'Nieznany błąd',
+      'tryAgain': 'Spróbuj ponownie',
+      'noMicPermission':
+          'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
+      'settingsTitle': 'Ustawienia',
+      'apiKeyLabel': 'Klucz API OpenAI',
+      'apiKeyDescription':
+          'Używany do transkrypcji, tłumaczenia i syntezy mowy. '
+              'Uzyskaj klucz na platform.openai.com',
+      'save': 'Zapisz',
+      'enterApiKey': 'Wprowadź klucz API',
+      'apiKeySaved': 'Klucz API zapisany',
+      'deleteKey': 'Usuń klucz',
+      'apiKeyDeleted': 'Klucz API usunięty',
+      'interfaceLanguage': 'Język interfejsu',
+      'cancel': 'Anuluj',
+      'historyTitle': 'Historia',
+      'clearAll': 'Wyczyść wszystko',
+      'clearHistoryTitle': 'Wyczyścić historię?',
+      'clearHistoryMsg':
+          'Wszystkie rekordy zostaną usunięte. Tej operacji nie można cofnąć.',
+      'delete': 'Usuń',
+      'historyEmpty': 'Historia jest pusta',
+      'historyEmptySub': 'Wyniki operacji będą tu zapisywane',
+      'deleteRecordTitle': 'Usunąć rekord?',
+      'deleteRecordMsg': 'Ten rekord zostanie usunięty z historii.',
+      'deleteEntry': 'Usuń wpis',
+      'original': 'ORYGINAŁ',
+      'translation': 'TŁUMACZENIE',
+      'htTranscription': 'Transkrypcja',
+      'htTranslation': 'Tłumaczenie tekstu',
+      'htTranscribeTranslate': 'Transkr. + Tłumacz.',
+      'htFullCycle': 'Pełny cykl',
+      'htTts': 'Tekst na głos',
+      'translateInputHint': 'Wpisz tekst do przetłumaczenia...',
+      'selectLanguage': 'Język docelowy',
+      'translateBtn': 'Przetłumacz',
+      'translating': 'Tłumaczenie...',
+      'sendingText': 'Wysyłanie do OpenAI',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -615,6 +728,11 @@ class AppLocalizations {
       'htTranscribeTranslate': '转录 + 翻译',
       'htFullCycle': '完整流程',
       'htTts': '文字转语音',
+      'translateInputHint': '输入要翻译的文字...',
+      'selectLanguage': '目标语言',
+      'translateBtn': '翻译',
+      'translating': '翻译中...',
+      'sendingText': '正在发送至 OpenAI',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -677,6 +795,11 @@ class AppLocalizations {
       'htTranscribeTranslate': '文字起こし + 翻訳',
       'htFullCycle': 'フルサイクル',
       'htTts': 'テキスト読み上げ',
+      'translateInputHint': '翻訳するテキストを入力...',
+      'selectLanguage': '翻訳先の言語',
+      'translateBtn': '翻訳する',
+      'translating': '翻訳中...',
+      'sendingText': 'OpenAIに送信中',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -739,6 +862,11 @@ class AppLocalizations {
       'htTranscribeTranslate': '전사 + 번역',
       'htFullCycle': '전체 사이클',
       'htTts': '텍스트 음성 변환',
+      'translateInputHint': '번역할 텍스트를 입력하세요...',
+      'selectLanguage': '대상 언어',
+      'translateBtn': '번역',
+      'translating': '번역 중...',
+      'sendingText': 'OpenAI로 전송 중',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -805,72 +933,11 @@ class AppLocalizations {
       'htTranscribeTranslate': 'Transkrip. + Çevir',
       'htFullCycle': 'Tam Döngü',
       'htTts': 'Metni Sese Dönüştür',
-    },
-
-    // ── Polish ────────────────────────────────────────────────────────────────
-    'pl': {
-      'appTitle': 'Asystent głosowy',
-      'historyTooltip': 'Historia',
-      'settingsTooltip': 'Ustawienia',
-      'apiKeyMissing':
-          'Klucz API OpenAI nie jest ustawiony. Dotknij, aby skonfigurować.',
-      'transcribeAudio': 'Transkrypcja audio',
-      'transcribeAudioSub': 'Głos → Tekst',
-      'translateText': 'Tłumaczenie tekstu',
-      'translateTextSub': 'Tekst → Tłumaczenie',
-      'transcribeAndTranslate': 'Transkrypcja + Tłumaczenie',
-      'transcribeAndTranslateSub': 'Głos → Tekst → Tłumaczenie',
-      'fullCycle': 'Pełny cykl',
-      'fullCycleSub': 'Głos → Tekst → Tłumaczenie → Głos',
-      'textToVoice': 'Tekst na głos',
-      'textToVoiceSub': 'Tekst → Audio',
-      'comingSoon': 'Zostanie dodane w następnym etapie',
-      'tapToRecord': 'Dotknij, aby rozpocząć nagrywanie',
-      'anyLanguage': 'Obsługiwane są wszystkie języki',
-      'tapToStop': 'Dotknij, aby zatrzymać',
-      'transcribing': 'Transkrypcja...',
-      'sendingAudio': 'Wysyłanie audio do OpenAI',
-      'result': 'Wynik',
-      'copy': 'Kopiuj',
-      'copyOriginal': 'Kopiuj oryginał',
-      'copyTranslation': 'Kopiuj tłumaczenie',
-      'again': 'Ponownie',
-      'copied': 'Skopiowano',
-      'errorOccurred': 'Wystąpił błąd',
-      'unknownError': 'Nieznany błąd',
-      'tryAgain': 'Spróbuj ponownie',
-      'noMicPermission':
-          'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
-      'settingsTitle': 'Ustawienia',
-      'apiKeyLabel': 'Klucz API OpenAI',
-      'apiKeyDescription':
-          'Używany do transkrypcji, tłumaczenia i syntezy mowy. '
-              'Uzyskaj klucz na platform.openai.com',
-      'save': 'Zapisz',
-      'enterApiKey': 'Wprowadź klucz API',
-      'apiKeySaved': 'Klucz API zapisany',
-      'deleteKey': 'Usuń klucz',
-      'apiKeyDeleted': 'Klucz API usunięty',
-      'interfaceLanguage': 'Język interfejsu',
-      'cancel': 'Anuluj',
-      'historyTitle': 'Historia',
-      'clearAll': 'Wyczyść wszystko',
-      'clearHistoryTitle': 'Wyczyścić historię?',
-      'clearHistoryMsg':
-          'Wszystkie rekordy zostaną usunięte. Tej operacji nie można cofnąć.',
-      'delete': 'Usuń',
-      'historyEmpty': 'Historia jest pusta',
-      'historyEmptySub': 'Wyniki operacji będą tu zapisywane',
-      'deleteRecordTitle': 'Usunąć rekord?',
-      'deleteRecordMsg': 'Ten rekord zostanie usunięty z historii.',
-      'deleteEntry': 'Usuń wpis',
-      'original': 'ORYGINAŁ',
-      'translation': 'TŁUMACZENIE',
-      'htTranscription': 'Transkrypcja',
-      'htTranslation': 'Tłumaczenie tekstu',
-      'htTranscribeTranslate': 'Transkr. + Tłumacz.',
-      'htFullCycle': 'Pełny cykl',
-      'htTts': 'Tekst na głos',
+      'translateInputHint': 'Çevrilecek metni girin...',
+      'selectLanguage': 'Hedef dil',
+      'translateBtn': 'Çevir',
+      'translating': 'Çeviriliyor...',
+      'sendingText': "OpenAI'ye gönderiliyor",
     },
   };
 }

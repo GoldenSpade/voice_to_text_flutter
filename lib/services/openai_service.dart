@@ -28,7 +28,7 @@ class OpenAIService {
     throw Exception(message ?? 'HTTP ${streamed.statusCode}');
   }
 
-  Future<String> translateText(String text, String targetLanguageCode) async {
+  Future<String> translateText(String text, String targetLanguage) async {
     final response = await http.post(
       Uri.parse('https://api.openai.com/v1/chat/completions'),
       headers: {
@@ -42,7 +42,7 @@ class OpenAIService {
           {
             'role': 'system',
             'content':
-                'Translate the following text to the language with ISO code "$targetLanguageCode". '
+                'Translate the following text to $targetLanguage. '
                     'Return only the translated text, no explanations.',
           },
           {'role': 'user', 'content': text},

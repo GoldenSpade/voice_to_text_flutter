@@ -4,6 +4,7 @@ import '../providers/app_state.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'transcription_screen.dart';
+import 'translation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -67,14 +68,21 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.translateText,
                     subtitle: l10n.translateTextSub,
                     color: const Color(0xFF0F3460),
-                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
+                    onTap: hasKey
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const TranslationScreen(),
+                              ),
+                            )
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(
                     icon: Icons.language,
                     label: l10n.transcribeAndTranslate,
                     subtitle: l10n.transcribeAndTranslateSub,
-                    color: const Color(0xFF16213E),
+                    color: const Color(0xFF1E3254),
                     onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                   const SizedBox(height: 12),
@@ -82,7 +90,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.record_voice_over,
                     label: l10n.fullCycle,
                     subtitle: l10n.fullCycleSub,
-                    color: const Color(0xFF1A1A2E),
+                    color: const Color(0xFF1B3A6B),
                     onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                   const SizedBox(height: 12),

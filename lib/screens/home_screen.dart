@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.mic,
                     label: l10n.transcribeAudio,
                     subtitle: l10n.transcribeAudioSub,
-                    color: const Color(0xFF533483),
+                    color: const Color(0xFF7f2774),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -69,7 +69,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.translate,
                     label: l10n.translateText,
                     subtitle: l10n.translateTextSub,
-                    color: const Color(0xFF0F3460),
+                    color: const Color(0xFF9a4362),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -84,7 +84,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.language,
                     label: l10n.transcribeAndTranslate,
                     subtitle: l10n.transcribeAndTranslateSub,
-                    color: const Color(0xFF1E3254),
+                    color: const Color(0xFF6a3a55),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -100,7 +100,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.record_voice_over,
                     label: l10n.fullCycle,
                     subtitle: l10n.fullCycleSub,
-                    color: const Color(0xFF1B3A6B),
+                    color: const Color(0xFF363973),
                     onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                   const SizedBox(height: 12),

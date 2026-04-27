@@ -1,61 +1,158 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:record/record.dart';
 import '../models/history_item.dart';
 import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
 
-enum _State { idle, processing, result, error }
+enum _State { idle, recording, transcribing, translating, result, error }
 
-class TranslationScreen extends StatefulWidget {
-  const TranslationScreen({super.key});
+class TranscriptionTranslationScreen extends StatefulWidget {
+  const TranscriptionTranslationScreen({super.key});
 
   @override
-  State<TranslationScreen> createState() => _TranslationScreenState();
+  State<TranscriptionTranslationScreen> createState() =>
+      _TranscriptionTranslationScreenState();
 }
 
-class _TranslationScreenState extends State<TranslationScreen> {
-  final _controller = TextEditingController();
+class _TranscriptionTranslationScreenState
+    extends State<TranscriptionTranslationScreen>
+    with SingleTickerProviderStateMixin {
+  final _recorder = AudioRecorder();
   _State _state = _State.idle;
-  String? _resultText;
+  String? _transcribedText;
+  String? _translatedText;
   String? _errorMessage;
+  Timer? _timer;
+  int _seconds = 0;
   var _lang = kTranslationLanguages[1]; // default: Russian
+
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.18).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pulseController.dispose();
+    _timer?.cancel();
+    _recorder.dispose();
     super.dispose();
   }
 
-  Future<void> _translate() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
+  Future<void> _startRecording() async {
+    final l10n = context.read<AppState>().l10n;
+    final hasPermission = await _recorder.hasPermission();
+    if (!hasPermission) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.noMicPermission)),
+        );
+      }
+      return;
+    }
 
+    final dir = await getTemporaryDirectory();
+    final path =
+        '${dir.path}/rec_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
+    await _recorder.start(
+      const RecordConfig(
+        encoder: AudioEncoder.aacLc,
+        sampleRate: 16000,
+        numChannels: 1,
+      ),
+      path: path,
+    );
+
+    _seconds = 0;
+    _timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) {
+        if (mounted) setState(() => _seconds++);
+      },
+    );
+
+    _pulseController.repeat(reverse: true);
+    setState(() => _state = _State.recording);
+  }
+
+  Future<void> _stopRecording() async {
+    _timer?.cancel();
+    _pulseController.stop();
+    _pulseController.reset();
+
+    final path = await _recorder.stop();
+    if (path == null) {
+      final l10n = context.read<AppState>().l10n;
+      setState(() {
+        _state = _State.error;
+        _errorMessage = l10n.unknownError;
+      });
+      return;
+    }
+
+    setState(() => _state = _State.transcribing);
+
+    final service = OpenAIService(context.read<AppState>().apiKey);
+
+    // Step 1: Transcribe
+    String transcribed;
+    try {
+      transcribed = await service.transcribeAudio(path);
+      try {
+        File(path).deleteSync();
+      } catch (_) {}
+    } catch (e) {
+      try {
+        File(path).deleteSync();
+      } catch (_) {}
+      if (mounted) {
+        setState(() {
+          _state = _State.error;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+      return;
+    }
+
+    if (!mounted) return;
     setState(() {
-      _state = _State.processing;
-      _resultText = null;
-      _errorMessage = null;
+      _transcribedText = transcribed;
+      _state = _State.translating;
     });
 
-    final appState = context.read<AppState>();
+    // Step 2: Translate
     try {
-      final result =
-          await OpenAIService(appState.apiKey).translateText(text, _lang.$3);
-
+      final translated = await service.translateText(transcribed, _lang.$3);
       if (mounted) {
         context.read<HistoryService>().add(HistoryItem(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
-              type: HistoryType.translation,
+              type: HistoryType.transcriptionTranslation,
               createdAt: DateTime.now(),
-              result: result,
-              original: text,
+              result: translated,
+              original: transcribed,
               languageName: _lang.$2,
             ));
         setState(() {
           _state = _State.result;
-          _resultText = result;
+          _translatedText = translated;
         });
       }
     } catch (e) {
@@ -67,6 +164,10 @@ class _TranslationScreenState extends State<TranslationScreen> {
       }
     }
   }
+
+  String _formatTime(int s) =>
+      '${(s ~/ 60).toString().padLeft(2, '0')}:'
+      '${(s % 60).toString().padLeft(2, '0')}';
 
   void _showLanguagePicker() {
     showModalBottomSheet(
@@ -90,7 +191,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
     final l10n = context.watch<AppState>().l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.translateText),
+        title: Text(l10n.transcribeAndTranslate),
         backgroundColor: const Color(0xFF0F3460),
         foregroundColor: Colors.white,
       ),
@@ -101,41 +202,22 @@ class _TranslationScreenState extends State<TranslationScreen> {
   Widget _buildBody(l10n) {
     return switch (_state) {
       _State.idle => _buildIdle(l10n),
-      _State.processing => _buildProcessing(l10n),
+      _State.recording => _buildRecording(l10n),
+      _State.transcribing =>
+        _buildProcessing(l10n.transcribing, l10n.sendingAudio),
+      _State.translating =>
+        _buildProcessing(l10n.translating, l10n.sendingText),
       _State.result => _buildResult(l10n),
       _State.error => _buildError(l10n),
     };
   }
 
   Widget _buildIdle(l10n) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _controller,
-              maxLines: null,
-              expands: true,
-              textAlignVertical: TextAlignVertical.top,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 15, height: 1.6),
-              decoration: InputDecoration(
-                hintText: l10n.translateInputHint,
-                hintStyle:
-                    TextStyle(color: Colors.white.withOpacity(0.3)),
-                filled: true,
-                fillColor: const Color(0xFF16213E),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.all(16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          InkWell(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: InkWell(
             onTap: _showLanguagePicker,
             borderRadius: BorderRadius.circular(12),
             child: Container(
@@ -169,34 +251,103 @@ class _TranslationScreenState extends State<TranslationScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: _controller,
-            builder: (_, value, __) => SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: value.text.trim().isEmpty ? null : _translate,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF533483),
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor:
-                      const Color(0xFF533483).withOpacity(0.35),
-                  disabledForegroundColor: Colors.white38,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+        ),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: _startRecording,
+                  child: Container(
+                    width: 128,
+                    height: 128,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF533483),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF533483).withOpacity(0.45),
+                          blurRadius: 28,
+                          spreadRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child:
+                        const Icon(Icons.mic, color: Colors.white, size: 56),
+                  ),
                 ),
-                child: Text(l10n.translateBtn,
-                    style: const TextStyle(fontSize: 16)),
+                const SizedBox(height: 28),
+                Text(
+                  l10n.tapToRecord,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.anyLanguage,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.45),
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecording(l10n) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ScaleTransition(
+            scale: _pulseAnimation,
+            child: GestureDetector(
+              onTap: _stopRecording,
+              child: Container(
+                width: 128,
+                height: 128,
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.redAccent.withOpacity(0.5),
+                      blurRadius: 36,
+                      spreadRadius: 10,
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.stop_rounded,
+                    color: Colors.white, size: 56),
               ),
             ),
+          ),
+          const SizedBox(height: 32),
+          Text(
+            _formatTime(_seconds),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 40,
+              fontWeight: FontWeight.w200,
+              letterSpacing: 6,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.tapToStop,
+            style: TextStyle(
+                color: Colors.white.withOpacity(0.55), fontSize: 14),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProcessing(l10n) {
+  Widget _buildProcessing(String title, String subtitle) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -208,10 +359,10 @@ class _TranslationScreenState extends State<TranslationScreen> {
                 strokeWidth: 3, color: Color(0xFF533483)),
           ),
           const SizedBox(height: 32),
-          Text(l10n.translating,
+          Text(title,
               style: const TextStyle(color: Colors.white, fontSize: 17)),
           const SizedBox(height: 8),
-          Text(l10n.sendingText,
+          Text(subtitle,
               style:
                   const TextStyle(color: Colors.white54, fontSize: 13)),
         ],
@@ -237,7 +388,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               ),
               child: SingleChildScrollView(
                 child: SelectableText(
-                  _controller.text.trim(),
+                  _transcribedText ?? '',
                   style: const TextStyle(
                       color: Colors.white70, fontSize: 14, height: 1.6),
                 ),
@@ -257,7 +408,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               ),
               child: SingleChildScrollView(
                 child: SelectableText(
-                  _resultText ?? '',
+                  _translatedText ?? '',
                   style: const TextStyle(
                       color: Colors.white, fontSize: 14, height: 1.6),
                 ),
@@ -270,7 +421,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               Expanded(
                 child: _CopyButton(
                   label: l10n.copyOriginal,
-                  text: _controller.text.trim(),
+                  text: _transcribedText ?? '',
                   parentContext: context,
                   snackLabel: l10n.copied,
                 ),
@@ -279,7 +430,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               Expanded(
                 child: _CopyButton(
                   label: l10n.copyTranslation,
-                  text: _resultText ?? '',
+                  text: _translatedText ?? '',
                   parentContext: context,
                   snackLabel: l10n.copied,
                 ),
@@ -292,9 +443,11 @@ class _TranslationScreenState extends State<TranslationScreen> {
             child: OutlinedButton.icon(
               onPressed: () => setState(() {
                 _state = _State.idle;
-                _resultText = null;
+                _transcribedText = null;
+                _translatedText = null;
+                _seconds = 0;
               }),
-              icon: const Icon(Icons.translate, size: 18),
+              icon: const Icon(Icons.mic, size: 18),
               label: Text(l10n.again),
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
@@ -341,6 +494,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               onPressed: () => setState(() {
                 _state = _State.idle;
                 _errorMessage = null;
+                _seconds = 0;
               }),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF533483),

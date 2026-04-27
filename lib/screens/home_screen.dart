@@ -4,6 +4,7 @@ import '../providers/app_state.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'transcription_screen.dart';
+import 'transcription_translation_screen.dart';
 import 'translation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -83,7 +84,15 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.transcribeAndTranslate,
                     subtitle: l10n.transcribeAndTranslateSub,
                     color: const Color(0xFF1E3254),
-                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
+                    onTap: hasKey
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    const TranscriptionTranslationScreen(),
+                              ),
+                            )
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(

@@ -42,6 +42,7 @@ class HistoryItem {
   final String? original;
   final String? languageName;
   final String? voiceName;
+  final String? audioFilePath;
 
   const HistoryItem({
     required this.id,
@@ -51,6 +52,7 @@ class HistoryItem {
     this.original,
     this.languageName,
     this.voiceName,
+    this.audioFilePath,
   });
 
   Map<String, dynamic> toJson() => {
@@ -61,6 +63,7 @@ class HistoryItem {
         if (original != null) 'original': original,
         if (languageName != null) 'languageName': languageName,
         if (voiceName != null) 'voiceName': voiceName,
+        if (audioFilePath != null) 'audioFilePath': audioFilePath,
       };
 
   factory HistoryItem.fromJson(Map<String, dynamic> json) => HistoryItem(
@@ -74,5 +77,6 @@ class HistoryItem {
         original: json['original'] as String?,
         languageName: json['languageName'] as String?,
         voiceName: json['voiceName'] as String?,
+        audioFilePath: json['audioFilePath'] as String?,
       );
 }

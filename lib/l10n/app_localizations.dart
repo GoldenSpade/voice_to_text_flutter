@@ -87,6 +87,7 @@ class AppLocalizations {
   String get pause => _t('pause');
   String get download => _t('download');
   String get saved => _t('saved');
+  String get share => _t('share');
 
   // ── History screen ────────────────────────────────────────────────────────
   String get historyTitle => _t('historyTitle');
@@ -190,6 +191,7 @@ class AppLocalizations {
       'pause': 'Pause',
       'download': 'Download',
       'saved': 'Saved',
+      'share': 'Share',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -269,6 +271,7 @@ class AppLocalizations {
       'pause': 'Пауза',
       'download': 'Скачать',
       'saved': 'Сохранено',
+      'share': 'Поделиться',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -349,6 +352,7 @@ class AppLocalizations {
       'pause': 'Pause',
       'download': 'Herunterladen',
       'saved': 'Gespeichert',
+      'share': 'Teilen',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -430,6 +434,7 @@ class AppLocalizations {
       'pause': 'Pause',
       'download': 'Télécharger',
       'saved': 'Enregistré',
+      'share': 'Partager',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -510,6 +515,7 @@ class AppLocalizations {
       'pause': 'Pausa',
       'download': 'Descargar',
       'saved': 'Guardado',
+      'share': 'Compartir',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -590,6 +596,7 @@ class AppLocalizations {
       'pause': 'Pausa',
       'download': 'Scarica',
       'saved': 'Salvato',
+      'share': 'Condividi',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -670,6 +677,7 @@ class AppLocalizations {
       'pause': 'Pausar',
       'download': 'Baixar',
       'saved': 'Salvo',
+      'share': 'Compartilhar',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -750,6 +758,7 @@ class AppLocalizations {
       'pause': 'Wstrzymaj',
       'download': 'Pobierz',
       'saved': 'Zapisano',
+      'share': 'Udostępnij',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -825,6 +834,7 @@ class AppLocalizations {
       'pause': '暂停',
       'download': '下载',
       'saved': '已保存',
+      'share': '分享',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -901,6 +911,7 @@ class AppLocalizations {
       'pause': '一時停止',
       'download': 'ダウンロード',
       'saved': '保存しました',
+      'share': '共有',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -977,6 +988,7 @@ class AppLocalizations {
       'pause': '일시정지',
       'download': '다운로드',
       'saved': '저장됨',
+      'share': '공유',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1057,6 +1069,7 @@ class AppLocalizations {
       'pause': 'Duraklat',
       'download': 'İndir',
       'saved': 'Kaydedildi',
+      'share': 'Paylaş',
     },
   };
 }

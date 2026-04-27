@@ -46,10 +46,12 @@ class _TtsScreenState extends State<TtsScreen> {
     super.initState();
     _playerSub = _player.playerStateStream.listen((s) {
       if (!mounted) return;
-      setState(() => _isPlaying = s.playing);
       if (s.processingState == ProcessingState.completed) {
+        _player.pause();
         _player.seek(Duration.zero);
         setState(() => _isPlaying = false);
+      } else {
+        setState(() => _isPlaying = s.playing);
       }
     });
   }
@@ -90,6 +92,7 @@ class _TtsScreenState extends State<TtsScreen> {
               createdAt: DateTime.now(),
               result: text,
               voiceName: _voice.$1,
+              audioFilePath: path,
             ));
         setState(() {
           _state = _State.ready;
@@ -120,8 +123,7 @@ class _TtsScreenState extends State<TtsScreen> {
   Future<void> _download(String savedLabel) async {
     if (_filePath == null) return;
     try {
-      final dir = await getDownloadsDirectory() ??
-          await getApplicationDocumentsDirectory();
+      final dir = await _resolveDownloadsDir();
       final ts = DateTime.now().millisecondsSinceEpoch;
       final name = 'tts_${_voice.$1}_$ts.mp3';
       await File(_filePath!).copy('${dir.path}/$name');
@@ -129,11 +131,30 @@ class _TtsScreenState extends State<TtsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('$savedLabel: $name'),
-            duration: const Duration(seconds: 2),
+            duration: const Duration(seconds: 3),
           ),
         );
       }
-    } catch (_) {}
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<Directory> _resolveDownloadsDir() async {
+    const androidDownloads = '/storage/emulated/0/Download';
+    if (Directory(androidDownloads).existsSync()) {
+      return Directory(androidDownloads);
+    }
+    final d = await getDownloadsDirectory();
+    if (d != null) return d;
+    return getApplicationDocumentsDirectory();
   }
 
   void _showVoicePicker() {

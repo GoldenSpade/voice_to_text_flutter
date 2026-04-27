@@ -15,6 +15,13 @@ class HistoryService extends ChangeNotifier {
     return File('${dir.path}/history.json');
   }
 
+  Future<Directory> _audioDir() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final audioDir = Directory('${dir.path}/audio');
+    if (!audioDir.existsSync()) audioDir.createSync(recursive: true);
+    return audioDir;
+  }
+
   Future<void> load() async {
     try {
       final file = await _file();
@@ -31,22 +38,70 @@ class HistoryService extends ChangeNotifier {
   }
 
   Future<void> add(HistoryItem item) async {
-    _items.insert(0, item);
-    if (_items.length > _maxItems) _items.removeLast();
+    HistoryItem savedItem = item;
+
+    if (item.audioFilePath != null) {
+      try {
+        final audioDir = await _audioDir();
+        final fileName = item.audioFilePath!.split('/').last;
+        final dest = '${audioDir.path}/$fileName';
+        await File(item.audioFilePath!).copy(dest);
+        savedItem = HistoryItem(
+          id: item.id,
+          type: item.type,
+          createdAt: item.createdAt,
+          result: item.result,
+          original: item.original,
+          languageName: item.languageName,
+          voiceName: item.voiceName,
+          audioFilePath: dest,
+        );
+      } catch (_) {
+        savedItem = HistoryItem(
+          id: item.id,
+          type: item.type,
+          createdAt: item.createdAt,
+          result: item.result,
+          original: item.original,
+          languageName: item.languageName,
+          voiceName: item.voiceName,
+        );
+      }
+    }
+
+    _items.insert(0, savedItem);
+    if (_items.length > _maxItems) {
+      _deleteAudioFile(_items.removeLast());
+    }
     notifyListeners();
     await _persist();
   }
 
   Future<void> delete(String id) async {
-    _items.removeWhere((e) => e.id == id);
+    final idx = _items.indexWhere((e) => e.id == id);
+    if (idx != -1) {
+      _deleteAudioFile(_items[idx]);
+      _items.removeAt(idx);
+    }
     notifyListeners();
     await _persist();
   }
 
   Future<void> clear() async {
+    for (final item in _items) {
+      _deleteAudioFile(item);
+    }
     _items.clear();
     notifyListeners();
     await _persist();
+  }
+
+  void _deleteAudioFile(HistoryItem item) {
+    if (item.audioFilePath != null) {
+      try {
+        File(item.audioFilePath!).deleteSync();
+      } catch (_) {}
+    }
   }
 
   Future<void> _persist() async {

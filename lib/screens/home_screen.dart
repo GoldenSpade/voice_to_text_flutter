@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
 import 'settings_screen.dart';
+import 'transcription_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -39,7 +40,14 @@ class HomeScreen extends StatelessWidget {
                     label: 'Транскрибация аудио',
                     subtitle: 'Голос → Текст',
                     color: const Color(0xFF533483),
-                    onTap: hasKey ? () => _notImplemented(context) : null,
+                    onTap: hasKey
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const TranscriptionScreen(),
+                              ),
+                            )
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(

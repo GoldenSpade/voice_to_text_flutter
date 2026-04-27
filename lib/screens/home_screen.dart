@@ -55,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.mic,
                     label: l10n.transcribeAudio,
                     subtitle: l10n.transcribeAudioSub,
-                    color: const Color(0xFF7f2774),
+                    color: const Color(0xFF3D5A80),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.translate,
                     label: l10n.translateText,
                     subtitle: l10n.translateTextSub,
-                    color: const Color(0xFF9a4362),
+                    color: const Color(0xFF6B4E71),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -85,7 +85,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.language,
                     label: l10n.transcribeAndTranslate,
                     subtitle: l10n.transcribeAndTranslateSub,
-                    color: const Color(0xFF6a3a55),
+                    color: const Color(0xFF2D6A4F),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -101,7 +101,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.record_voice_over,
                     label: l10n.fullCycle,
                     subtitle: l10n.fullCycleSub,
-                    color: const Color(0xFF363973),
+                    color: const Color(0xFF8B4049),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -116,7 +116,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.volume_up,
                     label: l10n.textToVoice,
                     subtitle: l10n.textToVoiceSub,
-                    color: const Color(0xFF533483),
+                    color: const Color(0xFF7B5E3A),
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,

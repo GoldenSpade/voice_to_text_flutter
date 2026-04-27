@@ -6,6 +6,7 @@ import 'settings_screen.dart';
 import 'transcription_screen.dart';
 import 'transcription_translation_screen.dart';
 import 'translation_screen.dart';
+import 'tts_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -108,7 +109,14 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.textToVoice,
                     subtitle: l10n.textToVoiceSub,
                     color: const Color(0xFF533483),
-                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
+                    onTap: hasKey
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const TtsScreen(),
+                              ),
+                            )
+                        : null,
                   ),
                 ],
               ),

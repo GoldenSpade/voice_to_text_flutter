@@ -77,6 +77,17 @@ class AppLocalizations {
   String get translating => _t('translating');
   String get sendingText => _t('sendingText');
 
+  // ── TTS screen ────────────────────────────────────────────────────────────
+  String get enterTextToSpeak => _t('enterTextToSpeak');
+  String get selectVoice => _t('selectVoice');
+  String get generateSpeech => _t('generateSpeech');
+  String get generating => _t('generating');
+  String get sendingForSpeech => _t('sendingForSpeech');
+  String get play => _t('play');
+  String get pause => _t('pause');
+  String get download => _t('download');
+  String get saved => _t('saved');
+
   // ── History screen ────────────────────────────────────────────────────────
   String get historyTitle => _t('historyTitle');
   String get clearAll => _t('clearAll');
@@ -170,6 +181,15 @@ class AppLocalizations {
       'translateBtn': 'Translate',
       'translating': 'Translating...',
       'sendingText': 'Sending to OpenAI',
+      'enterTextToSpeak': 'Enter text to convert to speech...',
+      'selectVoice': 'Voice',
+      'generateSpeech': 'Generate Speech',
+      'generating': 'Generating...',
+      'sendingForSpeech': 'Sending to OpenAI TTS',
+      'play': 'Play',
+      'pause': 'Pause',
+      'download': 'Download',
+      'saved': 'Saved',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -240,6 +260,15 @@ class AppLocalizations {
       'translateBtn': 'Перевести',
       'translating': 'Переводим...',
       'sendingText': 'Отправляем запрос в OpenAI',
+      'enterTextToSpeak': 'Введите текст для синтеза речи...',
+      'selectVoice': 'Голос',
+      'generateSpeech': 'Синтезировать речь',
+      'generating': 'Генерируем...',
+      'sendingForSpeech': 'Отправляем в OpenAI TTS',
+      'play': 'Воспроизвести',
+      'pause': 'Пауза',
+      'download': 'Скачать',
+      'saved': 'Сохранено',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -311,6 +340,15 @@ class AppLocalizations {
       'translateBtn': 'Übersetzen',
       'translating': 'Übersetzen...',
       'sendingText': 'An OpenAI senden',
+      'enterTextToSpeak': 'Text für Sprachsynthese eingeben...',
+      'selectVoice': 'Stimme',
+      'generateSpeech': 'Sprache generieren',
+      'generating': 'Generieren...',
+      'sendingForSpeech': 'An OpenAI TTS senden',
+      'play': 'Abspielen',
+      'pause': 'Pause',
+      'download': 'Herunterladen',
+      'saved': 'Gespeichert',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -383,6 +421,15 @@ class AppLocalizations {
       'translateBtn': 'Traduire',
       'translating': 'Traduction...',
       'sendingText': 'Envoi à OpenAI',
+      'enterTextToSpeak': 'Saisir le texte à convertir en parole...',
+      'selectVoice': 'Voix',
+      'generateSpeech': 'Générer la voix',
+      'generating': 'Génération...',
+      'sendingForSpeech': 'Envoi à OpenAI TTS',
+      'play': 'Lire',
+      'pause': 'Pause',
+      'download': 'Télécharger',
+      'saved': 'Enregistré',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -454,6 +501,15 @@ class AppLocalizations {
       'translateBtn': 'Traducir',
       'translating': 'Traduciendo...',
       'sendingText': 'Enviando a OpenAI',
+      'enterTextToSpeak': 'Ingresa el texto para convertir a voz...',
+      'selectVoice': 'Voz',
+      'generateSpeech': 'Generar voz',
+      'generating': 'Generando...',
+      'sendingForSpeech': 'Enviando a OpenAI TTS',
+      'play': 'Reproducir',
+      'pause': 'Pausa',
+      'download': 'Descargar',
+      'saved': 'Guardado',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -525,6 +581,15 @@ class AppLocalizations {
       'translateBtn': 'Traduci',
       'translating': 'Traduzione...',
       'sendingText': 'Invio a OpenAI',
+      'enterTextToSpeak': 'Inserisci il testo da convertire in voce...',
+      'selectVoice': 'Voce',
+      'generateSpeech': 'Genera voce',
+      'generating': 'Generazione...',
+      'sendingForSpeech': 'Invio a OpenAI TTS',
+      'play': 'Riproduci',
+      'pause': 'Pausa',
+      'download': 'Scarica',
+      'saved': 'Salvato',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -596,6 +661,15 @@ class AppLocalizations {
       'translateBtn': 'Traduzir',
       'translating': 'Traduzindo...',
       'sendingText': 'Enviando para OpenAI',
+      'enterTextToSpeak': 'Digite o texto para converter em fala...',
+      'selectVoice': 'Voz',
+      'generateSpeech': 'Gerar fala',
+      'generating': 'Gerando...',
+      'sendingForSpeech': 'Enviando para OpenAI TTS',
+      'play': 'Reproduzir',
+      'pause': 'Pausar',
+      'download': 'Baixar',
+      'saved': 'Salvo',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -667,6 +741,15 @@ class AppLocalizations {
       'translateBtn': 'Przetłumacz',
       'translating': 'Tłumaczenie...',
       'sendingText': 'Wysyłanie do OpenAI',
+      'enterTextToSpeak': 'Wpisz tekst do przekształcenia w mowę...',
+      'selectVoice': 'Głos',
+      'generateSpeech': 'Generuj mowę',
+      'generating': 'Generowanie...',
+      'sendingForSpeech': 'Wysyłanie do OpenAI TTS',
+      'play': 'Odtwórz',
+      'pause': 'Wstrzymaj',
+      'download': 'Pobierz',
+      'saved': 'Zapisano',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -733,6 +816,15 @@ class AppLocalizations {
       'translateBtn': '翻译',
       'translating': '翻译中...',
       'sendingText': '正在发送至 OpenAI',
+      'enterTextToSpeak': '输入要转换为语音的文字...',
+      'selectVoice': '语音',
+      'generateSpeech': '生成语音',
+      'generating': '生成中...',
+      'sendingForSpeech': '正在发送至 OpenAI TTS',
+      'play': '播放',
+      'pause': '暂停',
+      'download': '下载',
+      'saved': '已保存',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -800,6 +892,15 @@ class AppLocalizations {
       'translateBtn': '翻訳する',
       'translating': '翻訳中...',
       'sendingText': 'OpenAIに送信中',
+      'enterTextToSpeak': '音声に変換するテキストを入力...',
+      'selectVoice': '音声',
+      'generateSpeech': '音声を生成',
+      'generating': '生成中...',
+      'sendingForSpeech': 'OpenAI TTSに送信中',
+      'play': '再生',
+      'pause': '一時停止',
+      'download': 'ダウンロード',
+      'saved': '保存しました',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -867,6 +968,15 @@ class AppLocalizations {
       'translateBtn': '번역',
       'translating': '번역 중...',
       'sendingText': 'OpenAI로 전송 중',
+      'enterTextToSpeak': '음성으로 변환할 텍스트를 입력하세요...',
+      'selectVoice': '음성',
+      'generateSpeech': '음성 생성',
+      'generating': '생성 중...',
+      'sendingForSpeech': 'OpenAI TTS로 전송 중',
+      'play': '재생',
+      'pause': '일시정지',
+      'download': '다운로드',
+      'saved': '저장됨',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -938,6 +1048,15 @@ class AppLocalizations {
       'translateBtn': 'Çevir',
       'translating': 'Çeviriliyor...',
       'sendingText': "OpenAI'ye gönderiliyor",
+      'enterTextToSpeak': 'Sese dönüştürülecek metni girin...',
+      'selectVoice': 'Ses',
+      'generateSpeech': 'Ses Oluştur',
+      'generating': 'Oluşturuluyor...',
+      'sendingForSpeech': "OpenAI TTS'e gönderiliyor",
+      'play': 'Oynat',
+      'pause': 'Duraklat',
+      'download': 'İndir',
+      'saved': 'Kaydedildi',
     },
   };
 }

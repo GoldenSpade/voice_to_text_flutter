@@ -17,11 +17,14 @@ class HomeScreen extends StatelessWidget {
     final state = context.watch<AppState>();
     final l10n = state.l10n;
     final hasKey = state.hasApiKey;
+    final theme = state.buttonTheme;
+    final colors = theme.colors;
 
     return Scaffold(
+      backgroundColor: theme.backgroundColor,
       appBar: AppBar(
         title: Text(l10n.appTitle),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: theme.appBarColor,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -55,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.mic,
                     label: l10n.transcribeAudio,
                     subtitle: l10n.transcribeAudioSub,
-                    color: const Color(0xFF3D5A80),
+                    color: colors[0],
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -70,7 +73,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.translate,
                     label: l10n.translateText,
                     subtitle: l10n.translateTextSub,
-                    color: const Color(0xFF6B4E71),
+                    color: colors[1],
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -85,7 +88,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.language,
                     label: l10n.transcribeAndTranslate,
                     subtitle: l10n.transcribeAndTranslateSub,
-                    color: const Color(0xFF2D6A4F),
+                    color: colors[2],
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -101,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.record_voice_over,
                     label: l10n.fullCycle,
                     subtitle: l10n.fullCycleSub,
-                    color: const Color(0xFF8B4049),
+                    color: colors[3],
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -116,7 +119,7 @@ class HomeScreen extends StatelessWidget {
                     icon: Icons.volume_up,
                     label: l10n.textToVoice,
                     subtitle: l10n.textToVoiceSub,
-                    color: const Color(0xFF7B5E3A),
+                    color: colors[4],
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,

@@ -69,6 +69,13 @@ class AppLocalizations {
   String get apiKeyDeleted => _t('apiKeyDeleted');
   String get interfaceLanguage => _t('interfaceLanguage');
   String get cancel => _t('cancel');
+  String get colorThemeLabel => _t('colorThemeLabel');
+  String get themePastel => _t('themePastel');
+  String get themeVivid => _t('themeVivid');
+  String get themeOcean => _t('themeOcean');
+  String get themeSunset => _t('themeSunset');
+  String get themeMint => _t('themeMint');
+  String get themeLavender => _t('themeLavender');
 
   // ── Translation screen ────────────────────────────────────────────────────
   String get translateInputHint => _t('translateInputHint');
@@ -192,6 +199,13 @@ class AppLocalizations {
       'download': 'Download',
       'saved': 'Saved',
       'share': 'Share',
+      'colorThemeLabel': 'Color Theme',
+      'themePastel': 'Pastel',
+      'themeVivid': 'Vivid',
+      'themeOcean': 'Ocean',
+      'themeSunset': 'Sunset',
+      'themeMint': 'Mint',
+      'themeLavender': 'Lavender',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -272,6 +286,13 @@ class AppLocalizations {
       'download': 'Скачать',
       'saved': 'Сохранено',
       'share': 'Поделиться',
+      'colorThemeLabel': 'Цветовая тема',
+      'themePastel': 'Пастель',
+      'themeVivid': 'Яркая',
+      'themeOcean': 'Океан',
+      'themeSunset': 'Закат',
+      'themeMint': 'Мята',
+      'themeLavender': 'Лаванда',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -353,6 +374,13 @@ class AppLocalizations {
       'download': 'Herunterladen',
       'saved': 'Gespeichert',
       'share': 'Teilen',
+      'colorThemeLabel': 'Farbthema',
+      'themePastel': 'Pastell',
+      'themeVivid': 'Lebhaft',
+      'themeOcean': 'Ozean',
+      'themeSunset': 'Sonnenuntergang',
+      'themeMint': 'Minze',
+      'themeLavender': 'Lavendel',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -435,6 +463,13 @@ class AppLocalizations {
       'download': 'Télécharger',
       'saved': 'Enregistré',
       'share': 'Partager',
+      'colorThemeLabel': 'Thème de couleur',
+      'themePastel': 'Pastel',
+      'themeVivid': 'Vif',
+      'themeOcean': 'Océan',
+      'themeSunset': 'Coucher de soleil',
+      'themeMint': 'Menthe',
+      'themeLavender': 'Lavande',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -516,6 +551,13 @@ class AppLocalizations {
       'download': 'Descargar',
       'saved': 'Guardado',
       'share': 'Compartir',
+      'colorThemeLabel': 'Tema de color',
+      'themePastel': 'Pastel',
+      'themeVivid': 'Vívido',
+      'themeOcean': 'Océano',
+      'themeSunset': 'Atardecer',
+      'themeMint': 'Menta',
+      'themeLavender': 'Lavanda',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -597,6 +639,13 @@ class AppLocalizations {
       'download': 'Scarica',
       'saved': 'Salvato',
       'share': 'Condividi',
+      'colorThemeLabel': 'Tema colore',
+      'themePastel': 'Pastello',
+      'themeVivid': 'Vivace',
+      'themeOcean': 'Oceano',
+      'themeSunset': 'Tramonto',
+      'themeMint': 'Menta',
+      'themeLavender': 'Lavanda',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -678,6 +727,13 @@ class AppLocalizations {
       'download': 'Baixar',
       'saved': 'Salvo',
       'share': 'Compartilhar',
+      'colorThemeLabel': 'Tema de cor',
+      'themePastel': 'Pastel',
+      'themeVivid': 'Vívido',
+      'themeOcean': 'Oceano',
+      'themeSunset': 'Pôr do sol',
+      'themeMint': 'Hortelã',
+      'themeLavender': 'Lavanda',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -759,6 +815,13 @@ class AppLocalizations {
       'download': 'Pobierz',
       'saved': 'Zapisano',
       'share': 'Udostępnij',
+      'colorThemeLabel': 'Motyw kolorystyczny',
+      'themePastel': 'Pastelowy',
+      'themeVivid': 'Żywy',
+      'themeOcean': 'Ocean',
+      'themeSunset': 'Zachód słońca',
+      'themeMint': 'Mięta',
+      'themeLavender': 'Lawenda',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -835,6 +898,13 @@ class AppLocalizations {
       'download': '下载',
       'saved': '已保存',
       'share': '分享',
+      'colorThemeLabel': '颜色主题',
+      'themePastel': '柔和',
+      'themeVivid': '鲜艳',
+      'themeOcean': '海洋',
+      'themeSunset': '日落',
+      'themeMint': '薄荷',
+      'themeLavender': '薰衣草',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -912,6 +982,13 @@ class AppLocalizations {
       'download': 'ダウンロード',
       'saved': '保存しました',
       'share': '共有',
+      'colorThemeLabel': 'カラーテーマ',
+      'themePastel': 'パステル',
+      'themeVivid': '鮮やか',
+      'themeOcean': 'オーシャン',
+      'themeSunset': 'サンセット',
+      'themeMint': 'ミント',
+      'themeLavender': 'ラベンダー',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -989,6 +1066,13 @@ class AppLocalizations {
       'download': '다운로드',
       'saved': '저장됨',
       'share': '공유',
+      'colorThemeLabel': '색상 테마',
+      'themePastel': '파스텔',
+      'themeVivid': '선명한',
+      'themeOcean': '오션',
+      'themeSunset': '선셋',
+      'themeMint': '민트',
+      'themeLavender': '라벤더',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1070,6 +1154,13 @@ class AppLocalizations {
       'download': 'İndir',
       'saved': 'Kaydedildi',
       'share': 'Paylaş',
+      'colorThemeLabel': 'Renk Teması',
+      'themePastel': 'Pastel',
+      'themeVivid': 'Canlı',
+      'themeOcean': 'Okyanus',
+      'themeSunset': 'Gün Batımı',
+      'themeMint': 'Nane',
+      'themeLavender': 'Lavanta',
     },
   };
 }

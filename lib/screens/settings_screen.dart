@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
+import '../models/app_theme.dart';
 import '../providers/app_state.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -51,6 +52,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       Navigator.pop(context);
     }
   }
+
+  String _themeName(AppLocalizations l10n, int i) => switch (i) {
+        0 => l10n.themePastel,
+        1 => l10n.themeVivid,
+        2 => l10n.themeOcean,
+        3 => l10n.themeSunset,
+        4 => l10n.themeMint,
+        _ => l10n.themeLavender,
+      };
 
   void _showLanguagePicker(BuildContext context, AppState state) {
     showDialog(
@@ -201,6 +211,102 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ],
+
+          const SizedBox(height: 32),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 16),
+
+          // ── Color Theme ──────────────────────────────────────────────────
+          Text(
+            l10n.colorThemeLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 14,
+            children: List.generate(kAppThemes.length, (i) {
+              final theme = kAppThemes[i];
+              final selected = state.themeIndex == i;
+              final themeName = _themeName(l10n, i);
+              return GestureDetector(
+                onTap: () => state.saveTheme(i),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: selected ? Colors.white : Colors.white24,
+                          width: selected ? 2 : 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: 88,
+                          height: 108,
+                          child: Column(
+                            children: [
+                              Container(height: 14, color: theme.appBarColor),
+                              Expanded(
+                                child: Container(
+                                  color: theme.backgroundColor,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 6),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: theme.colors
+                                        .map((c) => Container(
+                                              height: 11,
+                                              decoration: BoxDecoration(
+                                                color: c,
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                              ),
+                                            ))
+                                        .toList(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (selected)
+                          const Icon(Icons.check_circle,
+                              color: Colors.white, size: 12),
+                        if (selected) const SizedBox(width: 3),
+                        Text(
+                          themeName,
+                          style: TextStyle(
+                            color:
+                                selected ? Colors.white : Colors.white54,
+                            fontSize: 11,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
 
           const SizedBox(height: 32),
           const Divider(color: Colors.white12),

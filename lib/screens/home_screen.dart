@@ -4,6 +4,7 @@ import '../providers/app_state.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'transcription_screen.dart';
+import 'full_cycle_screen.dart';
 import 'transcription_translation_screen.dart';
 import 'translation_screen.dart';
 import 'tts_screen.dart';
@@ -101,7 +102,14 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.fullCycle,
                     subtitle: l10n.fullCycleSub,
                     color: const Color(0xFF363973),
-                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
+                    onTap: hasKey
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const FullCycleScreen(),
+                              ),
+                            )
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(
@@ -156,11 +164,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  void _notImplemented(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
+
 }
 
 class _MenuButton extends StatelessWidget {

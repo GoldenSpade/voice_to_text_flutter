@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import 'help_screen.dart';
 import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'transcription_screen.dart';
@@ -41,6 +42,14 @@ class HomeScreen extends StatelessWidget {
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: l10n.helpTitle,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HelpScreen()),
             ),
           ),
         ],

@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state.dart';
+import 'history_screen.dart';
 import 'settings_screen.dart';
 import 'transcription_screen.dart';
-import 'history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final hasKey = context.watch<AppState>().hasApiKey;
+    final state = context.watch<AppState>();
+    final l10n = state.l10n;
+    final hasKey = state.hasApiKey;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Voice Assistant'),
+        title: Text(l10n.appTitle),
         backgroundColor: const Color(0xFF0F3460),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'История',
+            tooltip: l10n.historyTooltip,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const HistoryScreen()),
@@ -28,7 +30,7 @@ class HomeScreen extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'Настройки',
+            tooltip: l10n.settingsTooltip,
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const SettingsScreen()),
@@ -38,7 +40,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          if (!hasKey) _ApiKeyBanner(context),
+          if (!hasKey) _ApiKeyBanner(context, l10n.apiKeyMissing),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -47,8 +49,8 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   _MenuButton(
                     icon: Icons.mic,
-                    label: 'Транскрибация аудио',
-                    subtitle: 'Голос → Текст',
+                    label: l10n.transcribeAudio,
+                    subtitle: l10n.transcribeAudioSub,
                     color: const Color(0xFF533483),
                     onTap: hasKey
                         ? () => Navigator.push(
@@ -62,34 +64,34 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _MenuButton(
                     icon: Icons.translate,
-                    label: 'Перевод текста',
-                    subtitle: 'Текст → Переведённый текст',
+                    label: l10n.translateText,
+                    subtitle: l10n.translateTextSub,
                     color: const Color(0xFF0F3460),
-                    onTap: hasKey ? () => _notImplemented(context) : null,
+                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(
                     icon: Icons.language,
-                    label: 'Транскрибация + Перевод',
-                    subtitle: 'Голос → Текст → Перевод',
+                    label: l10n.transcribeAndTranslate,
+                    subtitle: l10n.transcribeAndTranslateSub,
                     color: const Color(0xFF16213E),
-                    onTap: hasKey ? () => _notImplemented(context) : null,
+                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(
                     icon: Icons.record_voice_over,
-                    label: 'Полный цикл',
-                    subtitle: 'Голос → Текст → Перевод → Голос',
+                    label: l10n.fullCycle,
+                    subtitle: l10n.fullCycleSub,
                     color: const Color(0xFF1A1A2E),
-                    onTap: hasKey ? () => _notImplemented(context) : null,
+                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                   const SizedBox(height: 12),
                   _MenuButton(
                     icon: Icons.volume_up,
-                    label: 'Текст в голос',
-                    subtitle: 'Текст → Аудио',
+                    label: l10n.textToVoice,
+                    subtitle: l10n.textToVoiceSub,
                     color: const Color(0xFF533483),
-                    onTap: hasKey ? () => _notImplemented(context) : null,
+                    onTap: hasKey ? () => _notImplemented(context, l10n.comingSoon) : null,
                   ),
                 ],
               ),
@@ -100,7 +102,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _ApiKeyBanner(BuildContext context) {
+  Widget _ApiKeyBanner(BuildContext context, String message) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -110,26 +112,28 @@ class HomeScreen extends StatelessWidget {
         width: double.infinity,
         color: const Color(0xFFB00020),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
-            SizedBox(width: 8),
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.white, size: 18),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'OpenAI API ключ не задан. Нажмите для настройки.',
-                style: TextStyle(color: Colors.white, fontSize: 13),
+                message,
+                style: const TextStyle(color: Colors.white, fontSize: 13),
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
+            const Icon(Icons.arrow_forward_ios,
+                color: Colors.white, size: 14),
           ],
         ),
       ),
     );
   }
 
-  void _notImplemented(BuildContext context) {
+  void _notImplemented(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Будет добавлено в следующем этапе')),
+      SnackBar(content: Text(message)),
     );
   }
 }

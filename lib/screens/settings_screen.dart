@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../providers/app_state.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -29,10 +30,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = context.read<AppState>().l10n;
     final key = _controller.text.trim();
     if (key.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Введите API ключ')),
+        SnackBar(content: Text(l10n.enterApiKey)),
       );
       return;
     }
@@ -41,8 +43,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _saving = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('API ключ сохранён'),
+        SnackBar(
+          content: Text(l10n.apiKeySaved),
           backgroundColor: Colors.green,
         ),
       );
@@ -50,103 +52,203 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _showLanguagePicker(BuildContext context, AppState state) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF16213E),
+        title: Text(
+          state.l10n.interfaceLanguage,
+          style: const TextStyle(color: Colors.white),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            children: AppLocalizations.supportedLanguages.map(((String, String) lang) {
+              final (code, name) = lang;
+              return RadioListTile<String>(
+                value: code,
+                groupValue: state.languageCode,
+                activeColor: const Color(0xFF533483),
+                title: Text(name, style: const TextStyle(color: Colors.white)),
+                onChanged: (val) {
+                  if (val != null) {
+                    state.saveLanguage(val);
+                    Navigator.pop(context);
+                  }
+                },
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              state.l10n.cancel,
+              style: const TextStyle(color: Colors.white54),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    final l10n = state.l10n;
+
+    final currentLangName = AppLocalizations.supportedLanguages
+        .firstWhere(
+          (e) => e.$1 == state.languageCode,
+          orElse: () => ('en', 'English'),
+        )
+        .$2;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Настройки'),
+        title: Text(l10n.settingsTitle),
         backgroundColor: const Color(0xFF0F3460),
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'OpenAI API ключ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
+        children: [
+          // ── API Key ──────────────────────────────────────────────────────
+          Text(
+            l10n.apiKeyLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.apiKeyDescription,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            obscureText: _obscure,
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: 'sk-proj-...',
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+              filled: true,
+              fillColor: const Color(0xFF16213E),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscure ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.white54,
+                ),
+                onPressed: () => setState(() => _obscure = !_obscure),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Используется для транскрибации, перевода и синтеза речи. '
-              'Получить ключ можно на platform.openai.com',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _controller,
-              obscureText: _obscure,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'sk-proj-...',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
-                filled: true,
-                fillColor: const Color(0xFF16213E),
-                border: OutlineInputBorder(
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: _saving ? null : _save,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF533483),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
                 ),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscure ? Icons.visibility_off : Icons.visibility,
-                    color: Colors.white54,
-                  ),
-                  onPressed: () => setState(() => _obscure = !_obscure),
-                ),
+              ),
+              child: _saving
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(l10n.save,
+                      style: const TextStyle(fontSize: 16)),
+            ),
+          ),
+          if (state.hasApiKey) ...[
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () async {
+                await context.read<AppState>().saveApiKey('');
+                _controller.clear();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.apiKeyDeleted)),
+                  );
+                }
+              },
+              child: Text(
+                l10n.deleteKey,
+                style: const TextStyle(color: Colors.redAccent),
               ),
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF533483),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _saving
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Text('Сохранить', style: TextStyle(fontSize: 16)),
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (context.watch<AppState>().hasApiKey)
-              TextButton(
-                onPressed: () async {
-                  await context.read<AppState>().saveApiKey('');
-                  _controller.clear();
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('API ключ удалён')),
-                    );
-                  }
-                },
-                child: const Text(
-                  'Удалить ключ',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-              ),
           ],
-        ),
+
+          const SizedBox(height: 32),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 16),
+
+          // ── Language ─────────────────────────────────────────────────────
+          Text(
+            l10n.interfaceLanguage,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          InkWell(
+            onTap: () => _showLanguagePicker(context, state),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF16213E),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.language,
+                      color: Colors.white54, size: 22),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      currentLangName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white38, size: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -52,13 +52,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   }
 
   Future<void> _startRecording() async {
+    final l10n = context.read<AppState>().l10n;
     final hasPermission = await _recorder.hasPermission();
     if (!hasPermission) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Нет доступа к микрофону. Разрешите в настройках телефона.'),
-          ),
+          SnackBar(content: Text(l10n.noMicPermission)),
         );
       }
       return;
@@ -80,7 +79,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     _seconds = 0;
     _timer = Timer.periodic(
       const Duration(seconds: 1),
-      (_) { if (mounted) setState(() => _seconds++); },
+      (_) {
+        if (mounted) setState(() => _seconds++);
+      },
     );
 
     _pulseController.repeat(reverse: true);
@@ -94,19 +95,23 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
 
     final path = await _recorder.stop();
     if (path == null) {
+      final l10n = context.read<AppState>().l10n;
       setState(() {
         _state = _State.error;
-        _errorMessage = 'Не удалось сохранить запись';
+        _errorMessage = l10n.unknownError;
       });
       return;
     }
 
     setState(() => _state = _State.processing);
 
-    final apiKey = context.read<AppState>().apiKey;
+    final appState = context.read<AppState>();
     try {
-      final text = await OpenAIService(apiKey).transcribeAudio(path);
-      try { File(path).deleteSync(); } catch (_) {}
+      final text =
+          await OpenAIService(appState.apiKey).transcribeAudio(path);
+      try {
+        File(path).deleteSync();
+      } catch (_) {}
       if (mounted) {
         context.read<HistoryService>().add(HistoryItem(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -120,7 +125,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         });
       }
     } catch (e) {
-      try { File(path).deleteSync(); } catch (_) {}
+      try {
+        File(path).deleteSync();
+      } catch (_) {}
       if (mounted) {
         setState(() {
           _state = _State.error;
@@ -131,31 +138,33 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   }
 
   String _formatTime(int s) =>
-      '${(s ~/ 60).toString().padLeft(2, '0')}:${(s % 60).toString().padLeft(2, '0')}';
+      '${(s ~/ 60).toString().padLeft(2, '0')}:'
+      '${(s % 60).toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<AppState>().l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Транскрибация аудио'),
+        title: Text(l10n.transcribeAudio),
         backgroundColor: const Color(0xFF0F3460),
         foregroundColor: Colors.white,
       ),
-      body: SafeArea(child: _buildBody()),
+      body: SafeArea(child: _buildBody(l10n)),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(l10n) {
     return switch (_state) {
-      _State.idle => _buildIdle(),
-      _State.recording => _buildRecording(),
-      _State.processing => _buildProcessing(),
-      _State.result => _buildResult(),
-      _State.error => _buildError(),
+      _State.idle => _buildIdle(l10n),
+      _State.recording => _buildRecording(l10n),
+      _State.processing => _buildProcessing(l10n),
+      _State.result => _buildResult(l10n),
+      _State.error => _buildError(l10n),
     };
   }
 
-  Widget _buildIdle() {
+  Widget _buildIdle(l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -180,13 +189,13 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
             ),
           ),
           const SizedBox(height: 28),
-          const Text(
-            'Нажмите, чтобы начать запись',
-            style: TextStyle(color: Colors.white, fontSize: 16),
+          Text(
+            l10n.tapToRecord,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
           const SizedBox(height: 8),
           Text(
-            'Поддерживаются любые языки',
+            l10n.anyLanguage,
             style: TextStyle(
               color: Colors.white.withOpacity(0.45),
               fontSize: 13,
@@ -197,7 +206,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     );
   }
 
-  Widget _buildRecording() {
+  Widget _buildRecording(l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -240,7 +249,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
           ),
           const SizedBox(height: 12),
           Text(
-            'Нажмите для остановки',
+            l10n.tapToStop,
             style: TextStyle(
               color: Colors.white.withOpacity(0.55),
               fontSize: 14,
@@ -251,12 +260,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     );
   }
 
-  Widget _buildProcessing() {
-    return const Center(
+  Widget _buildProcessing(l10n) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
+          const SizedBox(
             width: 64,
             height: 64,
             child: CircularProgressIndicator(
@@ -264,34 +273,35 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               color: Color(0xFF533483),
             ),
           ),
-          SizedBox(height: 32),
+          const SizedBox(height: 32),
           Text(
-            'Транскрибация...',
-            style: TextStyle(color: Colors.white, fontSize: 17),
+            l10n.transcribing,
+            style: const TextStyle(color: Colors.white, fontSize: 17),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Отправляем аудио в OpenAI',
-            style: TextStyle(color: Colors.white54, fontSize: 13),
+            l10n.sendingAudio,
+            style: const TextStyle(color: Colors.white54, fontSize: 13),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildResult() {
+  Widget _buildResult(l10n) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.check_circle_outline, color: Colors.greenAccent, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.check_circle_outline,
+                  color: Colors.greenAccent, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Результат',
-                style: TextStyle(
+                l10n.result,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -326,16 +336,17 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    Clipboard.setData(ClipboardData(text: _resultText ?? ''));
+                    Clipboard.setData(
+                        ClipboardData(text: _resultText ?? ''));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Скопировано'),
-                        duration: Duration(seconds: 1),
+                      SnackBar(
+                        content: Text(l10n.copied),
+                        duration: const Duration(seconds: 1),
                       ),
                     );
                   },
                   icon: const Icon(Icons.copy, size: 18),
-                  label: const Text('Копировать'),
+                  label: Text(l10n.copy),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF533483),
                     foregroundColor: Colors.white,
@@ -355,7 +366,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                     _seconds = 0;
                   }),
                   icon: const Icon(Icons.mic, size: 18),
-                  label: const Text('Снова'),
+                  label: Text(l10n.again),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: BorderSide(color: Colors.white.withOpacity(0.3)),
@@ -373,18 +384,19 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     );
   }
 
-  Widget _buildError() {
+  Widget _buildError(l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.redAccent, size: 64),
+            const Icon(Icons.error_outline,
+                color: Colors.redAccent, size: 64),
             const SizedBox(height: 20),
-            const Text(
-              'Произошла ошибка',
-              style: TextStyle(
+            Text(
+              l10n.errorOccurred,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -392,7 +404,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
             ),
             const SizedBox(height: 12),
             Text(
-              _errorMessage ?? 'Неизвестная ошибка',
+              _errorMessage ?? l10n.unknownError,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.6),
@@ -411,14 +423,11 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                 backgroundColor: const Color(0xFF533483),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 14,
-                ),
+                    horizontal: 32, vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Попробовать снова'),
+              child: Text(l10n.tryAgain),
             ),
           ],
         ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localizations.dart';
 import '../models/history_item.dart';
+import '../providers/app_state.dart';
 import '../services/history_service.dart';
 
 class HistoryScreen extends StatelessWidget {
@@ -9,9 +11,10 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<AppState>().l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('История'),
+        title: Text(l10n.historyTitle),
         backgroundColor: const Color(0xFF0F3460),
         foregroundColor: Colors.white,
         actions: [
@@ -20,8 +23,8 @@ class HistoryScreen extends StatelessWidget {
               if (svc.items.isEmpty) return const SizedBox.shrink();
               return IconButton(
                 icon: const Icon(Icons.delete_sweep_outlined),
-                tooltip: 'Очистить всё',
-                onPressed: () => _confirmClear(context, svc),
+                tooltip: l10n.clearAll,
+                onPressed: () => _confirmClear(context, svc, l10n),
               );
             },
           ),
@@ -29,7 +32,7 @@ class HistoryScreen extends StatelessWidget {
       ),
       body: Consumer<HistoryService>(
         builder: (context, svc, _) {
-          if (svc.items.isEmpty) return _buildEmpty();
+          if (svc.items.isEmpty) return _buildEmpty(l10n);
           return ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: svc.items.length,
@@ -42,57 +45,53 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmpty() {
+  Widget _buildEmpty(AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 72, color: Colors.white.withOpacity(0.15)),
+          Icon(Icons.history,
+              size: 72, color: Colors.white.withOpacity(0.15)),
           const SizedBox(height: 16),
           Text(
-            'История пуста',
+            l10n.historyEmpty,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.4),
-              fontSize: 17,
-            ),
+                color: Colors.white.withOpacity(0.4), fontSize: 17),
           ),
           const SizedBox(height: 8),
           Text(
-            'Результаты операций будут сохраняться здесь',
+            l10n.historyEmptySub,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.25),
-              fontSize: 13,
-            ),
+                color: Colors.white.withOpacity(0.25), fontSize: 13),
           ),
         ],
       ),
     );
   }
 
-  void _confirmClear(BuildContext context, HistoryService svc) {
+  void _confirmClear(
+      BuildContext context, HistoryService svc, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF16213E),
-        title: const Text('Очистить историю?',
-            style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'Все записи будут удалены. Это действие нельзя отменить.',
-          style: TextStyle(color: Colors.white70),
-        ),
+        title: Text(l10n.clearHistoryTitle,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.clearHistoryMsg,
+            style: const TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child:
-                const Text('Отмена', style: TextStyle(color: Colors.white54)),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
           ),
           TextButton(
             onPressed: () {
               svc.clear();
               Navigator.pop(context);
             },
-            child: const Text('Удалить',
-                style: TextStyle(color: Colors.redAccent)),
+            child: Text(l10n.delete,
+                style: const TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -108,6 +107,7 @@ class _HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.watch<AppState>().l10n;
     return Dismissible(
       key: ValueKey(item.id),
       direction: DismissDirection.endToStart,
@@ -123,7 +123,7 @@ class _HistoryCard extends StatelessWidget {
       ),
       onDismissed: (_) => service.delete(item.id),
       child: InkWell(
-        onTap: () => _showDetail(context),
+        onTap: () => _showDetail(context, l10n),
         borderRadius: BorderRadius.circular(12),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
@@ -141,7 +141,8 @@ class _HistoryCard extends StatelessWidget {
                   color: item.type.color.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(item.type.icon, color: item.type.color, size: 20),
+                child:
+                    Icon(item.type.icon, color: item.type.color, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -151,7 +152,7 @@ class _HistoryCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          item.type.label,
+                          l10n.historyTypeLabel(item.type),
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,
@@ -190,15 +191,11 @@ class _HistoryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Кнопка удаления на карточке
               IconButton(
-                icon: Icon(
-                  Icons.delete_outline,
-                  size: 18,
-                  color: Colors.white.withOpacity(0.3),
-                ),
+                icon: Icon(Icons.delete_outline,
+                    size: 18, color: Colors.white.withOpacity(0.3)),
                 splashRadius: 20,
-                onPressed: () => _confirmDelete(context),
+                onPressed: () => _confirmDelete(context, l10n),
               ),
             ],
           ),
@@ -207,7 +204,7 @@ class _HistoryCard extends StatelessWidget {
     );
   }
 
-  void _showDetail(BuildContext context) {
+  void _showDetail(BuildContext context, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -215,34 +212,33 @@ class _HistoryCard extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _DetailSheet(item: item, service: service),
+      builder: (_) =>
+          _DetailSheet(item: item, service: service, l10n: l10n),
     );
   }
 
-  void _confirmDelete(BuildContext context) {
+  void _confirmDelete(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF16213E),
-        title: const Text('Удалить запись?',
-            style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'Эта запись будет удалена из истории.',
-          style: TextStyle(color: Colors.white70),
-        ),
+        title: Text(l10n.deleteRecordTitle,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.deleteRecordMsg,
+            style: const TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child:
-                const Text('Отмена', style: TextStyle(color: Colors.white54)),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
           ),
           TextButton(
             onPressed: () {
               service.delete(item.id);
               Navigator.pop(context);
             },
-            child: const Text('Удалить',
-                style: TextStyle(color: Colors.redAccent)),
+            child: Text(l10n.delete,
+                style: const TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -263,8 +259,13 @@ class _HistoryCard extends StatelessWidget {
 class _DetailSheet extends StatelessWidget {
   final HistoryItem item;
   final HistoryService service;
+  final AppLocalizations l10n;
 
-  const _DetailSheet({required this.item, required this.service});
+  const _DetailSheet({
+    required this.item,
+    required this.service,
+    required this.l10n,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -285,7 +286,6 @@ class _DetailSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Drag handle
             Center(
               child: Container(
                 width: 40,
@@ -297,13 +297,12 @@ class _DetailSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // Заголовок
             Row(
               children: [
                 Icon(item.type.icon, color: item.type.color, size: 22),
                 const SizedBox(width: 10),
                 Text(
-                  item.type.label,
+                  l10n.historyTypeLabel(item.type),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -326,71 +325,60 @@ class _DetailSheet extends StatelessWidget {
               style: const TextStyle(color: Colors.white38, fontSize: 12),
             ),
             const Divider(color: Colors.white12, height: 24),
-            // Текст
             if (hasOriginal) ...[
-              const Text(
-                'ОРИГИНАЛ',
-                style: TextStyle(
-                  color: Colors.white38,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                ),
-              ),
+              Text(l10n.original,
+                  style: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  )),
               const SizedBox(height: 8),
               SelectableText(
                 item.original!,
                 style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 15,
-                  height: 1.6,
-                ),
+                    color: Colors.white70, fontSize: 15, height: 1.6),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'ПЕРЕВОД',
-                style: TextStyle(
-                  color: Colors.white38,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                ),
-              ),
+              Text(l10n.translation,
+                  style: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  )),
               const SizedBox(height: 8),
             ],
             SelectableText(
               item.result,
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                height: 1.6,
-              ),
+                  color: Colors.white, fontSize: 15, height: 1.6),
             ),
             const SizedBox(height: 20),
-            // Кнопки копирования — сразу под текстом
             Row(
               children: [
                 if (hasOriginal) ...[
                   Expanded(
                     child: _CopyButton(
-                      label: 'Оригинал',
+                      label: l10n.copyOriginal,
                       text: item.original!,
                       parentContext: context,
+                      snackLabel: l10n.copied,
                     ),
                   ),
                   const SizedBox(width: 10),
                 ],
                 Expanded(
                   child: _CopyButton(
-                    label: hasOriginal ? 'Перевод' : 'Копировать',
+                    label: hasOriginal ? l10n.copyTranslation : l10n.copy,
                     text: item.result,
                     parentContext: context,
+                    snackLabel: l10n.copied,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            // Кнопка удаления
             SizedBox(
               width: double.infinity,
               child: TextButton.icon(
@@ -400,15 +388,14 @@ class _DetailSheet extends StatelessWidget {
                 },
                 icon: const Icon(Icons.delete_outline,
                     size: 18, color: Colors.redAccent),
-                label: const Text(
-                  'Удалить запись',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
+                label: Text(l10n.deleteEntry,
+                    style: const TextStyle(color: Colors.redAccent)),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(color: Colors.redAccent.withOpacity(0.3)),
+                    side: BorderSide(
+                        color: Colors.redAccent.withOpacity(0.3)),
                   ),
                 ),
               ),
@@ -433,11 +420,13 @@ class _DetailSheet extends StatelessWidget {
 class _CopyButton extends StatelessWidget {
   final String label;
   final String text;
+  final String snackLabel;
   final BuildContext parentContext;
 
   const _CopyButton({
     required this.label,
     required this.text,
+    required this.snackLabel,
     required this.parentContext,
   });
 
@@ -447,9 +436,9 @@ class _CopyButton extends StatelessWidget {
       onPressed: () {
         Clipboard.setData(ClipboardData(text: text));
         ScaffoldMessenger.of(parentContext).showSnackBar(
-          const SnackBar(
-            content: Text('Скопировано'),
-            duration: Duration(seconds: 1),
+          SnackBar(
+            content: Text(snackLabel),
+            duration: const Duration(seconds: 1),
           ),
         );
       },
@@ -459,7 +448,8 @@ class _CopyButton extends StatelessWidget {
         backgroundColor: const Color(0xFF533483),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -477,10 +467,8 @@ class _Badge extends StatelessWidget {
         color: Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white60, fontSize: 11),
-      ),
+      child: Text(label,
+          style: const TextStyle(color: Colors.white60, fontSize: 11)),
     );
   }
 }

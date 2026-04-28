@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../models/translation_languages.dart';
@@ -49,6 +50,11 @@ class _TranscriptionTranslationScreenState
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.18).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    SharedPreferences.getInstance().then((prefs) {
+      final idx = (prefs.getInt('pref_tt_lang') ?? 1)
+          .clamp(0, kTranslationLanguages.length - 1);
+      if (mounted) setState(() => _lang = kTranslationLanguages[idx]);
+    });
   }
 
   @override
@@ -236,6 +242,9 @@ class _TranscriptionTranslationScreenState
       builder: (_) => _LanguagePicker(
         selected: _lang,
         onPick: (lang) {
+          final idx = kTranslationLanguages.indexOf(lang);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_tt_lang', idx));
           setState(() => _lang = lang);
           Navigator.pop(context);
         },

@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
@@ -76,6 +77,16 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       } else {
         setState(() => _isPlaying = s.playing);
       }
+    });
+    SharedPreferences.getInstance().then((prefs) {
+      final langIdx = (prefs.getInt('pref_fc_lang') ?? 0)
+          .clamp(0, kTranslationLanguages.length - 1);
+      final voiceIdx = (prefs.getInt('pref_fc_voice') ?? 0)
+          .clamp(0, _kVoices.length - 1);
+      if (mounted) setState(() {
+        _language = kTranslationLanguages[langIdx];
+        _voice = _kVoices[voiceIdx];
+      });
     });
   }
 
@@ -338,6 +349,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       builder: (_) => _LanguagePicker(
         selected: _language,
         onPick: (lang) {
+          final idx = kTranslationLanguages.indexOf(lang);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_fc_lang', idx));
           setState(() => _language = lang);
           Navigator.pop(context);
         },
@@ -354,6 +368,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       builder: (_) => _VoicePicker(
         selected: _voice,
         onPick: (v) {
+          final idx = _kVoices.indexOf(v);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_fc_voice', idx));
           setState(() => _voice = v);
           Navigator.pop(context);
         },

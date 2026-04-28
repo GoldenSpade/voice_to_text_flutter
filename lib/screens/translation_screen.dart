@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../models/translation_languages.dart';
@@ -24,6 +25,16 @@ class _TranslationScreenState extends State<TranslationScreen> {
   String? _errorMessage;
   var _lang = kTranslationLanguages[1];
   late AppButtonTheme _theme;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      final idx = (prefs.getInt('pref_trans_lang') ?? 1)
+          .clamp(0, kTranslationLanguages.length - 1);
+      if (mounted) setState(() => _lang = kTranslationLanguages[idx]);
+    });
+  }
 
   @override
   void dispose() {
@@ -80,6 +91,9 @@ class _TranslationScreenState extends State<TranslationScreen> {
       builder: (_) => _LanguagePicker(
         selected: _lang,
         onPick: (lang) {
+          final idx = kTranslationLanguages.indexOf(lang);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_trans_lang', idx));
           setState(() => _lang = lang);
           Navigator.pop(context);
         },

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../models/app_theme.dart';
@@ -54,6 +55,11 @@ class _TtsScreenState extends State<TtsScreen> {
       } else {
         setState(() => _isPlaying = s.playing);
       }
+    });
+    SharedPreferences.getInstance().then((prefs) {
+      final idx = (prefs.getInt('pref_tts_voice') ?? 0)
+          .clamp(0, _kVoices.length - 1);
+      if (mounted) setState(() => _voice = _kVoices[idx]);
     });
   }
 
@@ -168,6 +174,9 @@ class _TtsScreenState extends State<TtsScreen> {
       builder: (_) => _VoicePicker(
         selected: _voice,
         onPick: (v) {
+          final idx = _kVoices.indexOf(v);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_tts_voice', idx));
           setState(() => _voice = v);
           Navigator.pop(context);
         },

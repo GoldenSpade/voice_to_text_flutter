@@ -15,7 +15,8 @@ import '../services/openai_service.dart';
 enum _State { idle, recording, processing, result, error }
 
 class TranscriptionScreen extends StatefulWidget {
-  const TranscriptionScreen({super.key});
+  final String? initialFilePath;
+  const TranscriptionScreen({super.key, this.initialFilePath});
 
   @override
   State<TranscriptionScreen> createState() => _TranscriptionScreenState();
@@ -47,6 +48,11 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.18).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    if (widget.initialFilePath != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _transcribeFromPath(widget.initialFilePath!);
+      });
+    }
   }
 
   @override
@@ -146,23 +152,17 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     }
   }
 
-  Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-      allowMultiple: false,
-    );
-    if (result == null || result.files.single.path == null) return;
-
+  Future<void> _transcribeFromPath(String path) async {
     setState(() {
       _state = _State.processing;
       _resultText = null;
       _errorMessage = null;
+      _corrected = false;
     });
-
     final appState = context.read<AppState>();
     try {
-      final text = await OpenAIService(appState.apiKey)
-          .transcribeAudio(result.files.single.path!);
+      final text =
+          await OpenAIService(appState.apiKey).transcribeAudio(path);
       if (mounted) {
         final id = DateTime.now().millisecondsSinceEpoch.toString();
         context.read<HistoryService>().add(HistoryItem(
@@ -175,7 +175,6 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
           _state = _State.result;
           _resultText = text;
           _historyItemId = id;
-          _corrected = false;
         });
       }
     } catch (e) {
@@ -186,6 +185,15 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         });
       }
     }
+  }
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+      allowMultiple: false,
+    );
+    if (result == null || result.files.single.path == null) return;
+    await _transcribeFromPath(result.files.single.path!);
   }
 
   Future<void> _correctText() async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
@@ -21,7 +22,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
   _State _state = _State.idle;
   String? _resultText;
   String? _errorMessage;
-  var _lang = kTranslationLanguages[1]; // default: Russian
+  var _lang = kTranslationLanguages[1];
+  late AppButtonTheme _theme;
 
   @override
   void dispose() {
@@ -71,7 +73,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: _theme.surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -87,11 +89,13 @@ class _TranslationScreenState extends State<TranslationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.watch<AppState>().l10n;
+    final state = context.watch<AppState>();
+    _theme = state.buttonTheme;
+    final l10n = state.l10n;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.translateText),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: _theme.appBarColor,
         foregroundColor: Colors.white,
       ),
       body: SafeArea(child: _buildBody(l10n)),
@@ -125,7 +129,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                 hintStyle:
                     TextStyle(color: Colors.white.withOpacity(0.3)),
                 filled: true,
-                fillColor: const Color(0xFF16213E),
+                fillColor: _theme.surfaceColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -142,7 +146,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -177,10 +181,10 @@ class _TranslationScreenState extends State<TranslationScreen> {
               child: ElevatedButton(
                 onPressed: value.text.trim().isEmpty ? null : _translate,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF533483),
+                  backgroundColor: _theme.colors[0],
                   foregroundColor: Colors.white,
                   disabledBackgroundColor:
-                      const Color(0xFF533483).withOpacity(0.35),
+                      _theme.colors[0].withOpacity(0.35),
                   disabledForegroundColor: Colors.white38,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -201,11 +205,11 @@ class _TranslationScreenState extends State<TranslationScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 64,
             height: 64,
             child: CircularProgressIndicator(
-                strokeWidth: 3, color: Color(0xFF533483)),
+                strokeWidth: 3, color: _theme.colors[0]),
           ),
           const SizedBox(height: 32),
           Text(l10n.translating,
@@ -232,7 +236,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
@@ -252,7 +256,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
@@ -343,7 +347,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                 _errorMessage = null;
               }),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: _theme.colors[0],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 32, vertical: 14),
@@ -392,6 +396,7 @@ class _CopyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return ElevatedButton.icon(
       onPressed: () {
         Clipboard.setData(ClipboardData(text: text));
@@ -405,7 +410,7 @@ class _CopyButton extends StatelessWidget {
       icon: const Icon(Icons.copy, size: 16),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF533483),
+        backgroundColor: theme.colors[0],
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape:
@@ -423,6 +428,7 @@ class _LanguagePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.4,
@@ -453,10 +459,10 @@ class _LanguagePicker extends StatelessWidget {
                     style: const TextStyle(color: Colors.white),
                   ),
                   trailing: isSelected
-                      ? const Icon(Icons.check, color: Color(0xFF533483))
+                      ? Icon(Icons.check, color: theme.colors[0])
                       : null,
                   tileColor: isSelected
-                      ? const Color(0xFF533483).withOpacity(0.15)
+                      ? theme.colors[0].withOpacity(0.15)
                       : null,
                   onTap: () => onPick(lang),
                 );

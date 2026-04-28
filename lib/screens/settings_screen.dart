@@ -69,10 +69,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       };
 
   void _showLanguagePicker(BuildContext context, AppState state) {
+    final theme = state.buttonTheme;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF16213E),
+        backgroundColor: theme.surfaceColor,
         title: Text(
           state.l10n.interfaceLanguage,
           style: const TextStyle(color: Colors.white),
@@ -87,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               return RadioListTile<String>(
                 value: code,
                 groupValue: state.languageCode,
-                activeColor: const Color(0xFF533483),
+                activeColor: theme.colors[0],
                 title: Text(name, style: const TextStyle(color: Colors.white)),
                 onChanged: (val) {
                   if (val != null) {
@@ -116,6 +117,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final l10n = state.l10n;
+    final theme = state.buttonTheme;
 
     final currentLangName = AppLocalizations.supportedLanguages
         .firstWhere(
@@ -127,7 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settingsTitle),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: theme.appBarColor,
         foregroundColor: Colors.white,
       ),
       body: ListView(
@@ -152,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 vertical: 14,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -206,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               hintText: 'sk-proj-...',
               hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
               filled: true,
-              fillColor: const Color(0xFF16213E),
+              fillColor: theme.surfaceColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -227,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: ElevatedButton(
               onPressed: _saving ? null : _save,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: theme.colors[0],
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -283,7 +285,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             spacing: 12,
             runSpacing: 14,
             children: List.generate(kAppThemes.length, (i) {
-              final theme = kAppThemes[i];
+              final t = kAppThemes[i];
               final selected = state.themeIndex == i;
               final themeName = _themeName(l10n, i);
               return GestureDetector(
@@ -307,16 +309,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           height: 108,
                           child: Column(
                             children: [
-                              Container(height: 14, color: theme.appBarColor),
+                              Container(height: 14, color: t.appBarColor),
                               Expanded(
                                 child: Container(
-                                  color: theme.backgroundColor,
+                                  color: t.backgroundColor,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 6),
                                   child: Column(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
-                                    children: theme.colors
+                                    children: t.colors
                                         .map((c) => Container(
                                               height: 11,
                                               decoration: BoxDecoration(

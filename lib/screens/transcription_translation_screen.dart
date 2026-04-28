@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
+import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
@@ -31,7 +32,8 @@ class _TranscriptionTranslationScreenState
   String? _errorMessage;
   Timer? _timer;
   int _seconds = 0;
-  var _lang = kTranslationLanguages[1]; // default: Russian
+  var _lang = kTranslationLanguages[1];
+  late AppButtonTheme _theme;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -112,7 +114,6 @@ class _TranscriptionTranslationScreenState
 
     final service = OpenAIService(context.read<AppState>().apiKey);
 
-    // Step 1: Transcribe
     String transcribed;
     try {
       transcribed = await service.transcribeAudio(path);
@@ -138,7 +139,6 @@ class _TranscriptionTranslationScreenState
       _state = _State.translating;
     });
 
-    // Step 2: Translate
     try {
       final translated = await service.translateText(transcribed, _lang.$3);
       if (mounted) {
@@ -172,7 +172,7 @@ class _TranscriptionTranslationScreenState
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: _theme.surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -188,11 +188,13 @@ class _TranscriptionTranslationScreenState
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.watch<AppState>().l10n;
+    final state = context.watch<AppState>();
+    _theme = state.buttonTheme;
+    final l10n = state.l10n;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.transcribeAndTranslate),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: _theme.appBarColor,
         foregroundColor: Colors.white,
       ),
       body: SafeArea(child: _buildBody(l10n)),
@@ -224,7 +226,7 @@ class _TranscriptionTranslationScreenState
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -263,11 +265,11 @@ class _TranscriptionTranslationScreenState
                     width: 128,
                     height: 128,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF533483),
+                      color: _theme.colors[0],
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF533483).withOpacity(0.45),
+                          color: _theme.colors[0].withOpacity(0.45),
                           blurRadius: 28,
                           spreadRadius: 6,
                         ),
@@ -352,11 +354,11 @@ class _TranscriptionTranslationScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 64,
             height: 64,
             child: CircularProgressIndicator(
-                strokeWidth: 3, color: Color(0xFF533483)),
+                strokeWidth: 3, color: _theme.colors[0]),
           ),
           const SizedBox(height: 32),
           Text(title,
@@ -383,7 +385,7 @@ class _TranscriptionTranslationScreenState
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
@@ -403,7 +405,7 @@ class _TranscriptionTranslationScreenState
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
@@ -497,7 +499,7 @@ class _TranscriptionTranslationScreenState
                 _seconds = 0;
               }),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: _theme.colors[0],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 32, vertical: 14),
@@ -546,6 +548,7 @@ class _CopyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return ElevatedButton.icon(
       onPressed: () {
         Clipboard.setData(ClipboardData(text: text));
@@ -559,7 +562,7 @@ class _CopyButton extends StatelessWidget {
       icon: const Icon(Icons.copy, size: 16),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF533483),
+        backgroundColor: theme.colors[0],
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape:
@@ -577,6 +580,7 @@ class _LanguagePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.4,
@@ -606,11 +610,14 @@ class _LanguagePicker extends StatelessWidget {
                     lang.$2,
                     style: const TextStyle(color: Colors.white),
                   ),
+                  subtitle: Text(lang.$3,
+                      style: const TextStyle(
+                          color: Colors.white54, fontSize: 12)),
                   trailing: isSelected
-                      ? const Icon(Icons.check, color: Color(0xFF533483))
+                      ? Icon(Icons.check, color: theme.colors[0])
                       : null,
                   tileColor: isSelected
-                      ? const Color(0xFF533483).withOpacity(0.15)
+                      ? theme.colors[0].withOpacity(0.15)
                       : null,
                   onTap: () => onPick(lang),
                 );

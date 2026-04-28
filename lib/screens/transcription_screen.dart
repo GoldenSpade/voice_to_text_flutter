@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
+import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
@@ -27,6 +28,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   String? _errorMessage;
   Timer? _timer;
   int _seconds = 0;
+  late AppButtonTheme _theme;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -143,11 +145,13 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.watch<AppState>().l10n;
+    final state = context.watch<AppState>();
+    _theme = state.buttonTheme;
+    final l10n = state.l10n;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.transcribeAudio),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: _theme.appBarColor,
         foregroundColor: Colors.white,
       ),
       body: SafeArea(child: _buildBody(l10n)),
@@ -175,11 +179,11 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               width: 128,
               height: 128,
               decoration: BoxDecoration(
-                color: const Color(0xFF533483),
+                color: _theme.colors[0],
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF533483).withOpacity(0.45),
+                    color: _theme.colors[0].withOpacity(0.45),
                     blurRadius: 28,
                     spreadRadius: 6,
                   ),
@@ -265,12 +269,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 64,
             height: 64,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              color: Color(0xFF533483),
+              color: _theme.colors[0],
             ),
           ),
           const SizedBox(height: 32),
@@ -315,7 +319,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: SingleChildScrollView(
@@ -348,7 +352,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                   icon: const Icon(Icons.copy, size: 18),
                   label: Text(l10n.copy),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF533483),
+                    backgroundColor: _theme.colors[0],
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -420,7 +424,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                 _seconds = 0;
               }),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: _theme.colors[0],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 32, vertical: 14),

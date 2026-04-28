@@ -16,11 +16,13 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.watch<AppState>().l10n;
+    final state = context.watch<AppState>();
+    final l10n = state.l10n;
+    final theme = state.buttonTheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.historyTitle),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: theme.appBarColor,
         foregroundColor: Colors.white,
         actions: [
           Consumer<HistoryService>(
@@ -29,7 +31,7 @@ class HistoryScreen extends StatelessWidget {
               return IconButton(
                 icon: const Icon(Icons.delete_sweep_outlined),
                 tooltip: l10n.clearAll,
-                onPressed: () => _confirmClear(context, svc, l10n),
+                onPressed: () => _confirmClear(context, svc, l10n, theme.surfaceColor),
               );
             },
           ),
@@ -75,11 +77,11 @@ class HistoryScreen extends StatelessWidget {
   }
 
   void _confirmClear(
-      BuildContext context, HistoryService svc, AppLocalizations l10n) {
+      BuildContext context, HistoryService svc, AppLocalizations l10n, Color surfaceColor) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF16213E),
+        backgroundColor: surfaceColor,
         title: Text(l10n.clearHistoryTitle,
             style: const TextStyle(color: Colors.white)),
         content: Text(l10n.clearHistoryMsg,
@@ -113,6 +115,7 @@ class _HistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.watch<AppState>().l10n;
+    final theme = context.read<AppState>().buttonTheme;
     return Dismissible(
       key: ValueKey(item.id),
       direction: DismissDirection.endToStart,
@@ -134,7 +137,7 @@ class _HistoryCard extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF16213E),
+            color: theme.surfaceColor,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -205,7 +208,7 @@ class _HistoryCard extends StatelessWidget {
                 icon: Icon(Icons.delete_outline,
                     size: 18, color: Colors.white.withOpacity(0.3)),
                 splashRadius: 20,
-                onPressed: () => _confirmDelete(context, l10n),
+                onPressed: () => _confirmDelete(context, l10n, theme.surfaceColor),
               ),
             ],
           ),
@@ -215,10 +218,11 @@ class _HistoryCard extends StatelessWidget {
   }
 
   void _showDetail(BuildContext context, AppLocalizations l10n) {
+    final theme = context.read<AppState>().buttonTheme;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: theme.surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -231,11 +235,11 @@ class _HistoryCard extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, AppLocalizations l10n) {
+  void _confirmDelete(BuildContext context, AppLocalizations l10n, Color surfaceColor) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF16213E),
+        backgroundColor: surfaceColor,
         title: Text(l10n.deleteRecordTitle,
             style: const TextStyle(color: Colors.white)),
         content: Text(l10n.deleteRecordMsg,
@@ -391,6 +395,7 @@ class _DetailSheetState extends State<_DetailSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     final hasOriginal =
         widget.item.original != null && widget.item.original!.isNotEmpty;
 
@@ -497,7 +502,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                     style: const TextStyle(fontSize: 15),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF533483),
+                    backgroundColor: theme.colors[0],
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -624,6 +629,7 @@ class _CopyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return ElevatedButton.icon(
       onPressed: () {
         Clipboard.setData(ClipboardData(text: text));
@@ -637,7 +643,7 @@ class _CopyButton extends StatelessWidget {
       icon: const Icon(Icons.copy, size: 16),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF533483),
+        backgroundColor: theme.colors[0],
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape:

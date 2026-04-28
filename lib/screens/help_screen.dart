@@ -32,7 +32,7 @@ class HelpScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         itemCount: sections.length,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) => _SectionCard(sections[i]),
+        itemBuilder: (_, i) => _SectionCard(sections[i], theme.surfaceColor),
       ),
     );
   }
@@ -47,14 +47,15 @@ class _Section {
 
 class _SectionCard extends StatelessWidget {
   final _Section section;
-  const _SectionCard(this.section);
+  final Color surfaceColor;
+  const _SectionCard(this.section, this.surfaceColor);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(

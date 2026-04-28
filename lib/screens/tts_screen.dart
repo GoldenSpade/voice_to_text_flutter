@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
@@ -11,7 +12,6 @@ import '../services/openai_service.dart';
 
 enum _State { idle, generating, ready, error }
 
-// (voiceId, shortDescription) — descriptions stay in English (OpenAI product names)
 const _kVoices = <(String, String)>[
   ('alloy', 'Neutral, versatile'),
   ('ash', 'Soft, warm'),
@@ -37,9 +37,10 @@ class _TtsScreenState extends State<TtsScreen> {
   _State _state = _State.idle;
   String? _filePath;
   String? _errorMessage;
-  var _voice = _kVoices[0]; // default: alloy
+  var _voice = _kVoices[0];
   bool _isPlaying = false;
   StreamSubscription<PlayerState>? _playerSub;
+  late AppButtonTheme _theme;
 
   @override
   void initState() {
@@ -160,7 +161,7 @@ class _TtsScreenState extends State<TtsScreen> {
   void _showVoicePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: _theme.surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -176,11 +177,13 @@ class _TtsScreenState extends State<TtsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.watch<AppState>().l10n;
+    final state = context.watch<AppState>();
+    _theme = state.buttonTheme;
+    final l10n = state.l10n;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.textToVoice),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: _theme.appBarColor,
         foregroundColor: Colors.white,
       ),
       body: SafeArea(child: _buildBody(l10n)),
@@ -214,7 +217,7 @@ class _TtsScreenState extends State<TtsScreen> {
                 hintStyle:
                     TextStyle(color: Colors.white.withOpacity(0.3)),
                 filled: true,
-                fillColor: const Color(0xFF16213E),
+                fillColor: _theme.surfaceColor,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -231,7 +234,7 @@ class _TtsScreenState extends State<TtsScreen> {
               padding: const EdgeInsets.symmetric(
                   horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -275,10 +278,10 @@ class _TtsScreenState extends State<TtsScreen> {
                 onPressed:
                     value.text.trim().isEmpty ? null : _generate,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF533483),
+                  backgroundColor: _theme.colors[0],
                   foregroundColor: Colors.white,
                   disabledBackgroundColor:
-                      const Color(0xFF533483).withOpacity(0.35),
+                      _theme.colors[0].withOpacity(0.35),
                   disabledForegroundColor: Colors.white38,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -299,11 +302,11 @@ class _TtsScreenState extends State<TtsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 64,
             height: 64,
             child: CircularProgressIndicator(
-                strokeWidth: 3, color: Color(0xFF533483)),
+                strokeWidth: 3, color: _theme.colors[0]),
           ),
           const SizedBox(height: 32),
           Text(l10n.generating,
@@ -339,7 +342,7 @@ class _TtsScreenState extends State<TtsScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: SingleChildScrollView(
@@ -381,7 +384,7 @@ class _TtsScreenState extends State<TtsScreen> {
                   ),
                   label: Text(_isPlaying ? l10n.pause : l10n.play),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF533483),
+                    backgroundColor: _theme.colors[0],
                     foregroundColor: Colors.white,
                     padding:
                         const EdgeInsets.symmetric(vertical: 14),
@@ -471,7 +474,7 @@ class _TtsScreenState extends State<TtsScreen> {
                 _errorMessage = null;
               }),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: _theme.colors[0],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 32, vertical: 14),
@@ -495,6 +498,7 @@ class _VoicePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
       minChildSize: 0.4,
@@ -526,11 +530,10 @@ class _VoicePicker extends StatelessWidget {
                       style: const TextStyle(
                           color: Colors.white54, fontSize: 12)),
                   trailing: isSelected
-                      ? const Icon(Icons.check,
-                          color: Color(0xFF533483))
+                      ? Icon(Icons.check, color: theme.colors[0])
                       : null,
                   tileColor: isSelected
-                      ? const Color(0xFF533483).withOpacity(0.15)
+                      ? theme.colors[0].withOpacity(0.15)
                       : null,
                   onTap: () => onPick(v),
                 );

@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:share_plus/share_plus.dart';
+import '../models/app_theme.dart';
 import '../models/history_item.dart';
 import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
@@ -49,6 +50,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   String? _audioPath;
   String? _errorMessage;
   bool _isPlaying = false;
+  late AppButtonTheme _theme;
 
   late final AnimationController _pulseCtrl;
   late final Animation<double> _pulseAnim;
@@ -115,7 +117,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     final apiKey = context.read<AppState>().apiKey;
     final svc = OpenAIService(apiKey);
 
-    // Step 1: Transcribe
     setState(() => _stage = _Stage.transcribing);
     String original;
     try {
@@ -131,7 +132,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     }
     if (!mounted) return;
 
-    // Step 2: Translate
     setState(() => _stage = _Stage.translating);
     String translated;
     try {
@@ -147,7 +147,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     }
     if (!mounted) return;
 
-    // Step 3: Generate TTS
     setState(() => _stage = _Stage.generating);
     String audioPath;
     try {
@@ -253,7 +252,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: _theme.surfaceColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _LanguagePicker(
@@ -269,7 +268,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   void _showVoicePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF16213E),
+      backgroundColor: _theme.surfaceColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => _VoicePicker(
@@ -284,11 +283,13 @@ class _FullCycleScreenState extends State<FullCycleScreen>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.watch<AppState>().l10n;
+    final state = context.watch<AppState>();
+    _theme = state.buttonTheme;
+    final l10n = state.l10n;
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.fullCycle),
-        backgroundColor: const Color(0xFF0F3460),
+        backgroundColor: _theme.appBarColor,
         foregroundColor: Colors.white,
       ),
       body: SafeArea(child: _buildBody(l10n)),
@@ -317,6 +318,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             icon: Icons.translate,
             label: '${l10n.selectLanguage}:',
             value: _language.$2,
+            surfaceColor: _theme.surfaceColor,
             onTap: _showLanguagePicker,
           ),
           const SizedBox(height: 10),
@@ -324,6 +326,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             icon: Icons.record_voice_over,
             label: '${l10n.selectVoice}:',
             value: '${_voice.$1}  ·  ${_voice.$2}',
+            surfaceColor: _theme.surfaceColor,
             onTap: _showVoicePicker,
           ),
           const Spacer(),
@@ -333,11 +336,11 @@ class _FullCycleScreenState extends State<FullCycleScreen>
               width: 96,
               height: 96,
               decoration: BoxDecoration(
-                color: const Color(0xFF533483),
+                color: _theme.colors[0],
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF533483).withOpacity(0.45),
+                    color: _theme.colors[0].withOpacity(0.45),
                     blurRadius: 28,
                     spreadRadius: 4,
                   ),
@@ -409,11 +412,11 @@ class _FullCycleScreenState extends State<FullCycleScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(
+            SizedBox(
               width: 64,
               height: 64,
               child: CircularProgressIndicator(
-                  strokeWidth: 3, color: Color(0xFF533483)),
+                  strokeWidth: 3, color: _theme.colors[0]),
             ),
             const SizedBox(height: 32),
             Text(title,
@@ -435,7 +438,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
                   height: 8,
                   decoration: BoxDecoration(
                     color: i < step
-                        ? const Color(0xFF533483)
+                        ? _theme.colors[0]
                         : Colors.white24,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -454,7 +457,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Original text
           Text(
             l10n.original,
             style: const TextStyle(
@@ -469,7 +471,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF16213E),
+              color: _theme.surfaceColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: SelectableText(
@@ -479,7 +481,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             ),
           ),
           const SizedBox(height: 16),
-          // Translation
           Row(
             children: [
               Text(
@@ -500,7 +501,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF16213E),
+              color: _theme.surfaceColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: SelectableText(
@@ -510,7 +511,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             ),
           ),
           const SizedBox(height: 10),
-          // Voice indicator
           Row(
             children: [
               const Icon(Icons.record_voice_over,
@@ -526,7 +526,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             ],
           ),
           const SizedBox(height: 16),
-          // Play/Pause
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -542,7 +541,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
                 style: const TextStyle(fontSize: 15),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: _theme.colors[0],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -551,7 +550,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             ),
           ),
           const SizedBox(height: 8),
-          // Download + Share
           Row(
             children: [
               Expanded(
@@ -590,7 +588,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             ],
           ),
           const SizedBox(height: 8),
-          // Copy buttons
           Row(
             children: [
               Expanded(
@@ -607,7 +604,6 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             ],
           ),
           const SizedBox(height: 8),
-          // Again
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -661,7 +657,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
                 _errorMessage = null;
               }),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF533483),
+                backgroundColor: _theme.colors[0],
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 32, vertical: 14),
@@ -683,12 +679,14 @@ class _SelectorCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final Color surfaceColor;
   final VoidCallback onTap;
 
   const _SelectorCard({
     required this.icon,
     required this.label,
     required this.value,
+    required this.surfaceColor,
     required this.onTap,
   });
 
@@ -701,7 +699,7 @@ class _SelectorCard extends StatelessWidget {
         padding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF16213E),
+          color: surfaceColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -757,6 +755,7 @@ class _CopyButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return ElevatedButton.icon(
       onPressed: () {
         Clipboard.setData(ClipboardData(text: text));
@@ -770,7 +769,7 @@ class _CopyButton extends StatelessWidget {
       icon: const Icon(Icons.copy, size: 16),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF533483),
+        backgroundColor: theme.colors[0],
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape:
@@ -790,6 +789,7 @@ class _LanguagePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.4,
@@ -821,10 +821,10 @@ class _LanguagePicker extends StatelessWidget {
                       style: const TextStyle(
                           color: Colors.white54, fontSize: 12)),
                   trailing: isSelected
-                      ? const Icon(Icons.check, color: Color(0xFF533483))
+                      ? Icon(Icons.check, color: theme.colors[0])
                       : null,
                   tileColor: isSelected
-                      ? const Color(0xFF533483).withOpacity(0.15)
+                      ? theme.colors[0].withOpacity(0.15)
                       : null,
                   onTap: () => onPick(lang),
                 );
@@ -845,6 +845,7 @@ class _VoicePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
       minChildSize: 0.4,
@@ -876,10 +877,10 @@ class _VoicePicker extends StatelessWidget {
                       style: const TextStyle(
                           color: Colors.white54, fontSize: 12)),
                   trailing: isSelected
-                      ? const Icon(Icons.check, color: Color(0xFF533483))
+                      ? Icon(Icons.check, color: theme.colors[0])
                       : null,
                   tileColor: isSelected
-                      ? const Color(0xFF533483).withOpacity(0.15)
+                      ? theme.colors[0].withOpacity(0.15)
                       : null,
                   onTap: () => onPick(v),
                 );

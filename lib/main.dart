@@ -25,6 +25,7 @@ class VoiceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appTheme = context.watch<AppState>().buttonTheme;
     return MaterialApp(
       title: 'Voice Assistant',
       debugShowCheckedModeBanner: false,
@@ -34,9 +35,9 @@ class VoiceApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFF1A1A2E),
-        cardTheme: const CardThemeData(
-          color: Color(0xFF16213E),
+        scaffoldBackgroundColor: appTheme.backgroundColor,
+        cardTheme: CardThemeData(
+          color: appTheme.surfaceColor,
           elevation: 4,
         ),
       ),

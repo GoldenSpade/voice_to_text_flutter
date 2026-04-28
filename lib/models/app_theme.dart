@@ -8,6 +8,7 @@ class AppButtonTheme {
   final Color textPrimary;
   final Color textSecondary;
   final Color accentColor;
+  final Color? _surfaceColorOverride;
 
   const AppButtonTheme({
     required this.nameKey,
@@ -17,7 +18,22 @@ class AppButtonTheme {
     this.textPrimary = Colors.white,
     this.textSecondary = const Color(0xFFA6A6A6),
     this.accentColor = Colors.white,
-  });
+    Color? surfaceColor,
+  }) : _surfaceColorOverride = surfaceColor;
+
+  // 30 % blend from backgroundColor toward appBarColor.
+  // Graphite overrides this because its appBarColor is gold, not a dark hue.
+  Color get surfaceColor {
+    if (_surfaceColorOverride != null) return _surfaceColorOverride!;
+    final bg = backgroundColor;
+    final ab = appBarColor;
+    return Color.fromARGB(
+      255,
+      (bg.red   + (ab.red   - bg.red)   * 0.30).round().clamp(0, 255),
+      (bg.green + (ab.green - bg.green) * 0.30).round().clamp(0, 255),
+      (bg.blue  + (ab.blue  - bg.blue)  * 0.30).round().clamp(0, 255),
+    );
+  }
 }
 
 // Order: Multi-pastel → Neutral pastel → Warm/cool pastel → Green/Purple dark
@@ -180,5 +196,6 @@ const kAppThemes = <AppButtonTheme>[
     textPrimary: Color(0xFFEAECEF),
     textSecondary: Color(0xFF848E9C),
     accentColor: Color(0xFFF0B90B),
+    surfaceColor: Color(0xFF1E2329),
   ),
 ];

@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/app_theme.dart';
@@ -114,6 +115,85 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     final recPath = await _recorder.stop();
     if (recPath == null || !mounted) return;
 
+    final apiKey = context.read<AppState>().apiKey;
+    final svc = OpenAIService(apiKey);
+
+    setState(() => _stage = _Stage.transcribing);
+    String original;
+    try {
+      original = await svc.transcribeAudio(recPath);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _stage = _Stage.error;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+      return;
+    }
+    if (!mounted) return;
+
+    setState(() => _stage = _Stage.translating);
+    String translated;
+    try {
+      translated = await svc.translateText(original, _language.$3);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _stage = _Stage.error;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+      return;
+    }
+    if (!mounted) return;
+
+    setState(() => _stage = _Stage.generating);
+    String audioPath;
+    try {
+      final dir = await getTemporaryDirectory();
+      audioPath =
+          '${dir.path}/fc_tts_${DateTime.now().millisecondsSinceEpoch}.mp3';
+      await svc.textToSpeech(translated, _voice.$1, audioPath);
+      await _player.setFilePath(audioPath);
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _stage = _Stage.error;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+      return;
+    }
+    if (!mounted) return;
+
+    context.read<HistoryService>().add(HistoryItem(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          type: HistoryType.fullCycle,
+          createdAt: DateTime.now(),
+          original: original,
+          result: translated,
+          languageName: _language.$2,
+          voiceName: _voice.$1,
+          audioFilePath: audioPath,
+        ));
+
+    setState(() {
+      _stage = _Stage.result;
+      _originalText = original;
+      _translatedText = translated;
+      _audioPath = audioPath;
+    });
+  }
+
+  Future<void> _pickAndProcess() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+      allowMultiple: false,
+    );
+    if (result == null || result.files.single.path == null || !mounted) return;
+
+    final recPath = result.files.single.path!;
     final apiKey = context.read<AppState>().apiKey;
     final svc = OpenAIService(apiKey);
 
@@ -360,6 +440,37 @@ class _FullCycleScreenState extends State<FullCycleScreen>
             l10n.fullCycleSub,
             style:
                 TextStyle(color: Colors.white.withOpacity(0.28), fontSize: 12),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 48, height: 1, color: Colors.white12),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white24,
+                ),
+              ),
+              Container(width: 48, height: 1, color: Colors.white12),
+            ],
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _pickAndProcess,
+            icon: const Icon(Icons.upload_file, size: 18),
+            label: Text(l10n.uploadFile),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white70,
+              side: BorderSide(color: Colors.white.withOpacity(0.2)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
           ),
           const Spacer(),
         ],

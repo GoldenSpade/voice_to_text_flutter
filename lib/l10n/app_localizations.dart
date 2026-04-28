@@ -57,6 +57,7 @@ class AppLocalizations {
   String get unknownError => _t('unknownError');
   String get tryAgain => _t('tryAgain');
   String get noMicPermission => _t('noMicPermission');
+  String get uploadFile => _t('uploadFile');
 
   // ── Settings screen ───────────────────────────────────────────────────────
   String get settingsTitle => _t('settingsTitle');
@@ -172,6 +173,7 @@ class AppLocalizations {
       'tryAgain': 'Try Again',
       'noMicPermission':
           'No microphone access. Please allow in phone settings.',
+      'uploadFile': 'Upload file',
       'settingsTitle': 'Settings',
       'apiKeyLabel': 'OpenAI API Key',
       'apiKeyDescription':
@@ -275,6 +277,7 @@ class AppLocalizations {
       'tryAgain': 'Попробовать снова',
       'noMicPermission':
           'Нет доступа к микрофону. Разрешите в настройках телефона.',
+      'uploadFile': 'Загрузить файл',
       'settingsTitle': 'Настройки',
       'apiKeyLabel': 'OpenAI API ключ',
       'apiKeyDescription':
@@ -379,6 +382,7 @@ class AppLocalizations {
       'tryAgain': 'Erneut versuchen',
       'noMicPermission':
           'Kein Mikrofonzugriff. Bitte in den Einstellungen erlauben.',
+      'uploadFile': 'Datei hochladen',
       'settingsTitle': 'Einstellungen',
       'apiKeyLabel': 'OpenAI API-Schlüssel',
       'apiKeyDescription':
@@ -483,6 +487,7 @@ class AppLocalizations {
       'tryAgain': 'Réessayer',
       'noMicPermission':
           'Pas d\'accès au microphone. Autorisez dans les paramètres.',
+      'uploadFile': 'Importer un fichier',
       'settingsTitle': 'Paramètres',
       'apiKeyLabel': 'Clé API OpenAI',
       'apiKeyDescription':
@@ -588,6 +593,7 @@ class AppLocalizations {
       'tryAgain': 'Intentar de nuevo',
       'noMicPermission':
           'Sin acceso al micrófono. Permite en los ajustes del teléfono.',
+      'uploadFile': 'Subir archivo',
       'settingsTitle': 'Ajustes',
       'apiKeyLabel': 'Clave API de OpenAI',
       'apiKeyDescription':
@@ -692,6 +698,7 @@ class AppLocalizations {
       'tryAgain': 'Riprova',
       'noMicPermission':
           'Nessun accesso al microfono. Consenti nelle impostazioni.',
+      'uploadFile': 'Carica file',
       'settingsTitle': 'Impostazioni',
       'apiKeyLabel': 'Chiave API OpenAI',
       'apiKeyDescription':
@@ -796,6 +803,7 @@ class AppLocalizations {
       'tryAgain': 'Tentar novamente',
       'noMicPermission':
           'Sem acesso ao microfone. Permita nas configurações do telefone.',
+      'uploadFile': 'Enviar arquivo',
       'settingsTitle': 'Configurações',
       'apiKeyLabel': 'Chave API OpenAI',
       'apiKeyDescription':
@@ -900,6 +908,7 @@ class AppLocalizations {
       'tryAgain': 'Spróbuj ponownie',
       'noMicPermission':
           'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
+      'uploadFile': 'Prześlij plik',
       'settingsTitle': 'Ustawienia',
       'apiKeyLabel': 'Klucz API OpenAI',
       'apiKeyDescription':
@@ -1002,6 +1011,7 @@ class AppLocalizations {
       'unknownError': '未知错误',
       'tryAgain': '重试',
       'noMicPermission': '无麦克风权限，请在手机设置中允许。',
+      'uploadFile': '上传文件',
       'settingsTitle': '设置',
       'apiKeyLabel': 'OpenAI API 密钥',
       'apiKeyDescription': '用于转录、翻译和语音合成。在 platform.openai.com 获取密钥',
@@ -1101,6 +1111,7 @@ class AppLocalizations {
       'unknownError': '不明なエラー',
       'tryAgain': '再試行',
       'noMicPermission': 'マイクへのアクセスがありません。設定で許可してください。',
+      'uploadFile': 'ファイルを選択',
       'settingsTitle': '設定',
       'apiKeyLabel': 'OpenAI APIキー',
       'apiKeyDescription':
@@ -1201,6 +1212,7 @@ class AppLocalizations {
       'unknownError': '알 수 없는 오류',
       'tryAgain': '다시 시도',
       'noMicPermission': '마이크 접근 권한이 없습니다. 설정에서 허용해주세요.',
+      'uploadFile': '파일 업로드',
       'settingsTitle': '설정',
       'apiKeyLabel': 'OpenAI API 키',
       'apiKeyDescription':
@@ -1303,6 +1315,7 @@ class AppLocalizations {
       'tryAgain': 'Tekrar dene',
       'noMicPermission':
           'Mikrofon erişimi yok. Lütfen telefon ayarlarından izin verin.',
+      'uploadFile': 'Dosya yükle',
       'settingsTitle': 'Ayarlar',
       'apiKeyLabel': 'OpenAI API Anahtarı',
       'apiKeyDescription':

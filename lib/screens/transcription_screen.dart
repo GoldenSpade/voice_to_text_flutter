@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
@@ -139,6 +140,45 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     }
   }
 
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+      allowMultiple: false,
+    );
+    if (result == null || result.files.single.path == null) return;
+
+    setState(() {
+      _state = _State.processing;
+      _resultText = null;
+      _errorMessage = null;
+    });
+
+    final appState = context.read<AppState>();
+    try {
+      final text = await OpenAIService(appState.apiKey)
+          .transcribeAudio(result.files.single.path!);
+      if (mounted) {
+        context.read<HistoryService>().add(HistoryItem(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              type: HistoryType.transcription,
+              createdAt: DateTime.now(),
+              result: text,
+            ));
+        setState(() {
+          _state = _State.result;
+          _resultText = text;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _state = _State.error;
+          _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+    }
+  }
+
   String _formatTime(int s) =>
       '${(s ~/ 60).toString().padLeft(2, '0')}:'
       '${(s % 60).toString().padLeft(2, '0')}';
@@ -203,6 +243,37 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
             style: TextStyle(
               color: Colors.white.withOpacity(0.45),
               fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(width: 48, height: 1, color: Colors.white12),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white24,
+                ),
+              ),
+              Container(width: 48, height: 1, color: Colors.white12),
+            ],
+          ),
+          const SizedBox(height: 20),
+          OutlinedButton.icon(
+            onPressed: _pickFile,
+            icon: const Icon(Icons.upload_file, size: 18),
+            label: Text(l10n.uploadFile),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white70,
+              side: BorderSide(color: Colors.white.withOpacity(0.2)),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ],

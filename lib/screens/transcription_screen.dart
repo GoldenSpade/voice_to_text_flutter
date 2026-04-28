@@ -27,6 +27,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   _State _state = _State.idle;
   String? _resultText;
   String? _errorMessage;
+  String? _historyItemId;
+  bool _correcting = false;
+  bool _corrected = false;
   Timer? _timer;
   int _seconds = 0;
   late AppButtonTheme _theme;
@@ -116,8 +119,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         File(path).deleteSync();
       } catch (_) {}
       if (mounted) {
+        final id = DateTime.now().millisecondsSinceEpoch.toString();
         context.read<HistoryService>().add(HistoryItem(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              id: id,
               type: HistoryType.transcription,
               createdAt: DateTime.now(),
               result: text,
@@ -125,6 +129,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         setState(() {
           _state = _State.result;
           _resultText = text;
+          _historyItemId = id;
+          _corrected = false;
         });
       }
     } catch (e) {
@@ -158,8 +164,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
       final text = await OpenAIService(appState.apiKey)
           .transcribeAudio(result.files.single.path!);
       if (mounted) {
+        final id = DateTime.now().millisecondsSinceEpoch.toString();
         context.read<HistoryService>().add(HistoryItem(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              id: id,
               type: HistoryType.transcription,
               createdAt: DateTime.now(),
               result: text,
@@ -167,6 +174,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         setState(() {
           _state = _State.result;
           _resultText = text;
+          _historyItemId = id;
+          _corrected = false;
         });
       }
     } catch (e) {
@@ -175,6 +184,38 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
           _state = _State.error;
           _errorMessage = e.toString().replaceFirst('Exception: ', '');
         });
+      }
+    }
+  }
+
+  Future<void> _correctText() async {
+    if (_resultText == null || _correcting) return;
+    setState(() => _correcting = true);
+    final appState = context.read<AppState>();
+    try {
+      final corrected =
+          await OpenAIService(appState.apiKey).correctText(_resultText!);
+      if (mounted) {
+        if (_historyItemId != null) {
+          context
+              .read<HistoryService>()
+              .updateResult(_historyItemId!, corrected);
+        }
+        setState(() {
+          _resultText = corrected;
+          _correcting = false;
+          _corrected = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _correcting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text(e.toString().replaceFirst('Exception: ', '')),
+          ),
+        );
       }
     }
   }
@@ -405,7 +446,46 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: (_correcting || _corrected) ? null : _correctText,
+              icon: _correcting
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: _theme.colors[0],
+                      ),
+                    )
+                  : Icon(
+                      _corrected
+                          ? Icons.check_circle_outline
+                          : Icons.auto_fix_high,
+                      size: 18,
+                    ),
+              label: Text(
+                _correcting
+                    ? l10n.correcting
+                    : (_corrected ? l10n.corrected : l10n.fixErrors),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor:
+                    _corrected ? Colors.greenAccent : _theme.colors[0],
+                side: BorderSide(
+                  color: _corrected
+                      ? Colors.greenAccent.withOpacity(0.4)
+                      : _theme.colors[0].withOpacity(0.5),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -439,6 +519,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                     _state = _State.idle;
                     _resultText = null;
                     _seconds = 0;
+                    _historyItemId = null;
+                    _corrected = false;
                   }),
                   icon: const Icon(Icons.mic, size: 18),
                   label: Text(l10n.again),

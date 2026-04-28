@@ -104,6 +104,24 @@ class HistoryService extends ChangeNotifier {
     }
   }
 
+  Future<void> updateResult(String id, String newResult) async {
+    final idx = _items.indexWhere((e) => e.id == id);
+    if (idx == -1) return;
+    final old = _items[idx];
+    _items[idx] = HistoryItem(
+      id: old.id,
+      type: old.type,
+      createdAt: old.createdAt,
+      result: newResult,
+      original: old.original,
+      languageName: old.languageName,
+      voiceName: old.voiceName,
+      audioFilePath: old.audioFilePath,
+    );
+    notifyListeners();
+    await _persist();
+  }
+
   Future<int> restoreItems(List<HistoryItem> items) async {
     final existingIds = _items.map((e) => e.id).toSet();
     int added = 0;

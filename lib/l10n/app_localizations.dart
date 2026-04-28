@@ -58,6 +58,9 @@ class AppLocalizations {
   String get tryAgain => _t('tryAgain');
   String get noMicPermission => _t('noMicPermission');
   String get uploadFile => _t('uploadFile');
+  String get fixErrors => _t('fixErrors');
+  String get correcting => _t('correcting');
+  String get corrected => _t('corrected');
 
   // ── Settings screen ───────────────────────────────────────────────────────
   String get settingsTitle => _t('settingsTitle');
@@ -255,6 +258,12 @@ class AppLocalizations {
       'importHistory': 'Import History',
       'exportDone': 'Backup saved',
       'importDone': 'Import completed',
+      'searchHint': 'Search history...',
+      'filterAll': 'All',
+      'noResults': 'No results',
+      'fixErrors': 'Fix errors',
+      'correcting': 'Correcting...',
+      'corrected': 'Corrected',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -364,6 +373,12 @@ class AppLocalizations {
       'importHistory': 'Импорт истории',
       'exportDone': 'Резервная копия сохранена',
       'importDone': 'Импорт завершён',
+      'searchHint': 'Поиск по истории...',
+      'filterAll': 'Все',
+      'noResults': 'Ничего не найдено',
+      'fixErrors': 'Исправить ошибки',
+      'correcting': 'Исправляем...',
+      'corrected': 'Исправлено',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -474,6 +489,12 @@ class AppLocalizations {
       'importHistory': 'Verlauf importieren',
       'exportDone': 'Sicherung gespeichert',
       'importDone': 'Import abgeschlossen',
+      'searchHint': 'Verlauf durchsuchen...',
+      'filterAll': 'Alle',
+      'noResults': 'Keine Ergebnisse',
+      'fixErrors': 'Fehler beheben',
+      'correcting': 'Wird korrigiert...',
+      'corrected': 'Korrigiert',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -585,6 +606,12 @@ class AppLocalizations {
       'importHistory': "Importer l'historique",
       'exportDone': 'Sauvegarde enregistrée',
       'importDone': 'Importation terminée',
+      'searchHint': "Rechercher dans l'historique...",
+      'filterAll': 'Tous',
+      'noResults': 'Aucun résultat',
+      'fixErrors': 'Corriger les erreurs',
+      'correcting': 'Correction...',
+      'corrected': 'Corrigé',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -695,6 +722,12 @@ class AppLocalizations {
       'importHistory': 'Importar historial',
       'exportDone': 'Copia guardada',
       'importDone': 'Importación completada',
+      'searchHint': 'Buscar en historial...',
+      'filterAll': 'Todos',
+      'noResults': 'Sin resultados',
+      'fixErrors': 'Corregir errores',
+      'correcting': 'Corrigiendo...',
+      'corrected': 'Corregido',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -805,6 +838,12 @@ class AppLocalizations {
       'importHistory': 'Importa cronologia',
       'exportDone': 'Backup salvato',
       'importDone': 'Importazione completata',
+      'searchHint': 'Cerca nella cronologia...',
+      'filterAll': 'Tutti',
+      'noResults': 'Nessun risultato',
+      'fixErrors': 'Correggi errori',
+      'correcting': 'Correzione...',
+      'corrected': 'Corretto',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -915,6 +954,12 @@ class AppLocalizations {
       'importHistory': 'Importar histórico',
       'exportDone': 'Backup salvo',
       'importDone': 'Importação concluída',
+      'searchHint': 'Pesquisar histórico...',
+      'filterAll': 'Todos',
+      'noResults': 'Sem resultados',
+      'fixErrors': 'Corrigir erros',
+      'correcting': 'Corrigindo...',
+      'corrected': 'Corrigido',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -1025,6 +1070,12 @@ class AppLocalizations {
       'importHistory': 'Importuj historię',
       'exportDone': 'Kopia zapisana',
       'importDone': 'Import zakończony',
+      'searchHint': 'Szukaj w historii...',
+      'filterAll': 'Wszystkie',
+      'noResults': 'Brak wyników',
+      'fixErrors': 'Popraw błędy',
+      'correcting': 'Poprawianie...',
+      'corrected': 'Poprawiono',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1130,6 +1181,12 @@ class AppLocalizations {
       'importHistory': '导入历史记录',
       'exportDone': '备份已保存',
       'importDone': '导入完成',
+      'searchHint': '搜索历史...',
+      'filterAll': '全部',
+      'noResults': '无结果',
+      'fixErrors': '纠正错误',
+      'correcting': '正在纠正...',
+      'corrected': '已纠正',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1236,6 +1293,12 @@ class AppLocalizations {
       'importHistory': '履歴をインポート',
       'exportDone': 'バックアップを保存しました',
       'importDone': 'インポート完了',
+      'searchHint': '履歴を検索...',
+      'filterAll': 'すべて',
+      'noResults': '結果なし',
+      'fixErrors': 'エラーを修正',
+      'correcting': '修正中...',
+      'corrected': '修正済み',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1342,6 +1405,12 @@ class AppLocalizations {
       'importHistory': '기록 가져오기',
       'exportDone': '백업이 저장되었습니다',
       'importDone': '가져오기 완료',
+      'searchHint': '기록 검색...',
+      'filterAll': '전체',
+      'noResults': '결과 없음',
+      'fixErrors': '오류 수정',
+      'correcting': '수정 중...',
+      'corrected': '수정됨',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1452,6 +1521,12 @@ class AppLocalizations {
       'importHistory': 'Geçmişi İçe Aktar',
       'exportDone': 'Yedek kaydedildi',
       'importDone': 'İçe aktarma tamamlandı',
+      'searchHint': 'Geçmişte ara...',
+      'filterAll': 'Tümü',
+      'noResults': 'Sonuç yok',
+      'fixErrors': 'Hataları düzelt',
+      'correcting': 'Düzeltiliyor...',
+      'corrected': 'Düzeltildi',
     },
   };
 }

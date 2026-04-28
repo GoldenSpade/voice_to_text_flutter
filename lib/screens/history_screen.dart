@@ -39,7 +39,7 @@ class HistoryScreen extends StatelessWidget {
         builder: (context, svc, _) {
           if (svc.items.isEmpty) return _buildEmpty(l10n);
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.only(top: 8, bottom: 100),
             itemCount: svc.items.length,
             separatorBuilder: (_, __) => const SizedBox(height: 4),
             itemBuilder: (context, i) =>

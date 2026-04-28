@@ -65,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         8 => l10n.themeVivid,
         9 => l10n.themeMint,
         10 => l10n.themeLavender,
-        _ => l10n.themeBinance,
+        _ => l10n.themeGraphite,
       };
 
   void _showLanguagePicker(BuildContext context, AppState state) {

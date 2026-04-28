@@ -167,7 +167,7 @@ const kAppThemes = <AppButtonTheme>[
   ),
   // 11 — Binance (dark gray + gold)
   AppButtonTheme(
-    nameKey: 'themeBinance',
+    nameKey: 'themeGraphite',
     appBarColor: Color(0xFFB8940A),
     backgroundColor: Color(0xFF181A20),
     colors: [

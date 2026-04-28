@@ -5,12 +5,18 @@ class AppButtonTheme {
   final Color appBarColor;
   final Color backgroundColor;
   final List<Color> colors;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color accentColor;
 
   const AppButtonTheme({
     required this.nameKey,
     required this.appBarColor,
     required this.backgroundColor,
     required this.colors,
+    this.textPrimary = Colors.white,
+    this.textSecondary = const Color(0xFFA6A6A6),
+    this.accentColor = Colors.white,
   });
 }
 
@@ -171,5 +177,8 @@ const kAppThemes = <AppButtonTheme>[
       Color(0xFF2E3948),
       Color(0xFF232A35),
     ],
+    textPrimary: Color(0xFFEAECEF),
+    textSecondary: Color(0xFF848E9C),
+    accentColor: Color(0xFFF0B90B),
   ),
 ];

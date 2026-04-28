@@ -68,6 +68,9 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.transcribeAudio,
                     subtitle: l10n.transcribeAudioSub,
                     color: colors[0],
+                    textColor: theme.textPrimary,
+                    subtitleColor: theme.textSecondary,
+                    iconColor: theme.accentColor,
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -83,6 +86,9 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.translateText,
                     subtitle: l10n.translateTextSub,
                     color: colors[1],
+                    textColor: theme.textPrimary,
+                    subtitleColor: theme.textSecondary,
+                    iconColor: theme.accentColor,
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -98,6 +104,9 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.transcribeAndTranslate,
                     subtitle: l10n.transcribeAndTranslateSub,
                     color: colors[2],
+                    textColor: theme.textPrimary,
+                    subtitleColor: theme.textSecondary,
+                    iconColor: theme.accentColor,
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -114,6 +123,9 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.fullCycle,
                     subtitle: l10n.fullCycleSub,
                     color: colors[3],
+                    textColor: theme.textPrimary,
+                    subtitleColor: theme.textSecondary,
+                    iconColor: theme.accentColor,
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -129,6 +141,9 @@ class HomeScreen extends StatelessWidget {
                     label: l10n.textToVoice,
                     subtitle: l10n.textToVoiceSub,
                     color: colors[4],
+                    textColor: theme.textPrimary,
+                    subtitleColor: theme.textSecondary,
+                    iconColor: theme.accentColor,
                     onTap: hasKey
                         ? () => Navigator.push(
                               context,
@@ -185,6 +200,9 @@ class _MenuButton extends StatelessWidget {
   final String subtitle;
   final Color color;
   final VoidCallback? onTap;
+  final Color textColor;
+  final Color subtitleColor;
+  final Color iconColor;
 
   const _MenuButton({
     required this.icon,
@@ -192,6 +210,9 @@ class _MenuButton extends StatelessWidget {
     required this.subtitle,
     required this.color,
     required this.onTap,
+    this.textColor = Colors.white,
+    this.subtitleColor = const Color(0xFFA6A6A6),
+    this.iconColor = Colors.white,
   });
 
   @override
@@ -212,10 +233,10 @@ class _MenuButton extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: iconColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, color: Colors.white, size: 26),
+                  child: Icon(icon, color: iconColor, size: 26),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -224,8 +245,8 @@ class _MenuButton extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: textColor,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -234,7 +255,7 @@ class _MenuButton extends StatelessWidget {
                       Text(
                         subtitle,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.65),
+                          color: subtitleColor,
                           fontSize: 12,
                         ),
                       ),
@@ -243,7 +264,7 @@ class _MenuButton extends StatelessWidget {
                 ),
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: Colors.white.withOpacity(0.4),
+                  color: textColor.withOpacity(0.4),
                   size: 16,
                 ),
               ],

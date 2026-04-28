@@ -104,6 +104,26 @@ class HistoryService extends ChangeNotifier {
     }
   }
 
+  Future<int> restoreItems(List<HistoryItem> items) async {
+    final existingIds = _items.map((e) => e.id).toSet();
+    int added = 0;
+    for (final item in items) {
+      if (!existingIds.contains(item.id)) {
+        _items.add(item);
+        existingIds.add(item.id);
+        added++;
+      }
+    }
+    if (added == 0) return 0;
+    _items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    while (_items.length > _maxItems) {
+      _deleteAudioFile(_items.removeLast());
+    }
+    notifyListeners();
+    await _persist();
+    return added;
+  }
+
   Future<void> _persist() async {
     try {
       final file = await _file();

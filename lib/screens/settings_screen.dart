@@ -1,8 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../models/app_theme.dart';
 import '../providers/app_state.dart';
+import '../services/backup_service.dart';
+import '../services/history_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -67,6 +70,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
         10 => l10n.themeLavender,
         _ => l10n.themeGraphite,
       };
+
+  Future<void> _export(AppLocalizations l10n) async {
+    try {
+      final name =
+          await BackupService.export(context.read<HistoryService>());
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.exportDone}: $name'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+  }
+
+  Future<void> _import(AppLocalizations l10n) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['zip'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    try {
+      final count = await BackupService.import(
+        result.files.single.path!,
+        context.read<HistoryService>(),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.importDone}: $count'),
+            backgroundColor: Colors.green.shade700,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+  }
 
   void _showLanguagePicker(BuildContext context, AppState state) {
     final theme = state.buttonTheme;
@@ -363,7 +420,102 @@ class _SettingsScreenState extends State<SettingsScreen> {
             }),
           ),
 
+          const SizedBox(height: 32),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 16),
+
+          // ── Backup ────────────────────────────────────────────────────────
+          Text(
+            l10n.backupSection,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _BackupTile(
+            icon: Icons.upload_rounded,
+            title: l10n.exportHistory,
+            subtitle: 'ZIP → Downloads',
+            surfaceColor: theme.surfaceColor,
+            accentColor: theme.colors[0],
+            onTap: () => _export(l10n),
+          ),
+          const SizedBox(height: 8),
+          _BackupTile(
+            icon: Icons.download_rounded,
+            title: l10n.importHistory,
+            subtitle: 'ZIP',
+            surfaceColor: theme.surfaceColor,
+            accentColor: theme.colors[0],
+            onTap: () => _import(l10n),
+          ),
+
         ],
+      ),
+    );
+  }
+}
+
+class _BackupTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color surfaceColor;
+  final Color accentColor;
+  final VoidCallback onTap;
+
+  const _BackupTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.surfaceColor,
+    required this.accentColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: accentColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: accentColor, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 15)),
+                  Text(subtitle,
+                      style: const TextStyle(
+                          color: Colors.white38, fontSize: 12)),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios,
+                color: Colors.white24, size: 16),
+          ],
+        ),
       ),
     );
   }

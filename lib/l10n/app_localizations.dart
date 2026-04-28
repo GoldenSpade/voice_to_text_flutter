@@ -71,6 +71,11 @@ class AppLocalizations {
   String get interfaceLanguage => _t('interfaceLanguage');
   String get cancel => _t('cancel');
   String get colorThemeLabel => _t('colorThemeLabel');
+  String get backupSection => _t('backupSection');
+  String get exportHistory => _t('exportHistory');
+  String get importHistory => _t('importHistory');
+  String get exportDone => _t('exportDone');
+  String get importDone => _t('importDone');
   String get themePastel => _t('themePastel');
   String get themeVivid => _t('themeVivid');
   String get themeOcean => _t('themeOcean');
@@ -242,6 +247,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Dusk',
       'themeEarth': 'Earth',
+      'backupSection': 'Data Backup',
+      'exportHistory': 'Export History',
+      'importHistory': 'Import History',
+      'exportDone': 'Backup saved',
+      'importDone': 'Import completed',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -346,6 +356,11 @@ class AppLocalizations {
       'themeMono': 'Моно',
       'themeDusk': 'Сумерки',
       'themeEarth': 'Земля',
+      'backupSection': 'Резервная копия',
+      'exportHistory': 'Экспорт истории',
+      'importHistory': 'Импорт истории',
+      'exportDone': 'Резервная копия сохранена',
+      'importDone': 'Импорт завершён',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -451,6 +466,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Dämmerung',
       'themeEarth': 'Erde',
+      'backupSection': 'Datensicherung',
+      'exportHistory': 'Verlauf exportieren',
+      'importHistory': 'Verlauf importieren',
+      'exportDone': 'Sicherung gespeichert',
+      'importDone': 'Import abgeschlossen',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -557,6 +577,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Crépuscule',
       'themeEarth': 'Terre',
+      'backupSection': 'Sauvegarde des données',
+      'exportHistory': "Exporter l'historique",
+      'importHistory': "Importer l'historique",
+      'exportDone': 'Sauvegarde enregistrée',
+      'importDone': 'Importation terminée',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -662,6 +687,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Crepúsculo',
       'themeEarth': 'Tierra',
+      'backupSection': 'Copia de seguridad',
+      'exportHistory': 'Exportar historial',
+      'importHistory': 'Importar historial',
+      'exportDone': 'Copia guardada',
+      'importDone': 'Importación completada',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -767,6 +797,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Crepuscolo',
       'themeEarth': 'Terra',
+      'backupSection': 'Backup dei dati',
+      'exportHistory': 'Esporta cronologia',
+      'importHistory': 'Importa cronologia',
+      'exportDone': 'Backup salvato',
+      'importDone': 'Importazione completata',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -872,6 +907,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Crepúsculo',
       'themeEarth': 'Terra',
+      'backupSection': 'Backup de dados',
+      'exportHistory': 'Exportar histórico',
+      'importHistory': 'Importar histórico',
+      'exportDone': 'Backup salvo',
+      'importDone': 'Importação concluída',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -977,6 +1017,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Zmierzch',
       'themeEarth': 'Ziemia',
+      'backupSection': 'Kopia zapasowa',
+      'exportHistory': 'Eksportuj historię',
+      'importHistory': 'Importuj historię',
+      'exportDone': 'Kopia zapisana',
+      'importDone': 'Import zakończony',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1077,6 +1122,11 @@ class AppLocalizations {
       'themeMono': '单色',
       'themeDusk': '黄昏',
       'themeEarth': '大地',
+      'backupSection': '数据备份',
+      'exportHistory': '导出历史记录',
+      'importHistory': '导入历史记录',
+      'exportDone': '备份已保存',
+      'importDone': '导入完成',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1178,6 +1228,11 @@ class AppLocalizations {
       'themeMono': 'モノ',
       'themeDusk': 'ダスク',
       'themeEarth': 'アース',
+      'backupSection': 'データバックアップ',
+      'exportHistory': '履歴をエクスポート',
+      'importHistory': '履歴をインポート',
+      'exportDone': 'バックアップを保存しました',
+      'importDone': 'インポート完了',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1279,6 +1334,11 @@ class AppLocalizations {
       'themeMono': '모노',
       'themeDusk': '황혼',
       'themeEarth': '대지',
+      'backupSection': '데이터 백업',
+      'exportHistory': '기록 내보내기',
+      'importHistory': '기록 가져오기',
+      'exportDone': '백업이 저장되었습니다',
+      'importDone': '가져오기 완료',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1384,6 +1444,11 @@ class AppLocalizations {
       'themeMono': 'Mono',
       'themeDusk': 'Alacakaranlık',
       'themeEarth': 'Toprak',
+      'backupSection': 'Veri Yedekleme',
+      'exportHistory': 'Geçmişi Dışa Aktar',
+      'importHistory': 'Geçmişi İçe Aktar',
+      'exportDone': 'Yedek kaydedildi',
+      'importDone': 'İçe aktarma tamamlandı',
     },
   };
 }

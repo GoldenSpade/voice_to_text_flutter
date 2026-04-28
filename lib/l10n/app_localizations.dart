@@ -76,6 +76,12 @@ class AppLocalizations {
   String get themeSunset => _t('themeSunset');
   String get themeMint => _t('themeMint');
   String get themeLavender => _t('themeLavender');
+  String get themeBinance => _t('themeBinance');
+  String get themeSakura => _t('themeSakura');
+  String get themeMist => _t('themeMist');
+  String get themeMono => _t('themeMono');
+  String get themeDusk => _t('themeDusk');
+  String get themeEarth => _t('themeEarth');
 
   // ── Help screen ───────────────────────────────────────────────────────────
   String get helpTitle => _t('helpTitle');
@@ -228,6 +234,12 @@ class AppLocalizations {
       'themeSunset': 'Sunset',
       'themeMint': 'Mint',
       'themeLavender': 'Lavender',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Mist',
+      'themeMono': 'Mono',
+      'themeDusk': 'Dusk',
+      'themeEarth': 'Earth',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -325,6 +337,12 @@ class AppLocalizations {
       'themeSunset': 'Закат',
       'themeMint': 'Мята',
       'themeLavender': 'Лаванда',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Сакура',
+      'themeMist': 'Туман',
+      'themeMono': 'Моно',
+      'themeDusk': 'Сумерки',
+      'themeEarth': 'Земля',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -423,6 +441,12 @@ class AppLocalizations {
       'themeSunset': 'Sonnenuntergang',
       'themeMint': 'Minze',
       'themeLavender': 'Lavendel',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Nebel',
+      'themeMono': 'Mono',
+      'themeDusk': 'Dämmerung',
+      'themeEarth': 'Erde',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -522,6 +546,12 @@ class AppLocalizations {
       'themeSunset': 'Coucher de soleil',
       'themeMint': 'Menthe',
       'themeLavender': 'Lavande',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Brume',
+      'themeMono': 'Mono',
+      'themeDusk': 'Crépuscule',
+      'themeEarth': 'Terre',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -620,6 +650,12 @@ class AppLocalizations {
       'themeSunset': 'Atardecer',
       'themeMint': 'Menta',
       'themeLavender': 'Lavanda',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Niebla',
+      'themeMono': 'Mono',
+      'themeDusk': 'Crepúsculo',
+      'themeEarth': 'Tierra',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -718,6 +754,12 @@ class AppLocalizations {
       'themeSunset': 'Tramonto',
       'themeMint': 'Menta',
       'themeLavender': 'Lavanda',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Nebbia',
+      'themeMono': 'Mono',
+      'themeDusk': 'Crepuscolo',
+      'themeEarth': 'Terra',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -816,6 +858,12 @@ class AppLocalizations {
       'themeSunset': 'Pôr do sol',
       'themeMint': 'Hortelã',
       'themeLavender': 'Lavanda',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Névoa',
+      'themeMono': 'Mono',
+      'themeDusk': 'Crepúsculo',
+      'themeEarth': 'Terra',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -914,6 +962,12 @@ class AppLocalizations {
       'themeSunset': 'Zachód słońca',
       'themeMint': 'Mięta',
       'themeLavender': 'Lawenda',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Mgła',
+      'themeMono': 'Mono',
+      'themeDusk': 'Zmierzch',
+      'themeEarth': 'Ziemia',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1007,6 +1061,12 @@ class AppLocalizations {
       'themeSunset': '日落',
       'themeMint': '薄荷',
       'themeLavender': '薰衣草',
+      'themeBinance': 'Binance',
+      'themeSakura': '樱花',
+      'themeMist': '薄雾',
+      'themeMono': '单色',
+      'themeDusk': '黄昏',
+      'themeEarth': '大地',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1101,6 +1161,12 @@ class AppLocalizations {
       'themeSunset': 'サンセット',
       'themeMint': 'ミント',
       'themeLavender': 'ラベンダー',
+      'themeBinance': 'Binance',
+      'themeSakura': 'サクラ',
+      'themeMist': 'ミスト',
+      'themeMono': 'モノ',
+      'themeDusk': 'ダスク',
+      'themeEarth': 'アース',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1195,6 +1261,12 @@ class AppLocalizations {
       'themeSunset': '선셋',
       'themeMint': '민트',
       'themeLavender': '라벤더',
+      'themeBinance': 'Binance',
+      'themeSakura': '사쿠라',
+      'themeMist': '미스트',
+      'themeMono': '모노',
+      'themeDusk': '황혼',
+      'themeEarth': '대지',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1293,6 +1365,12 @@ class AppLocalizations {
       'themeSunset': 'Gün Batımı',
       'themeMint': 'Nane',
       'themeLavender': 'Lavanta',
+      'themeBinance': 'Binance',
+      'themeSakura': 'Sakura',
+      'themeMist': 'Sis',
+      'themeMono': 'Mono',
+      'themeDusk': 'Alacakaranlık',
+      'themeEarth': 'Toprak',
     },
   };
 }

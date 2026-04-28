@@ -55,11 +55,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   String _themeName(AppLocalizations l10n, int i) => switch (i) {
         0 => l10n.themePastel,
-        1 => l10n.themeVivid,
-        2 => l10n.themeOcean,
-        3 => l10n.themeSunset,
-        4 => l10n.themeMint,
-        _ => l10n.themeLavender,
+        1 => l10n.themeDusk,
+        2 => l10n.themeEarth,
+        3 => l10n.themeMono,
+        4 => l10n.themeMist,
+        5 => l10n.themeOcean,
+        6 => l10n.themeSakura,
+        7 => l10n.themeSunset,
+        8 => l10n.themeVivid,
+        9 => l10n.themeMint,
+        10 => l10n.themeLavender,
+        _ => l10n.themeBinance,
       };
 
   void _showLanguagePicker(BuildContext context, AppState state) {
@@ -125,8 +131,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
         foregroundColor: Colors.white,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
         children: [
+          // ── Language ─────────────────────────────────────────────────────
+          Text(
+            l10n.interfaceLanguage,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          InkWell(
+            onTap: () => _showLanguagePicker(context, state),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF16213E),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.language,
+                      color: Colors.white54, size: 22),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      currentLangName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white38, size: 16),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 32),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 16),
+
           // ── API Key ──────────────────────────────────────────────────────
           Text(
             l10n.apiKeyLabel,
@@ -308,52 +361,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             }),
           ),
 
-          const SizedBox(height: 32),
-          const Divider(color: Colors.white12),
-          const SizedBox(height: 16),
-
-          // ── Language ─────────────────────────────────────────────────────
-          Text(
-            l10n.interfaceLanguage,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          InkWell(
-            onTap: () => _showLanguagePicker(context, state),
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.language,
-                      color: Colors.white54, size: 22),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      currentLangName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                  const Icon(Icons.arrow_forward_ios,
-                      color: Colors.white38, size: 16),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );

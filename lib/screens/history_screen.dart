@@ -11,14 +11,45 @@ import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  final _searchController = TextEditingController();
+  String _query = '';
+  HistoryType? _activeFilter;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<HistoryItem> _filtered(List<HistoryItem> items) {
+    var result = items.toList();
+    if (_activeFilter != null) {
+      result = result.where((e) => e.type == _activeFilter).toList();
+    }
+    final q = _query.trim().toLowerCase();
+    if (q.isNotEmpty) {
+      result = result.where((e) {
+        return e.result.toLowerCase().contains(q) ||
+            (e.original?.toLowerCase().contains(q) ?? false);
+      }).toList();
+    }
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final l10n = state.l10n;
     final theme = state.buttonTheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.historyTitle),
@@ -31,7 +62,8 @@ class HistoryScreen extends StatelessWidget {
               return IconButton(
                 icon: const Icon(Icons.delete_sweep_outlined),
                 tooltip: l10n.clearAll,
-                onPressed: () => _confirmClear(context, svc, l10n, theme.surfaceColor),
+                onPressed: () =>
+                    _confirmClear(context, svc, l10n, theme.surfaceColor),
               );
             },
           ),
@@ -40,12 +72,88 @@ class HistoryScreen extends StatelessWidget {
       body: Consumer<HistoryService>(
         builder: (context, svc, _) {
           if (svc.items.isEmpty) return _buildEmpty(l10n);
-          return ListView.separated(
-            padding: const EdgeInsets.only(top: 8, bottom: 100),
-            itemCount: svc.items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 4),
-            itemBuilder: (context, i) =>
-                _HistoryCard(item: svc.items[i], service: svc),
+
+          final filtered = _filtered(svc.items);
+
+          return Column(
+            children: [
+              // ── Search bar ──────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  onChanged: (v) => setState(() => _query = v),
+                  decoration: InputDecoration(
+                    hintText: l10n.searchHint,
+                    hintStyle: TextStyle(
+                        color: Colors.white.withOpacity(0.3), fontSize: 14),
+                    prefixIcon: const Icon(Icons.search,
+                        color: Colors.white38, size: 20),
+                    suffixIcon: _query.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear,
+                                color: Colors.white38, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _query = '');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: theme.surfaceColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    isDense: true,
+                  ),
+                ),
+              ),
+
+              // ── Filter chips ────────────────────────────────────────────
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                child: Row(
+                  children: [
+                    _FilterPill(
+                      label: l10n.filterAll,
+                      selected: _activeFilter == null,
+                      color: theme.colors[0],
+                      onTap: () => setState(() => _activeFilter = null),
+                    ),
+                    const SizedBox(width: 6),
+                    ...HistoryType.values.map((type) => Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: _FilterPill(
+                            label: l10n.historyTypeLabel(type),
+                            selected: _activeFilter == type,
+                            color: type.color,
+                            onTap: () => setState(() => _activeFilter =
+                                _activeFilter == type ? null : type),
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+
+              // ── List ────────────────────────────────────────────────────
+              Expanded(
+                child: filtered.isEmpty
+                    ? _buildNoResults(l10n)
+                    : ListView.separated(
+                        padding:
+                            const EdgeInsets.only(top: 4, bottom: 100),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: 4),
+                        itemBuilder: (context, i) =>
+                            _HistoryCard(item: filtered[i], service: svc),
+                      ),
+              ),
+            ],
           );
         },
       ),
@@ -76,8 +184,26 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  void _confirmClear(
-      BuildContext context, HistoryService svc, AppLocalizations l10n, Color surfaceColor) {
+  Widget _buildNoResults(AppLocalizations l10n) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off,
+              size: 64, color: Colors.white.withOpacity(0.15)),
+          const SizedBox(height: 16),
+          Text(
+            l10n.noResults,
+            style: TextStyle(
+                color: Colors.white.withOpacity(0.4), fontSize: 17),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmClear(BuildContext context, HistoryService svc,
+      AppLocalizations l10n, Color surfaceColor) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -105,6 +231,53 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 }
+
+// ── Filter pill ───────────────────────────────────────────────────────────────
+
+class _FilterPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _FilterPill({
+    required this.label,
+    required this.selected,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected
+              ? color.withOpacity(0.2)
+              : Colors.white.withOpacity(0.07),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? color : Colors.white.withOpacity(0.15),
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? color : Colors.white54,
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── History card ──────────────────────────────────────────────────────────────
 
 class _HistoryCard extends StatelessWidget {
   final HistoryItem item;
@@ -149,8 +322,8 @@ class _HistoryCard extends StatelessWidget {
                   color: item.type.color.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child:
-                    Icon(item.type.icon, color: item.type.color, size: 20),
+                child: Icon(item.type.icon,
+                    color: item.type.color, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -208,7 +381,8 @@ class _HistoryCard extends StatelessWidget {
                 icon: Icon(Icons.delete_outline,
                     size: 18, color: Colors.white.withOpacity(0.3)),
                 splashRadius: 20,
-                onPressed: () => _confirmDelete(context, l10n, theme.surfaceColor),
+                onPressed: () =>
+                    _confirmDelete(context, l10n, theme.surfaceColor),
               ),
             ],
           ),
@@ -235,7 +409,8 @@ class _HistoryCard extends StatelessWidget {
     );
   }
 
-  void _confirmDelete(BuildContext context, AppLocalizations l10n, Color surfaceColor) {
+  void _confirmDelete(
+      BuildContext context, AppLocalizations l10n, Color surfaceColor) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -273,6 +448,8 @@ class _HistoryCard extends StatelessWidget {
         '${dt.minute.toString().padLeft(2, '0')}';
   }
 }
+
+// ── Detail bottom sheet ───────────────────────────────────────────────────────
 
 class _DetailSheet extends StatefulWidget {
   final HistoryItem item;
@@ -362,7 +539,8 @@ class _DetailSheetState extends State<_DetailSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            content:
+                Text(e.toString().replaceFirst('Exception: ', '')),
             duration: const Duration(seconds: 3),
           ),
         );
@@ -451,7 +629,8 @@ class _DetailSheetState extends State<_DetailSheet> {
             const SizedBox(height: 4),
             Text(
               _formatDateFull(widget.item.createdAt),
-              style: const TextStyle(color: Colors.white38, fontSize: 12),
+              style:
+                  const TextStyle(color: Colors.white38, fontSize: 12),
             ),
             const Divider(color: Colors.white12, height: 24),
             if (hasOriginal) ...[
@@ -498,7 +677,9 @@ class _DetailSheetState extends State<_DetailSheet> {
                     size: 22,
                   ),
                   label: Text(
-                    _isPlaying ? widget.l10n.pause : widget.l10n.play,
+                    _isPlaying
+                        ? widget.l10n.pause
+                        : widget.l10n.play,
                     style: const TextStyle(fontSize: 15),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -613,6 +794,8 @@ class _DetailSheetState extends State<_DetailSheet> {
         '${dt.minute.toString().padLeft(2, '0')}';
   }
 }
+
+// ── Shared widgets ────────────────────────────────────────────────────────────
 
 class _CopyButton extends StatelessWidget {
   final String label;

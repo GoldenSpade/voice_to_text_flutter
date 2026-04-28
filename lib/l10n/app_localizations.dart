@@ -122,6 +122,9 @@ class AppLocalizations {
 
   // ── History screen ────────────────────────────────────────────────────────
   String get historyTitle => _t('historyTitle');
+  String get searchHint => _t('searchHint');
+  String get filterAll => _t('filterAll');
+  String get noResults => _t('noResults');
   String get clearAll => _t('clearAll');
   String get clearHistoryTitle => _t('clearHistoryTitle');
   String get clearHistoryMsg => _t('clearHistoryMsg');

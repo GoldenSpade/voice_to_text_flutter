@@ -94,6 +94,9 @@ class AppLocalizations {
   String get themeMono => _t('themeMono');
   String get themeDusk => _t('themeDusk');
   String get themeEarth => _t('themeEarth');
+  String get themeGroupMulti => _t('themeGroupMulti');
+  String get themeGroupMono => _t('themeGroupMono');
+  String get themePastelMono => _t('themePastelMono');
 
   // ── Help screen ───────────────────────────────────────────────────────────
   String get helpTitle => _t('helpTitle');
@@ -270,6 +273,9 @@ class AppLocalizations {
       'shareText': 'Share text',
       'shareOriginal': 'Share original',
       'shareTranslation': 'Share translation',
+      'themeGroupMulti': 'Multicolor',
+      'themeGroupMono': 'Monochrome',
+      'themePastelMono': 'Pastel Mono',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -388,6 +394,9 @@ class AppLocalizations {
       'shareText': 'Поделиться текстом',
       'shareOriginal': 'Поделиться оригиналом',
       'shareTranslation': 'Поделиться переводом',
+      'themeGroupMulti': 'Разноцветные',
+      'themeGroupMono': 'Однотонные',
+      'themePastelMono': 'Пастель моно',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -507,6 +516,9 @@ class AppLocalizations {
       'shareText': 'Text teilen',
       'shareOriginal': 'Original teilen',
       'shareTranslation': 'Übersetzung teilen',
+      'themeGroupMulti': 'Mehrfarbig',
+      'themeGroupMono': 'Einfarbig',
+      'themePastelMono': 'Pastell Mono',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -627,6 +639,9 @@ class AppLocalizations {
       'shareText': 'Partager le texte',
       'shareOriginal': "Partager l'original",
       'shareTranslation': 'Partager la traduction',
+      'themeGroupMulti': 'Multicolore',
+      'themeGroupMono': 'Monochrome',
+      'themePastelMono': 'Pastel Mono',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -746,6 +761,9 @@ class AppLocalizations {
       'shareText': 'Compartir texto',
       'shareOriginal': 'Compartir original',
       'shareTranslation': 'Compartir traducción',
+      'themeGroupMulti': 'Multicolor',
+      'themeGroupMono': 'Monocromo',
+      'themePastelMono': 'Pastel Mono',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -865,6 +883,9 @@ class AppLocalizations {
       'shareText': 'Condividi testo',
       'shareOriginal': 'Condividi originale',
       'shareTranslation': 'Condividi traduzione',
+      'themeGroupMulti': 'Multicolore',
+      'themeGroupMono': 'Monocolore',
+      'themePastelMono': 'Pastello Mono',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -984,6 +1005,9 @@ class AppLocalizations {
       'shareText': 'Compartilhar texto',
       'shareOriginal': 'Compartilhar original',
       'shareTranslation': 'Compartilhar tradução',
+      'themeGroupMulti': 'Multicolor',
+      'themeGroupMono': 'Monocromático',
+      'themePastelMono': 'Pastel Mono',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -1103,6 +1127,9 @@ class AppLocalizations {
       'shareText': 'Udostępnij tekst',
       'shareOriginal': 'Udostępnij oryginał',
       'shareTranslation': 'Udostępnij tłumaczenie',
+      'themeGroupMulti': 'Wielobarwne',
+      'themeGroupMono': 'Jednobarwne',
+      'themePastelMono': 'Pastelowy Mono',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1217,6 +1244,9 @@ class AppLocalizations {
       'shareText': '分享文本',
       'shareOriginal': '分享原文',
       'shareTranslation': '分享译文',
+      'themeGroupMulti': '多色',
+      'themeGroupMono': '单色',
+      'themePastelMono': '柔和单色',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1332,6 +1362,9 @@ class AppLocalizations {
       'shareText': 'テキストをシェア',
       'shareOriginal': '原文をシェア',
       'shareTranslation': '翻訳をシェア',
+      'themeGroupMulti': 'マルチカラー',
+      'themeGroupMono': 'モノクロ',
+      'themePastelMono': 'パステルモノ',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1447,6 +1480,9 @@ class AppLocalizations {
       'shareText': '텍스트 공유',
       'shareOriginal': '원문 공유',
       'shareTranslation': '번역 공유',
+      'themeGroupMulti': '멀티컬러',
+      'themeGroupMono': '단색',
+      'themePastelMono': '파스텔 모노',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1566,6 +1602,9 @@ class AppLocalizations {
       'shareText': 'Metni paylaş',
       'shareOriginal': 'Orijinali paylaş',
       'shareTranslation': 'Çeviriyi paylaş',
+      'themeGroupMulti': 'Çok renkli',
+      'themeGroupMono': 'Tek renkli',
+      'themePastelMono': 'Pastel Mono',
     },
   };
 }

@@ -68,8 +68,127 @@ class _SettingsScreenState extends State<SettingsScreen> {
         8 => l10n.themeVivid,
         9 => l10n.themeMint,
         10 => l10n.themeLavender,
-        _ => l10n.themeGraphite,
+        11 => l10n.themeGraphite,
+        _ => l10n.themePastelMono,
       };
+
+  static const _monoIndices = {12};
+
+  Widget _buildThemeGroup({
+    required String title,
+    required List<int> indices,
+    required int selectedIndex,
+    required AppLocalizations l10n,
+    required AppState state,
+    bool initiallyExpanded = false,
+  }) {
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        initiallyExpanded: initiallyExpanded,
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: const EdgeInsets.only(top: 12),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: indices.contains(selectedIndex)
+                ? Colors.white
+                : Colors.white54,
+            fontSize: 14,
+            fontWeight: indices.contains(selectedIndex)
+                ? FontWeight.w600
+                : FontWeight.normal,
+          ),
+        ),
+        trailing: Icon(
+          Icons.expand_more,
+          color: Colors.white38,
+        ),
+        children: [
+          Wrap(
+            spacing: 12,
+            runSpacing: 14,
+            children: indices.map((i) {
+              final t = kAppThemes[i];
+              final selected = selectedIndex == i;
+              final themeName = _themeName(l10n, i);
+              return GestureDetector(
+                onTap: () => state.saveTheme(i),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: selected ? Colors.white : Colors.white24,
+                          width: selected ? 2 : 1,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: 88,
+                          height: 108,
+                          child: Column(
+                            children: [
+                              Container(height: 14, color: t.appBarColor),
+                              Expanded(
+                                child: Container(
+                                  color: t.backgroundColor,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 6),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: t.colors
+                                        .map((c) => Container(
+                                              height: 11,
+                                              decoration: BoxDecoration(
+                                                color: c,
+                                                borderRadius:
+                                                    BorderRadius.circular(3),
+                                              ),
+                                            ))
+                                        .toList(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (selected)
+                          const Icon(Icons.check_circle,
+                              color: Colors.white, size: 12),
+                        if (selected) const SizedBox(width: 3),
+                        Text(
+                          themeName,
+                          style: TextStyle(
+                            color: selected ? Colors.white : Colors.white54,
+                            fontSize: 11,
+                            fontWeight: selected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _export(AppLocalizations l10n) async {
     try {
@@ -337,87 +456,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 14,
-            children: List.generate(kAppThemes.length, (i) {
-              final t = kAppThemes[i];
-              final selected = state.themeIndex == i;
-              final themeName = _themeName(l10n, i);
-              return GestureDetector(
-                onTap: () => state.saveTheme(i),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: selected ? Colors.white : Colors.white24,
-                          width: selected ? 2 : 1,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: SizedBox(
-                          width: 88,
-                          height: 108,
-                          child: Column(
-                            children: [
-                              Container(height: 14, color: t.appBarColor),
-                              Expanded(
-                                child: Container(
-                                  color: t.backgroundColor,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 6),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: t.colors
-                                        .map((c) => Container(
-                                              height: 11,
-                                              decoration: BoxDecoration(
-                                                color: c,
-                                                borderRadius:
-                                                    BorderRadius.circular(3),
-                                              ),
-                                            ))
-                                        .toList(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (selected)
-                          const Icon(Icons.check_circle,
-                              color: Colors.white, size: 12),
-                        if (selected) const SizedBox(width: 3),
-                        Text(
-                          themeName,
-                          style: TextStyle(
-                            color:
-                                selected ? Colors.white : Colors.white54,
-                            fontSize: 11,
-                            fontWeight: selected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            }),
+          const SizedBox(height: 8),
+          _buildThemeGroup(
+            title: l10n.themeGroupMulti,
+            indices: List.generate(
+                kAppThemes.length - _monoIndices.length, (i) => i),
+            selectedIndex: state.themeIndex,
+            l10n: l10n,
+            state: state,
+            initiallyExpanded: !_monoIndices.contains(state.themeIndex),
+          ),
+          const Divider(color: Colors.white12, height: 1),
+          _buildThemeGroup(
+            title: l10n.themeGroupMono,
+            indices: _monoIndices.toList(),
+            selectedIndex: state.themeIndex,
+            l10n: l10n,
+            state: state,
+            initiallyExpanded: _monoIndices.contains(state.themeIndex),
           ),
 
           const SizedBox(height: 32),

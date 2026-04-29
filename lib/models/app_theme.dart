@@ -198,4 +198,20 @@ const kAppThemes = <AppButtonTheme>[
     accentColor: Color(0xFFF0B90B),
     surfaceColor: Color(0xFF1E2329),
   ),
+
+  // ── Monochrome themes ─────────────────────────────────────────────────────
+
+  // 12 — Pastel Mono (same palette as Pastel, single button color)
+  AppButtonTheme(
+    nameKey: 'themePastelMono',
+    appBarColor: Color(0xFF0F3460),
+    backgroundColor: Color(0xFF1A1A2E),
+    colors: [
+      Color(0xFF3D5A80),
+      Color(0xFF3D5A80),
+      Color(0xFF3D5A80),
+      Color(0xFF3D5A80),
+      Color(0xFF3D5A80),
+    ],
+  ),
 ];

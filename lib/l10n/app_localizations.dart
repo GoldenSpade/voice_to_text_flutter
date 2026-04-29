@@ -97,6 +97,9 @@ class AppLocalizations {
   String get themeGroupMulti => _t('themeGroupMulti');
   String get themeGroupMono => _t('themeGroupMono');
   String get themePastelMono => _t('themePastelMono');
+  String get themeDuskMono => _t('themeDuskMono');
+  String get themeEarthMono => _t('themeEarthMono');
+  String get themeNeutralMono => _t('themeNeutralMono');
 
   // ── Help screen ───────────────────────────────────────────────────────────
   String get helpTitle => _t('helpTitle');
@@ -276,6 +279,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Multicolor',
       'themeGroupMono': 'Monochrome',
       'themePastelMono': 'Pastel Mono',
+      'themeDuskMono': 'Dusk Mono',
+      'themeEarthMono': 'Earth Mono',
+      'themeNeutralMono': 'Neutral Mono',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -397,6 +403,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Разноцветные',
       'themeGroupMono': 'Однотонные',
       'themePastelMono': 'Пастель моно',
+      'themeDuskMono': 'Сумерки моно',
+      'themeEarthMono': 'Земля моно',
+      'themeNeutralMono': 'Нейтраль моно',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -519,6 +528,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Mehrfarbig',
       'themeGroupMono': 'Einfarbig',
       'themePastelMono': 'Pastell Mono',
+      'themeDuskMono': 'Dämmerung Mono',
+      'themeEarthMono': 'Erde Mono',
+      'themeNeutralMono': 'Neutral Mono',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -642,6 +654,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Multicolore',
       'themeGroupMono': 'Monochrome',
       'themePastelMono': 'Pastel Mono',
+      'themeDuskMono': 'Crépuscule Mono',
+      'themeEarthMono': 'Terre Mono',
+      'themeNeutralMono': 'Neutre Mono',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -764,6 +779,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Multicolor',
       'themeGroupMono': 'Monocromo',
       'themePastelMono': 'Pastel Mono',
+      'themeDuskMono': 'Crepúsculo Mono',
+      'themeEarthMono': 'Tierra Mono',
+      'themeNeutralMono': 'Neutral Mono',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -886,6 +904,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Multicolore',
       'themeGroupMono': 'Monocolore',
       'themePastelMono': 'Pastello Mono',
+      'themeDuskMono': 'Crepuscolo Mono',
+      'themeEarthMono': 'Terra Mono',
+      'themeNeutralMono': 'Neutro Mono',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -1008,6 +1029,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Multicolor',
       'themeGroupMono': 'Monocromático',
       'themePastelMono': 'Pastel Mono',
+      'themeDuskMono': 'Crepúsculo Mono',
+      'themeEarthMono': 'Terra Mono',
+      'themeNeutralMono': 'Neutro Mono',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -1130,6 +1154,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Wielobarwne',
       'themeGroupMono': 'Jednobarwne',
       'themePastelMono': 'Pastelowy Mono',
+      'themeDuskMono': 'Zmierzch Mono',
+      'themeEarthMono': 'Ziemia Mono',
+      'themeNeutralMono': 'Neutralny Mono',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1247,6 +1274,9 @@ class AppLocalizations {
       'themeGroupMulti': '多色',
       'themeGroupMono': '单色',
       'themePastelMono': '柔和单色',
+      'themeDuskMono': '黄昏单色',
+      'themeEarthMono': '大地单色',
+      'themeNeutralMono': '中性单色',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1365,6 +1395,9 @@ class AppLocalizations {
       'themeGroupMulti': 'マルチカラー',
       'themeGroupMono': 'モノクロ',
       'themePastelMono': 'パステルモノ',
+      'themeDuskMono': 'ダスクモノ',
+      'themeEarthMono': 'アースモノ',
+      'themeNeutralMono': 'ニュートラルモノ',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1483,6 +1516,9 @@ class AppLocalizations {
       'themeGroupMulti': '멀티컬러',
       'themeGroupMono': '단색',
       'themePastelMono': '파스텔 모노',
+      'themeDuskMono': '황혼 모노',
+      'themeEarthMono': '대지 모노',
+      'themeNeutralMono': '뉴트럴 모노',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1605,6 +1641,9 @@ class AppLocalizations {
       'themeGroupMulti': 'Çok renkli',
       'themeGroupMono': 'Tek renkli',
       'themePastelMono': 'Pastel Mono',
+      'themeDuskMono': 'Alacakaranlık Mono',
+      'themeEarthMono': 'Toprak Mono',
+      'themeNeutralMono': 'Nötr Mono',
     },
   };
 }

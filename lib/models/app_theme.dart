@@ -214,4 +214,46 @@ const kAppThemes = <AppButtonTheme>[
       Color(0xFF3D5A80),
     ],
   ),
+
+  // 13 — Dusk Mono (single-color variant of Dusk)
+  AppButtonTheme(
+    nameKey: 'themeDuskMono',
+    appBarColor: Color(0xFF1A3040),
+    backgroundColor: Color(0xFF0C1820),
+    colors: [
+      Color(0xFF2E5870),
+      Color(0xFF2E5870),
+      Color(0xFF2E5870),
+      Color(0xFF2E5870),
+      Color(0xFF2E5870),
+    ],
+  ),
+
+  // 14 — Earth Mono (single-color variant of Earth)
+  AppButtonTheme(
+    nameKey: 'themeEarthMono',
+    appBarColor: Color(0xFF3A2818),
+    backgroundColor: Color(0xFF1A1208),
+    colors: [
+      Color(0xFF6A4A28),
+      Color(0xFF6A4A28),
+      Color(0xFF6A4A28),
+      Color(0xFF6A4A28),
+      Color(0xFF6A4A28),
+    ],
+  ),
+
+  // 15 — Neutral Mono (single-color variant of Mono)
+  AppButtonTheme(
+    nameKey: 'themeNeutralMono',
+    appBarColor: Color(0xFF303040),
+    backgroundColor: Color(0xFF181820),
+    colors: [
+      Color(0xFF506080),
+      Color(0xFF506080),
+      Color(0xFF506080),
+      Color(0xFF506080),
+      Color(0xFF506080),
+    ],
+  ),
 ];

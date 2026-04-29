@@ -69,10 +69,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         9 => l10n.themeMint,
         10 => l10n.themeLavender,
         11 => l10n.themeGraphite,
-        _ => l10n.themePastelMono,
+        12 => l10n.themePastelMono,
+        13 => l10n.themeDuskMono,
+        14 => l10n.themeEarthMono,
+        _ => l10n.themeNeutralMono,
       };
 
-  static const _monoIndices = {12};
+  static const _monoIndices = {12, 13, 14, 15};
 
   Widget _buildThemeGroup({
     required String title,

@@ -256,4 +256,120 @@ const kAppThemes = <AppButtonTheme>[
       Color(0xFF506080),
     ],
   ),
+
+  // 16 — Mist Mono
+  AppButtonTheme(
+    nameKey: 'themeMistMono',
+    appBarColor: Color(0xFF1A3050),
+    backgroundColor: Color(0xFF0A1828),
+    colors: [
+      Color(0xFF3A5878),
+      Color(0xFF3A5878),
+      Color(0xFF3A5878),
+      Color(0xFF3A5878),
+      Color(0xFF3A5878),
+    ],
+  ),
+
+  // 17 — Ocean Mono
+  AppButtonTheme(
+    nameKey: 'themeOceanMono',
+    appBarColor: Color(0xFF083848),
+    backgroundColor: Color(0xFF041820),
+    colors: [
+      Color(0xFF1A6878),
+      Color(0xFF1A6878),
+      Color(0xFF1A6878),
+      Color(0xFF1A6878),
+      Color(0xFF1A6878),
+    ],
+  ),
+
+  // 18 — Sakura Mono
+  AppButtonTheme(
+    nameKey: 'themeSakuraMono',
+    appBarColor: Color(0xFF502030),
+    backgroundColor: Color(0xFF1A0810),
+    colors: [
+      Color(0xFF6A3850),
+      Color(0xFF6A3850),
+      Color(0xFF6A3850),
+      Color(0xFF6A3850),
+      Color(0xFF6A3850),
+    ],
+  ),
+
+  // 19 — Sunset Mono
+  AppButtonTheme(
+    nameKey: 'themeSunsetMono',
+    appBarColor: Color(0xFF482010),
+    backgroundColor: Color(0xFF180A00),
+    colors: [
+      Color(0xFF784028),
+      Color(0xFF784028),
+      Color(0xFF784028),
+      Color(0xFF784028),
+      Color(0xFF784028),
+    ],
+  ),
+
+  // 20 — Vivid Mono
+  AppButtonTheme(
+    nameKey: 'themeVividMono',
+    appBarColor: Color(0xFF280A48),
+    backgroundColor: Color(0xFF100418),
+    colors: [
+      Color(0xFF7840A0),
+      Color(0xFF7840A0),
+      Color(0xFF7840A0),
+      Color(0xFF7840A0),
+      Color(0xFF7840A0),
+    ],
+  ),
+
+  // 21 — Mint Mono
+  AppButtonTheme(
+    nameKey: 'themeMintMono',
+    appBarColor: Color(0xFF1A5038),
+    backgroundColor: Color(0xFF0A2018),
+    colors: [
+      Color(0xFF2D6B4F),
+      Color(0xFF2D6B4F),
+      Color(0xFF2D6B4F),
+      Color(0xFF2D6B4F),
+      Color(0xFF2D6B4F),
+    ],
+  ),
+
+  // 22 — Lavender Mono
+  AppButtonTheme(
+    nameKey: 'themeLavenderMono',
+    appBarColor: Color(0xFF3A2068),
+    backgroundColor: Color(0xFF140A28),
+    colors: [
+      Color(0xFF5A3A8B),
+      Color(0xFF5A3A8B),
+      Color(0xFF5A3A8B),
+      Color(0xFF5A3A8B),
+      Color(0xFF5A3A8B),
+    ],
+  ),
+
+  // 23 — Graphite Mono
+  AppButtonTheme(
+    nameKey: 'themeGraphiteMono',
+    appBarColor: Color(0xFFB8940A),
+    backgroundColor: Color(0xFF181A20),
+    colors: [
+      Color(0xFF2B3139),
+      Color(0xFF2B3139),
+      Color(0xFF2B3139),
+      Color(0xFF2B3139),
+      Color(0xFF2B3139),
+    ],
+    textPrimary: Color(0xFFEAECEF),
+    textSecondary: Color(0xFF848E9C),
+    accentColor: Color(0xFFF0B90B),
+    surfaceColor: Color(0xFF1E2329),
+  ),
 ];

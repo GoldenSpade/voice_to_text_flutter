@@ -100,6 +100,14 @@ class AppLocalizations {
   String get themeDuskMono => _t('themeDuskMono');
   String get themeEarthMono => _t('themeEarthMono');
   String get themeNeutralMono => _t('themeNeutralMono');
+  String get themeMistMono => _t('themeMistMono');
+  String get themeOceanMono => _t('themeOceanMono');
+  String get themeSakuraMono => _t('themeSakuraMono');
+  String get themeSunsetMono => _t('themeSunsetMono');
+  String get themeVividMono => _t('themeVividMono');
+  String get themeMintMono => _t('themeMintMono');
+  String get themeLavenderMono => _t('themeLavenderMono');
+  String get themeGraphiteMono => _t('themeGraphiteMono');
 
   // ── Help screen ───────────────────────────────────────────────────────────
   String get helpTitle => _t('helpTitle');
@@ -282,6 +290,14 @@ class AppLocalizations {
       'themeDuskMono': 'Dusk Mono',
       'themeEarthMono': 'Earth Mono',
       'themeNeutralMono': 'Neutral Mono',
+      'themeMistMono': 'Mist Mono',
+      'themeOceanMono': 'Ocean Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Sunset Mono',
+      'themeVividMono': 'Vivid Mono',
+      'themeMintMono': 'Mint Mono',
+      'themeLavenderMono': 'Lavender Mono',
+      'themeGraphiteMono': 'Graphite Mono',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -406,6 +422,14 @@ class AppLocalizations {
       'themeDuskMono': 'Сумерки моно',
       'themeEarthMono': 'Земля моно',
       'themeNeutralMono': 'Нейтраль моно',
+      'themeMistMono': 'Туман моно',
+      'themeOceanMono': 'Океан моно',
+      'themeSakuraMono': 'Сакура моно',
+      'themeSunsetMono': 'Закат моно',
+      'themeVividMono': 'Яркая моно',
+      'themeMintMono': 'Мята моно',
+      'themeLavenderMono': 'Лаванда моно',
+      'themeGraphiteMono': 'Графит моно',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -531,6 +555,14 @@ class AppLocalizations {
       'themeDuskMono': 'Dämmerung Mono',
       'themeEarthMono': 'Erde Mono',
       'themeNeutralMono': 'Neutral Mono',
+      'themeMistMono': 'Nebel Mono',
+      'themeOceanMono': 'Ozean Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Sonnenuntergang Mono',
+      'themeVividMono': 'Lebhaft Mono',
+      'themeMintMono': 'Minze Mono',
+      'themeLavenderMono': 'Lavendel Mono',
+      'themeGraphiteMono': 'Graphit Mono',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -657,6 +689,14 @@ class AppLocalizations {
       'themeDuskMono': 'Crépuscule Mono',
       'themeEarthMono': 'Terre Mono',
       'themeNeutralMono': 'Neutre Mono',
+      'themeMistMono': 'Brume Mono',
+      'themeOceanMono': 'Océan Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Coucher Mono',
+      'themeVividMono': 'Vif Mono',
+      'themeMintMono': 'Menthe Mono',
+      'themeLavenderMono': 'Lavande Mono',
+      'themeGraphiteMono': 'Graphite Mono',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -782,6 +822,14 @@ class AppLocalizations {
       'themeDuskMono': 'Crepúsculo Mono',
       'themeEarthMono': 'Tierra Mono',
       'themeNeutralMono': 'Neutral Mono',
+      'themeMistMono': 'Niebla Mono',
+      'themeOceanMono': 'Océano Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Atardecer Mono',
+      'themeVividMono': 'Vívido Mono',
+      'themeMintMono': 'Menta Mono',
+      'themeLavenderMono': 'Lavanda Mono',
+      'themeGraphiteMono': 'Grafito Mono',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -907,6 +955,14 @@ class AppLocalizations {
       'themeDuskMono': 'Crepuscolo Mono',
       'themeEarthMono': 'Terra Mono',
       'themeNeutralMono': 'Neutro Mono',
+      'themeMistMono': 'Nebbia Mono',
+      'themeOceanMono': 'Oceano Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Tramonto Mono',
+      'themeVividMono': 'Vivace Mono',
+      'themeMintMono': 'Menta Mono',
+      'themeLavenderMono': 'Lavanda Mono',
+      'themeGraphiteMono': 'Grafite Mono',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -1032,6 +1088,14 @@ class AppLocalizations {
       'themeDuskMono': 'Crepúsculo Mono',
       'themeEarthMono': 'Terra Mono',
       'themeNeutralMono': 'Neutro Mono',
+      'themeMistMono': 'Névoa Mono',
+      'themeOceanMono': 'Oceano Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Pôr do Sol Mono',
+      'themeVividMono': 'Vívido Mono',
+      'themeMintMono': 'Hortelã Mono',
+      'themeLavenderMono': 'Lavanda Mono',
+      'themeGraphiteMono': 'Grafite Mono',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -1157,6 +1221,14 @@ class AppLocalizations {
       'themeDuskMono': 'Zmierzch Mono',
       'themeEarthMono': 'Ziemia Mono',
       'themeNeutralMono': 'Neutralny Mono',
+      'themeMistMono': 'Mgła Mono',
+      'themeOceanMono': 'Ocean Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Zachód Mono',
+      'themeVividMono': 'Żywy Mono',
+      'themeMintMono': 'Mięta Mono',
+      'themeLavenderMono': 'Lawenda Mono',
+      'themeGraphiteMono': 'Grafit Mono',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1277,6 +1349,14 @@ class AppLocalizations {
       'themeDuskMono': '黄昏单色',
       'themeEarthMono': '大地单色',
       'themeNeutralMono': '中性单色',
+      'themeMistMono': '薄雾单色',
+      'themeOceanMono': '海洋单色',
+      'themeSakuraMono': '樱花单色',
+      'themeSunsetMono': '日落单色',
+      'themeVividMono': '鲜艳单色',
+      'themeMintMono': '薄荷单色',
+      'themeLavenderMono': '薰衣草单色',
+      'themeGraphiteMono': '石墨单色',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1398,6 +1478,14 @@ class AppLocalizations {
       'themeDuskMono': 'ダスクモノ',
       'themeEarthMono': 'アースモノ',
       'themeNeutralMono': 'ニュートラルモノ',
+      'themeMistMono': 'ミストモノ',
+      'themeOceanMono': 'オーシャンモノ',
+      'themeSakuraMono': 'サクラモノ',
+      'themeSunsetMono': 'サンセットモノ',
+      'themeVividMono': '鮮やかモノ',
+      'themeMintMono': 'ミントモノ',
+      'themeLavenderMono': 'ラベンダーモノ',
+      'themeGraphiteMono': 'グラファイトモノ',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1519,6 +1607,14 @@ class AppLocalizations {
       'themeDuskMono': '황혼 모노',
       'themeEarthMono': '대지 모노',
       'themeNeutralMono': '뉴트럴 모노',
+      'themeMistMono': '미스트 모노',
+      'themeOceanMono': '오션 모노',
+      'themeSakuraMono': '사쿠라 모노',
+      'themeSunsetMono': '선셋 모노',
+      'themeVividMono': '선명한 모노',
+      'themeMintMono': '민트 모노',
+      'themeLavenderMono': '라벤더 모노',
+      'themeGraphiteMono': '흑연 모노',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1644,6 +1740,14 @@ class AppLocalizations {
       'themeDuskMono': 'Alacakaranlık Mono',
       'themeEarthMono': 'Toprak Mono',
       'themeNeutralMono': 'Nötr Mono',
+      'themeMistMono': 'Sis Mono',
+      'themeOceanMono': 'Okyanus Mono',
+      'themeSakuraMono': 'Sakura Mono',
+      'themeSunsetMono': 'Gün Batımı Mono',
+      'themeVividMono': 'Canlı Mono',
+      'themeMintMono': 'Nane Mono',
+      'themeLavenderMono': 'Lavanta Mono',
+      'themeGraphiteMono': 'Grafit Mono',
     },
   };
 }

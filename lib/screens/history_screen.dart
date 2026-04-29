@@ -756,6 +756,66 @@ class _DetailSheetState extends State<_DetailSheet> {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
+            if (hasOriginal)
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          Share.share(widget.item.original!),
+                      icon: const Icon(Icons.share_rounded, size: 16),
+                      label: Text(widget.l10n.shareOriginal,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white70,
+                        side: BorderSide(
+                            color: Colors.white.withOpacity(0.2)),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 11),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          Share.share(widget.item.result),
+                      icon: const Icon(Icons.share_rounded, size: 16),
+                      label: Text(widget.l10n.shareTranslation,
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white70,
+                        side: BorderSide(
+                            color: Colors.white.withOpacity(0.2)),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 11),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Share.share(widget.item.result),
+                  icon: const Icon(Icons.share_rounded, size: 16),
+                  label: Text(widget.l10n.shareText),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: BorderSide(
+                        color: Colors.white.withOpacity(0.2)),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,

@@ -61,6 +61,9 @@ class AppLocalizations {
   String get fixErrors => _t('fixErrors');
   String get correcting => _t('correcting');
   String get corrected => _t('corrected');
+  String get shareText => _t('shareText');
+  String get shareOriginal => _t('shareOriginal');
+  String get shareTranslation => _t('shareTranslation');
 
   // ── Settings screen ───────────────────────────────────────────────────────
   String get settingsTitle => _t('settingsTitle');
@@ -264,6 +267,9 @@ class AppLocalizations {
       'fixErrors': 'Fix errors',
       'correcting': 'Correcting...',
       'corrected': 'Corrected',
+      'shareText': 'Share text',
+      'shareOriginal': 'Share original',
+      'shareTranslation': 'Share translation',
     },
 
     // ── Russian ───────────────────────────────────────────────────────────────
@@ -379,6 +385,9 @@ class AppLocalizations {
       'fixErrors': 'Исправить ошибки',
       'correcting': 'Исправляем...',
       'corrected': 'Исправлено',
+      'shareText': 'Поделиться текстом',
+      'shareOriginal': 'Поделиться оригиналом',
+      'shareTranslation': 'Поделиться переводом',
     },
 
     // ── German ────────────────────────────────────────────────────────────────
@@ -495,6 +504,9 @@ class AppLocalizations {
       'fixErrors': 'Fehler beheben',
       'correcting': 'Wird korrigiert...',
       'corrected': 'Korrigiert',
+      'shareText': 'Text teilen',
+      'shareOriginal': 'Original teilen',
+      'shareTranslation': 'Übersetzung teilen',
     },
 
     // ── French ────────────────────────────────────────────────────────────────
@@ -612,6 +624,9 @@ class AppLocalizations {
       'fixErrors': 'Corriger les erreurs',
       'correcting': 'Correction...',
       'corrected': 'Corrigé',
+      'shareText': 'Partager le texte',
+      'shareOriginal': "Partager l'original",
+      'shareTranslation': 'Partager la traduction',
     },
 
     // ── Spanish ───────────────────────────────────────────────────────────────
@@ -728,6 +743,9 @@ class AppLocalizations {
       'fixErrors': 'Corregir errores',
       'correcting': 'Corrigiendo...',
       'corrected': 'Corregido',
+      'shareText': 'Compartir texto',
+      'shareOriginal': 'Compartir original',
+      'shareTranslation': 'Compartir traducción',
     },
 
     // ── Italian ───────────────────────────────────────────────────────────────
@@ -844,6 +862,9 @@ class AppLocalizations {
       'fixErrors': 'Correggi errori',
       'correcting': 'Correzione...',
       'corrected': 'Corretto',
+      'shareText': 'Condividi testo',
+      'shareOriginal': 'Condividi originale',
+      'shareTranslation': 'Condividi traduzione',
     },
 
     // ── Portuguese ────────────────────────────────────────────────────────────
@@ -960,6 +981,9 @@ class AppLocalizations {
       'fixErrors': 'Corrigir erros',
       'correcting': 'Corrigindo...',
       'corrected': 'Corrigido',
+      'shareText': 'Compartilhar texto',
+      'shareOriginal': 'Compartilhar original',
+      'shareTranslation': 'Compartilhar tradução',
     },
 
         // ── Polish ────────────────────────────────────────────────────────────────
@@ -1076,6 +1100,9 @@ class AppLocalizations {
       'fixErrors': 'Popraw błędy',
       'correcting': 'Poprawianie...',
       'corrected': 'Poprawiono',
+      'shareText': 'Udostępnij tekst',
+      'shareOriginal': 'Udostępnij oryginał',
+      'shareTranslation': 'Udostępnij tłumaczenie',
     },
 
     // ── Chinese ───────────────────────────────────────────────────────────────
@@ -1187,6 +1214,9 @@ class AppLocalizations {
       'fixErrors': '纠正错误',
       'correcting': '正在纠正...',
       'corrected': '已纠正',
+      'shareText': '分享文本',
+      'shareOriginal': '分享原文',
+      'shareTranslation': '分享译文',
     },
 
     // ── Japanese ──────────────────────────────────────────────────────────────
@@ -1299,6 +1329,9 @@ class AppLocalizations {
       'fixErrors': 'エラーを修正',
       'correcting': '修正中...',
       'corrected': '修正済み',
+      'shareText': 'テキストをシェア',
+      'shareOriginal': '原文をシェア',
+      'shareTranslation': '翻訳をシェア',
     },
 
     // ── Korean ────────────────────────────────────────────────────────────────
@@ -1411,6 +1444,9 @@ class AppLocalizations {
       'fixErrors': '오류 수정',
       'correcting': '수정 중...',
       'corrected': '수정됨',
+      'shareText': '텍스트 공유',
+      'shareOriginal': '원문 공유',
+      'shareTranslation': '번역 공유',
     },
 
     // ── Turkish ───────────────────────────────────────────────────────────────
@@ -1527,6 +1563,9 @@ class AppLocalizations {
       'fixErrors': 'Hataları düzelt',
       'correcting': 'Düzeltiliyor...',
       'corrected': 'Düzeltildi',
+      'shareText': 'Metni paylaş',
+      'shareOriginal': 'Orijinali paylaş',
+      'shareTranslation': 'Çeviriyi paylaş',
     },
   };
 }

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:record/record.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
@@ -520,18 +521,12 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => setState(() {
-                    _state = _State.idle;
-                    _resultText = null;
-                    _seconds = 0;
-                    _historyItemId = null;
-                    _corrected = false;
-                  }),
-                  icon: const Icon(Icons.mic, size: 18),
-                  label: Text(l10n.again),
+                  onPressed: () => Share.share(_resultText ?? ''),
+                  icon: const Icon(Icons.share_rounded, size: 18),
+                  label: Text(l10n.shareText),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.white,
                     side: BorderSide(color: Colors.white.withOpacity(0.3)),
@@ -543,6 +538,29 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => setState(() {
+                _state = _State.idle;
+                _resultText = null;
+                _seconds = 0;
+                _historyItemId = null;
+                _corrected = false;
+              }),
+              icon: const Icon(Icons.mic, size: 18),
+              label: Text(l10n.again),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: BorderSide(color: Colors.white.withOpacity(0.3)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
           ),
         ],
       ),

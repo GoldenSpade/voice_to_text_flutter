@@ -10,6 +10,7 @@ import '../l10n/app_localizations.dart';
 import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
+import 'transform_sheet.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -816,7 +817,24 @@ class _DetailSheetState extends State<_DetailSheet> {
                   ),
                 ),
               ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () =>
+                    showTransformSheet(context, widget.item.result),
+                icon: const Icon(Icons.auto_awesome, size: 18),
+                label: Text(widget.l10n.transformText),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: TextButton.icon(

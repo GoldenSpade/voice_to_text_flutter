@@ -14,6 +14,7 @@ import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import 'transform_sheet.dart';
 
 enum _State { idle, recording, transcribing, translating, result, error }
 
@@ -572,6 +573,23 @@ class _TranscriptionTranslationScreenState
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  showTransformSheet(context, _translatedText ?? ''),
+              icon: const Icon(Icons.auto_awesome, size: 18),
+              label: Text(l10n.transformText),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white70,
+                side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           SizedBox(

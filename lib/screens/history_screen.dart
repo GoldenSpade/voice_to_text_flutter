@@ -575,9 +575,18 @@ class _DetailSheetState extends State<_DetailSheet> {
   bool _audioReady = false;
   StreamSubscription<PlayerState>? _playerSub;
 
+  late String _currentOriginal;
+  late String _currentResult;
+  final _editOrigCtrl = TextEditingController();
+  final _editResultCtrl = TextEditingController();
+  bool _editingOriginal = false;
+  bool _editingResult = false;
+
   @override
   void initState() {
     super.initState();
+    _currentOriginal = widget.item.original ?? '';
+    _currentResult = widget.item.result;
     if (widget.item.audioFilePath != null) _initPlayer();
   }
 
@@ -665,8 +674,32 @@ class _DetailSheetState extends State<_DetailSheet> {
     await Share.shareXFiles([XFile(path)]);
   }
 
+  void _startEditOriginal() {
+    _editOrigCtrl.text = _currentOriginal;
+    setState(() => _editingOriginal = true);
+  }
+
+  void _finishEditOriginal() {
+    final newText = _editOrigCtrl.text;
+    setState(() { _currentOriginal = newText; _editingOriginal = false; });
+    widget.service.updateOriginal(widget.item.id, newText);
+  }
+
+  void _startEditResult() {
+    _editResultCtrl.text = _currentResult;
+    setState(() => _editingResult = true);
+  }
+
+  void _finishEditResult() {
+    final newText = _editResultCtrl.text;
+    setState(() { _currentResult = newText; _editingResult = false; });
+    widget.service.updateResult(widget.item.id, newText);
+  }
+
   @override
   void dispose() {
+    _editOrigCtrl.dispose();
+    _editResultCtrl.dispose();
     _playerSub?.cancel();
     _player?.dispose();
     super.dispose();
@@ -735,37 +768,88 @@ class _DetailSheetState extends State<_DetailSheet> {
             ),
             const Divider(color: Colors.white12, height: 24),
             if (hasOriginal) ...[
-              Text(widget.l10n.original,
-                  style: const TextStyle(
-                    color: Colors.white38,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1,
-                  )),
+              Row(children: [
+                Expanded(child: Text(widget.l10n.original,
+                    style: const TextStyle(color: Colors.white38, fontSize: 11,
+                        fontWeight: FontWeight.w600, letterSpacing: 1))),
+                GestureDetector(
+                  onTap: _editingOriginal ? _finishEditOriginal : _startEditOriginal,
+                  child: Icon(
+                    _editingOriginal ? Icons.check_rounded : Icons.edit_rounded,
+                    size: 16,
+                    color: _editingOriginal ? Colors.greenAccent : Colors.white38,
+                  ),
+                ),
+              ]),
               const SizedBox(height: 8),
-              SelectableText(
-                widget.item.original!,
-                style: const TextStyle(
-                    color: Colors.white70, fontSize: 15, height: 1.6),
-              ),
+              _editingOriginal
+                  ? TextField(
+                      controller: _editOrigCtrl,
+                      maxLines: null,
+                      autofocus: true,
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 15, height: 1.6),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                      ),
+                    )
+                  : SelectableText(_currentOriginal,
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 15, height: 1.6)),
               const SizedBox(height: 20),
-              Text(
+              Row(children: [
+                Expanded(child: Text(
                   widget.item.type == HistoryType.transform
                       ? widget.l10n.result
                       : widget.l10n.translation,
-                  style: const TextStyle(
-                    color: Colors.white38,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1,
-                  )),
+                  style: const TextStyle(color: Colors.white38, fontSize: 11,
+                      fontWeight: FontWeight.w600, letterSpacing: 1),
+                )),
+                GestureDetector(
+                  onTap: _editingResult ? _finishEditResult : _startEditResult,
+                  child: Icon(
+                    _editingResult ? Icons.check_rounded : Icons.edit_rounded,
+                    size: 16,
+                    color: _editingResult ? Colors.greenAccent : Colors.white38,
+                  ),
+                ),
+              ]),
               const SizedBox(height: 8),
             ],
-            SelectableText(
-              widget.item.result,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 15, height: 1.6),
-            ),
+            if (!hasOriginal) ...[
+              Row(children: [
+                Expanded(child: Text(widget.l10n.result,
+                    style: const TextStyle(color: Colors.white38, fontSize: 11,
+                        fontWeight: FontWeight.w600, letterSpacing: 1))),
+                GestureDetector(
+                  onTap: _editingResult ? _finishEditResult : _startEditResult,
+                  child: Icon(
+                    _editingResult ? Icons.check_rounded : Icons.edit_rounded,
+                    size: 16,
+                    color: _editingResult ? Colors.greenAccent : Colors.white38,
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 8),
+            ],
+            _editingResult
+                ? TextField(
+                    controller: _editResultCtrl,
+                    maxLines: null,
+                    autofocus: true,
+                    style: const TextStyle(
+                        color: Colors.white, fontSize: 15, height: 1.6),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                  )
+                : SelectableText(_currentResult,
+                    style: const TextStyle(
+                        color: Colors.white, fontSize: 15, height: 1.6)),
             const SizedBox(height: 20),
             if (_audioReady) ...[
               const Divider(color: Colors.white12, height: 1),
@@ -841,7 +925,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                   Expanded(
                     child: _CopyButton(
                       label: widget.l10n.copyOriginal,
-                      text: widget.item.original!,
+                      text: _currentOriginal,
                       parentContext: context,
                       snackLabel: widget.l10n.copied,
                     ),
@@ -855,7 +939,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                             ? widget.l10n.copy
                             : widget.l10n.copyTranslation)
                         : widget.l10n.copy,
-                    text: widget.item.result,
+                    text: _currentResult,
                     parentContext: context,
                     snackLabel: widget.l10n.copied,
                   ),
@@ -869,7 +953,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () =>
-                          Share.share(widget.item.original!),
+                          Share.share(_currentOriginal),
                       icon: const Icon(Icons.share_rounded, size: 16),
                       label: Text(widget.l10n.shareOriginal,
                           maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -888,7 +972,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () =>
-                          Share.share(widget.item.result),
+                          Share.share(_currentResult),
                       icon: const Icon(Icons.share_rounded, size: 16),
                       label: Text(
                           widget.item.type == HistoryType.transform
@@ -912,7 +996,7 @@ class _DetailSheetState extends State<_DetailSheet> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () => Share.share(widget.item.result),
+                  onPressed: () => Share.share(_currentResult),
                   icon: const Icon(Icons.share_rounded, size: 16),
                   label: Text(widget.l10n.shareText),
                   style: OutlinedButton.styleFrom(
@@ -930,7 +1014,7 @@ class _DetailSheetState extends State<_DetailSheet> {
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: () =>
-                    showTransformSheet(context, widget.item.result),
+                    showTransformSheet(context, _currentResult),
                 icon: const Icon(Icons.auto_awesome, size: 18),
                 label: Text(widget.l10n.transformText),
                 style: OutlinedButton.styleFrom(

@@ -35,6 +35,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   String? _historyItemId;
   bool _correcting = false;
   bool _corrected = false;
+  final _editCtrl = TextEditingController();
+  bool _editing = false;
   Timer? _timer;
   int _seconds = 0;
   var _speechLang = kTranscriptionLanguages[0];
@@ -68,6 +70,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   @override
   void dispose() {
     _pulseController.dispose();
+    _editCtrl.dispose();
     _timer?.cancel();
     _recorder.dispose();
     super.dispose();
@@ -257,6 +260,22 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
           ),
         );
       }
+    }
+  }
+
+  void _startEdit() {
+    _editCtrl.text = _resultText ?? '';
+    setState(() => _editing = true);
+  }
+
+  void _finishEdit() {
+    final newText = _editCtrl.text;
+    setState(() {
+      _resultText = newText;
+      _editing = false;
+    });
+    if (_historyItemId != null) {
+      context.read<HistoryService>().updateResult(_historyItemId!, newText);
     }
   }
 
@@ -500,12 +519,22 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               const Icon(Icons.check_circle_outline,
                   color: Colors.greenAccent, size: 20),
               const SizedBox(width: 8),
-              Text(
-                l10n.result,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Text(
+                  l10n.result,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: _editing ? _finishEdit : _startEdit,
+                child: Icon(
+                  _editing ? Icons.check_rounded : Icons.edit_rounded,
+                  size: 20,
+                  color: _editing ? Colors.greenAccent : Colors.white38,
                 ),
               ),
             ],
@@ -519,23 +548,40 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                 color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: SingleChildScrollView(
-                child: SelectableText(
-                  _resultText ?? '',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    height: 1.65,
-                  ),
-                ),
-              ),
+              child: _editing
+                  ? TextField(
+                      controller: _editCtrl,
+                      maxLines: null,
+                      expands: true,
+                      autofocus: true,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        height: 1.65,
+                      ),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: SelectableText(
+                        _resultText ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          height: 1.65,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: (_correcting || _corrected) ? null : _correctText,
+              onPressed: (_correcting || _corrected || _editing) ? null : _correctText,
               icon: _correcting
                   ? SizedBox(
                       width: 16,
@@ -642,6 +688,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                 _seconds = 0;
                 _historyItemId = null;
                 _corrected = false;
+                _editing = false;
               }),
               icon: const Icon(Icons.mic, size: 18),
               label: Text(l10n.again),

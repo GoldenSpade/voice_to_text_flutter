@@ -35,6 +35,9 @@ class _TranscriptionTranslationScreenState
   String? _transcribedText;
   String? _translatedText;
   String? _errorMessage;
+  String? _historyItemId;
+  final _editOrigCtrl = TextEditingController();
+  bool _editingOriginal = false;
   Timer? _timer;
   int _seconds = 0;
   var _lang = kTranslationLanguages[1];
@@ -69,6 +72,7 @@ class _TranscriptionTranslationScreenState
   @override
   void dispose() {
     _pulseController.dispose();
+    _editOrigCtrl.dispose();
     _timer?.cancel();
     _recorder.dispose();
     super.dispose();
@@ -160,8 +164,9 @@ class _TranscriptionTranslationScreenState
     try {
       final translated = await service.translateText(transcribed, _lang.$3);
       if (mounted) {
+        final id = DateTime.now().millisecondsSinceEpoch.toString();
         context.read<HistoryService>().add(HistoryItem(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              id: id,
               type: HistoryType.transcriptionTranslation,
               createdAt: DateTime.now(),
               result: translated,
@@ -171,6 +176,7 @@ class _TranscriptionTranslationScreenState
         setState(() {
           _state = _State.result;
           _translatedText = translated;
+          _historyItemId = id;
         });
       }
     } catch (e) {
@@ -218,8 +224,9 @@ class _TranscriptionTranslationScreenState
     try {
       final translated = await service.translateText(transcribed, _lang.$3);
       if (mounted) {
+        final id = DateTime.now().millisecondsSinceEpoch.toString();
         context.read<HistoryService>().add(HistoryItem(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              id: id,
               type: HistoryType.transcriptionTranslation,
               createdAt: DateTime.now(),
               result: translated,
@@ -229,6 +236,7 @@ class _TranscriptionTranslationScreenState
         setState(() {
           _state = _State.result;
           _translatedText = translated;
+          _historyItemId = id;
         });
       }
     } catch (e) {
@@ -238,6 +246,22 @@ class _TranscriptionTranslationScreenState
           _errorMessage = e.toString().replaceFirst('Exception: ', '');
         });
       }
+    }
+  }
+
+  void _startEditOriginal() {
+    _editOrigCtrl.text = _transcribedText ?? '';
+    setState(() => _editingOriginal = true);
+  }
+
+  void _finishEditOriginal() {
+    final newText = _editOrigCtrl.text;
+    setState(() {
+      _transcribedText = newText;
+      _editingOriginal = false;
+    });
+    if (_historyItemId != null) {
+      context.read<HistoryService>().updateOriginal(_historyItemId!, newText);
     }
   }
 
@@ -548,7 +572,19 @@ class _TranscriptionTranslationScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionLabel(l10n.original),
+          Row(
+            children: [
+              Expanded(child: _SectionLabel(l10n.original)),
+              GestureDetector(
+                onTap: _editingOriginal ? _finishEditOriginal : _startEditOriginal,
+                child: Icon(
+                  _editingOriginal ? Icons.check_rounded : Icons.edit_rounded,
+                  size: 16,
+                  color: _editingOriginal ? Colors.greenAccent : Colors.white38,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           Expanded(
             child: Container(
@@ -558,13 +594,27 @@ class _TranscriptionTranslationScreenState
                 color: _theme.surfaceColor,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: SingleChildScrollView(
-                child: SelectableText(
-                  _transcribedText ?? '',
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 14, height: 1.6),
-                ),
-              ),
+              child: _editingOriginal
+                  ? TextField(
+                      controller: _editOrigCtrl,
+                      maxLines: null,
+                      expands: true,
+                      autofocus: true,
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 14, height: 1.6),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: SelectableText(
+                        _transcribedText ?? '',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 14, height: 1.6),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -671,6 +721,8 @@ class _TranscriptionTranslationScreenState
                 _transcribedText = null;
                 _translatedText = null;
                 _seconds = 0;
+                _historyItemId = null;
+                _editingOriginal = false;
               }),
               icon: const Icon(Icons.mic, size: 18),
               label: Text(l10n.again),

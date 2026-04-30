@@ -54,6 +54,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   String? _translatedText;
   String? _audioPath;
   String? _errorMessage;
+  String? _historyItemId;
+  final _editOrigCtrl = TextEditingController();
+  bool _editingOriginal = false;
   bool _isPlaying = false;
   late AppButtonTheme _theme;
 
@@ -99,6 +102,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   @override
   void dispose() {
     _pulseCtrl.dispose();
+    _editOrigCtrl.dispose();
     _playerSub?.cancel();
     _player.dispose();
     _recorder.dispose();
@@ -186,8 +190,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     }
     if (!mounted) return;
 
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
     context.read<HistoryService>().add(HistoryItem(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: id,
           type: HistoryType.fullCycle,
           createdAt: DateTime.now(),
           original: original,
@@ -202,6 +207,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       _originalText = original;
       _translatedText = translated;
       _audioPath = audioPath;
+      _historyItemId = id;
     });
   }
 
@@ -266,8 +272,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     }
     if (!mounted) return;
 
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
     context.read<HistoryService>().add(HistoryItem(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: id,
           type: HistoryType.fullCycle,
           createdAt: DateTime.now(),
           original: original,
@@ -282,6 +289,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       _originalText = original;
       _translatedText = translated;
       _audioPath = audioPath;
+      _historyItemId = id;
     });
   }
 
@@ -346,7 +354,25 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       _audioPath = null;
       _errorMessage = null;
       _isPlaying = false;
+      _historyItemId = null;
+      _editingOriginal = false;
     });
+  }
+
+  void _startEditOriginal() {
+    _editOrigCtrl.text = _originalText ?? '';
+    setState(() => _editingOriginal = true);
+  }
+
+  void _finishEditOriginal() {
+    final newText = _editOrigCtrl.text;
+    setState(() {
+      _originalText = newText;
+      _editingOriginal = false;
+    });
+    if (_historyItemId != null) {
+      context.read<HistoryService>().updateOriginal(_historyItemId!, newText);
+    }
   }
 
   void _showSpeechLanguagePicker() {
@@ -621,14 +647,28 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.original,
-            style: const TextStyle(
-              color: Colors.white38,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.original,
+                  style: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: _editingOriginal ? _finishEditOriginal : _startEditOriginal,
+                child: Icon(
+                  _editingOriginal ? Icons.check_rounded : Icons.edit_rounded,
+                  size: 16,
+                  color: _editingOriginal ? Colors.greenAccent : Colors.white38,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Container(
@@ -638,11 +678,24 @@ class _FullCycleScreenState extends State<FullCycleScreen>
               color: _theme.surfaceColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: SelectableText(
-              _originalText ?? '',
-              style: const TextStyle(
-                  color: Colors.white70, fontSize: 14, height: 1.5),
-            ),
+            child: _editingOriginal
+                ? TextField(
+                    controller: _editOrigCtrl,
+                    maxLines: null,
+                    autofocus: true,
+                    style: const TextStyle(
+                        color: Colors.white70, fontSize: 14, height: 1.5),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                    ),
+                  )
+                : SelectableText(
+                    _originalText ?? '',
+                    style: const TextStyle(
+                        color: Colors.white70, fontSize: 14, height: 1.5),
+                  ),
           ),
           const SizedBox(height: 16),
           Row(

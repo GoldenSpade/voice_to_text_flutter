@@ -15,6 +15,7 @@ import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
 import 'transform_sheet.dart';
+import 'translate_sheet.dart';
 
 enum _State { idle, recording, processing, result, error }
 
@@ -624,6 +625,23 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
                   showTransformSheet(context, _resultText ?? ''),
               icon: const Icon(Icons.auto_awesome, size: 18),
               label: Text(l10n.transformText),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white70,
+                side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () =>
+                  showTranslateSheet(context, _resultText ?? ''),
+              icon: const Icon(Icons.translate, size: 18),
+              label: Text(l10n.translateBtn),
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white70,
                 side: BorderSide(color: Colors.white.withOpacity(0.2)),

@@ -10,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
+import '../models/transcription_languages.dart';
 import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
@@ -37,6 +38,7 @@ class _TranscriptionTranslationScreenState
   Timer? _timer;
   int _seconds = 0;
   var _lang = kTranslationLanguages[1];
+  var _speechLang = kTranscriptionLanguages[0];
   late AppButtonTheme _theme;
 
   late AnimationController _pulseController;
@@ -53,9 +55,14 @@ class _TranscriptionTranslationScreenState
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     SharedPreferences.getInstance().then((prefs) {
-      final idx = (prefs.getInt('pref_tt_lang') ?? 1)
+      final langIdx = (prefs.getInt('pref_tt_lang') ?? 1)
           .clamp(0, kTranslationLanguages.length - 1);
-      if (mounted) setState(() => _lang = kTranslationLanguages[idx]);
+      final speechIdx = (prefs.getInt('pref_tt_speech_lang') ?? 0)
+          .clamp(0, kTranscriptionLanguages.length - 1);
+      if (mounted) setState(() {
+        _lang = kTranslationLanguages[langIdx];
+        _speechLang = kTranscriptionLanguages[speechIdx];
+      });
     });
   }
 
@@ -122,10 +129,12 @@ class _TranscriptionTranslationScreenState
     setState(() => _state = _State.transcribing);
 
     final service = OpenAIService(context.read<AppState>().apiKey);
+    final speechLangCode = _speechLang.$1.isEmpty ? null : _speechLang.$1;
 
     String transcribed;
     try {
-      transcribed = await service.transcribeAudio(path);
+      transcribed =
+          await service.transcribeAudio(path, language: speechLangCode);
       try {
         File(path).deleteSync();
       } catch (_) {}
@@ -183,11 +192,13 @@ class _TranscriptionTranslationScreenState
 
     final path = result.files.single.path!;
     final service = OpenAIService(context.read<AppState>().apiKey);
+    final speechLangCode = _speechLang.$1.isEmpty ? null : _speechLang.$1;
 
     setState(() => _state = _State.transcribing);
     String transcribed;
     try {
-      transcribed = await service.transcribeAudio(path);
+      transcribed =
+          await service.transcribeAudio(path, language: speechLangCode);
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -233,6 +244,26 @@ class _TranscriptionTranslationScreenState
   String _formatTime(int s) =>
       '${(s ~/ 60).toString().padLeft(2, '0')}:'
       '${(s % 60).toString().padLeft(2, '0')}';
+
+  void _showSpeechLanguagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: _theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _SpeechLangPicker(
+        selected: _speechLang,
+        onPick: (lang) {
+          final idx = kTranscriptionLanguages.indexOf(lang);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_tt_speech_lang', idx));
+          setState(() => _speechLang = lang);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
 
   void _showLanguagePicker() {
     showModalBottomSheet(
@@ -287,6 +318,46 @@ class _TranscriptionTranslationScreenState
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: InkWell(
+            onTap: _showSpeechLanguagePicker,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: _theme.surfaceColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.mic_none,
+                      color: Colors.white54, size: 20),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${l10n.speechLanguage}:',
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.5), fontSize: 13),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _speechLang.$1.isEmpty
+                          ? l10n.langAuto
+                          : _speechLang.$2,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 15),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white38, size: 16),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: InkWell(
             onTap: _showLanguagePicker,
             borderRadius: BorderRadius.circular(12),
@@ -765,6 +836,68 @@ class _LanguagePicker extends StatelessWidget {
                   subtitle: Text(lang.$3,
                       style: const TextStyle(
                           color: Colors.white54, fontSize: 12)),
+                  trailing: isSelected
+                      ? Icon(Icons.check, color: theme.colors[0])
+                      : null,
+                  tileColor: isSelected
+                      ? theme.colors[0].withOpacity(0.15)
+                      : null,
+                  onTap: () => onPick(lang),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SpeechLangPicker extends StatelessWidget {
+  final (String, String) selected;
+  final void Function((String, String)) onPick;
+
+  const _SpeechLangPicker({required this.selected, required this.onPick});
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.read<AppState>();
+    final theme = appState.buttonTheme;
+    final l10n = appState.l10n;
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, controller) => Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView.builder(
+              controller: controller,
+              itemCount: kTranscriptionLanguages.length,
+              itemBuilder: (_, i) {
+                final lang = kTranscriptionLanguages[i];
+                final isSelected = lang.$1 == selected.$1;
+                final displayName =
+                    lang.$1.isEmpty ? l10n.langAuto : lang.$2;
+                return ListTile(
+                  title: Text(displayName,
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: lang.$1.isEmpty
+                      ? null
+                      : Text(lang.$1,
+                          style: const TextStyle(
+                              color: Colors.white54, fontSize: 12)),
                   trailing: isSelected
                       ? Icon(Icons.check, color: theme.colors[0])
                       : null,

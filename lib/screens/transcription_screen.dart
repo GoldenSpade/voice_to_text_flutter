@@ -7,8 +7,10 @@ import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:record/record.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
+import '../models/transcription_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
@@ -35,6 +37,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   bool _corrected = false;
   Timer? _timer;
   int _seconds = 0;
+  var _speechLang = kTranscriptionLanguages[0];
   late AppButtonTheme _theme;
 
   late AnimationController _pulseController;
@@ -50,6 +53,11 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.18).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    SharedPreferences.getInstance().then((prefs) {
+      final idx = (prefs.getInt('pref_ts_speech_lang') ?? 0)
+          .clamp(0, kTranscriptionLanguages.length - 1);
+      if (mounted) setState(() => _speechLang = kTranscriptionLanguages[idx]);
+    });
     if (widget.initialFilePath != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _transcribeFromPath(widget.initialFilePath!);
@@ -120,9 +128,10 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     setState(() => _state = _State.processing);
 
     final appState = context.read<AppState>();
+    final langCode = _speechLang.$1.isEmpty ? null : _speechLang.$1;
     try {
-      final text =
-          await OpenAIService(appState.apiKey).transcribeAudio(path);
+      final text = await OpenAIService(appState.apiKey)
+          .transcribeAudio(path, language: langCode);
       try {
         File(path).deleteSync();
       } catch (_) {}
@@ -162,9 +171,10 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
       _corrected = false;
     });
     final appState = context.read<AppState>();
+    final langCode = _speechLang.$1.isEmpty ? null : _speechLang.$1;
     try {
-      final text =
-          await OpenAIService(appState.apiKey).transcribeAudio(path);
+      final text = await OpenAIService(appState.apiKey)
+          .transcribeAudio(path, language: langCode);
       if (mounted) {
         final id = DateTime.now().millisecondsSinceEpoch.toString();
         context.read<HistoryService>().add(HistoryItem(
@@ -196,6 +206,26 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     );
     if (result == null || result.files.single.path == null) return;
     await _transcribeFromPath(result.files.single.path!);
+  }
+
+  void _showSpeechLanguagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: _theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _SpeechLangPicker(
+        selected: _speechLang,
+        onPick: (lang) {
+          final idx = kTranscriptionLanguages.indexOf(lang);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_ts_speech_lang', idx));
+          setState(() => _speechLang = lang);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   Future<void> _correctText() async {
@@ -260,75 +290,120 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   }
 
   Widget _buildIdle(l10n) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GestureDetector(
-            onTap: _startRecording,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: InkWell(
+            onTap: _showSpeechLanguagePicker,
+            borderRadius: BorderRadius.circular(12),
             child: Container(
-              width: 128,
-              height: 128,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: _theme.colors[0],
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: _theme.colors[0].withOpacity(0.45),
-                    blurRadius: 28,
-                    spreadRadius: 6,
+                color: _theme.surfaceColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.mic_none,
+                      color: Colors.white54, size: 20),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${l10n.speechLanguage}:',
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.5), fontSize: 13),
                   ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _speechLang.$1.isEmpty
+                          ? l10n.langAuto
+                          : _speechLang.$2,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 15),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white38, size: 16),
                 ],
               ),
-              child: const Icon(Icons.mic, color: Colors.white, size: 56),
             ),
           ),
-          const SizedBox(height: 28),
-          Text(
-            l10n.tapToRecord,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.anyLanguage,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.45),
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 28),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(width: 48, height: 1, color: Colors.white12),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white24,
+        ),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: _startRecording,
+                  child: Container(
+                    width: 128,
+                    height: 128,
+                    decoration: BoxDecoration(
+                      color: _theme.colors[0],
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: _theme.colors[0].withOpacity(0.45),
+                          blurRadius: 28,
+                          spreadRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.mic, color: Colors.white, size: 56),
+                  ),
                 ),
-              ),
-              Container(width: 48, height: 1, color: Colors.white12),
-            ],
-          ),
-          const SizedBox(height: 20),
-          OutlinedButton.icon(
-            onPressed: _pickFile,
-            icon: const Icon(Icons.upload_file, size: 18),
-            label: Text(l10n.uploadFile),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white70,
-              side: BorderSide(color: Colors.white.withOpacity(0.2)),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                const SizedBox(height: 28),
+                Text(
+                  l10n.tapToRecord,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.anyLanguage,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.45),
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(width: 48, height: 1, color: Colors.white12),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white24,
+                      ),
+                    ),
+                    Container(width: 48, height: 1, color: Colors.white12),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                OutlinedButton.icon(
+                  onPressed: _pickFile,
+                  icon: const Icon(Icons.upload_file, size: 18),
+                  label: Text(l10n.uploadFile),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white70,
+                    side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -632,6 +707,68 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SpeechLangPicker extends StatelessWidget {
+  final (String, String) selected;
+  final void Function((String, String)) onPick;
+
+  const _SpeechLangPicker({required this.selected, required this.onPick});
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.read<AppState>();
+    final theme = appState.buttonTheme;
+    final l10n = appState.l10n;
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, controller) => Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView.builder(
+              controller: controller,
+              itemCount: kTranscriptionLanguages.length,
+              itemBuilder: (_, i) {
+                final lang = kTranscriptionLanguages[i];
+                final isSelected = lang.$1 == selected.$1;
+                final displayName =
+                    lang.$1.isEmpty ? l10n.langAuto : lang.$2;
+                return ListTile(
+                  title: Text(displayName,
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: lang.$1.isEmpty
+                      ? null
+                      : Text(lang.$1,
+                          style: const TextStyle(
+                              color: Colors.white54, fontSize: 12)),
+                  trailing: isSelected
+                      ? Icon(Icons.check, color: theme.colors[0])
+                      : null,
+                  tileColor: isSelected
+                      ? theme.colors[0].withOpacity(0.15)
+                      : null,
+                  onTap: () => onPick(lang),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

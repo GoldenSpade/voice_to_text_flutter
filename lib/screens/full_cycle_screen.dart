@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/app_theme.dart';
 import '../models/history_item.dart';
+import '../models/transcription_languages.dart';
 import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
@@ -47,6 +48,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   _Stage _stage = _Stage.idle;
   var _language = kTranslationLanguages[0];
   var _voice = _kVoices[0];
+  var _speechLang = kTranscriptionLanguages[0];
 
   String? _originalText;
   String? _translatedText;
@@ -84,9 +86,12 @@ class _FullCycleScreenState extends State<FullCycleScreen>
           .clamp(0, kTranslationLanguages.length - 1);
       final voiceIdx = (prefs.getInt('pref_fc_voice') ?? 0)
           .clamp(0, _kVoices.length - 1);
+      final speechIdx = (prefs.getInt('pref_fc_speech_lang') ?? 0)
+          .clamp(0, kTranscriptionLanguages.length - 1);
       if (mounted) setState(() {
         _language = kTranslationLanguages[langIdx];
         _voice = _kVoices[voiceIdx];
+        _speechLang = kTranscriptionLanguages[speechIdx];
       });
     });
   }
@@ -130,10 +135,12 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     final apiKey = context.read<AppState>().apiKey;
     final svc = OpenAIService(apiKey);
 
+    final speechLangCode = _speechLang.$1.isEmpty ? null : _speechLang.$1;
+
     setState(() => _stage = _Stage.transcribing);
     String original;
     try {
-      original = await svc.transcribeAudio(recPath);
+      original = await svc.transcribeAudio(recPath, language: speechLangCode);
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -208,11 +215,12 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     final recPath = result.files.single.path!;
     final apiKey = context.read<AppState>().apiKey;
     final svc = OpenAIService(apiKey);
+    final speechLangCode = _speechLang.$1.isEmpty ? null : _speechLang.$1;
 
     setState(() => _stage = _Stage.transcribing);
     String original;
     try {
-      original = await svc.transcribeAudio(recPath);
+      original = await svc.transcribeAudio(recPath, language: speechLangCode);
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -341,6 +349,25 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     });
   }
 
+  void _showSpeechLanguagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: _theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => _SpeechLangPicker(
+        selected: _speechLang,
+        onPick: (lang) {
+          final idx = kTranscriptionLanguages.indexOf(lang);
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_fc_speech_lang', idx));
+          setState(() => _speechLang = lang);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   void _showLanguagePicker() {
     showModalBottomSheet(
       context: context,
@@ -412,6 +439,14 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
       child: Column(
         children: [
+          _SelectorCard(
+            icon: Icons.mic_none,
+            label: '${l10n.speechLanguage}:',
+            value: _speechLang.$1.isEmpty ? l10n.langAuto : _speechLang.$2,
+            surfaceColor: _theme.surfaceColor,
+            onTap: _showSpeechLanguagePicker,
+          ),
+          const SizedBox(height: 10),
           _SelectorCard(
             icon: Icons.translate,
             label: '${l10n.selectLanguage}:',
@@ -1065,6 +1100,68 @@ class _VoicePicker extends StatelessWidget {
                       ? theme.colors[0].withOpacity(0.15)
                       : null,
                   onTap: () => onPick(v),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SpeechLangPicker extends StatelessWidget {
+  final (String, String) selected;
+  final void Function((String, String)) onPick;
+
+  const _SpeechLangPicker({required this.selected, required this.onPick});
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.read<AppState>();
+    final theme = appState.buttonTheme;
+    final l10n = appState.l10n;
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, controller) => Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView.builder(
+              controller: controller,
+              itemCount: kTranscriptionLanguages.length,
+              itemBuilder: (_, i) {
+                final lang = kTranscriptionLanguages[i];
+                final isSelected = lang.$1 == selected.$1;
+                final displayName =
+                    lang.$1.isEmpty ? l10n.langAuto : lang.$2;
+                return ListTile(
+                  title: Text(displayName,
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: lang.$1.isEmpty
+                      ? null
+                      : Text(lang.$1,
+                          style: const TextStyle(
+                              color: Colors.white54, fontSize: 12)),
+                  trailing: isSelected
+                      ? Icon(Icons.check, color: theme.colors[0])
+                      : null,
+                  tileColor: isSelected
+                      ? theme.colors[0].withOpacity(0.15)
+                      : null,
+                  onTap: () => onPick(lang),
                 );
               },
             ),

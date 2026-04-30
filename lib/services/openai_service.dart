@@ -7,7 +7,7 @@ class OpenAIService {
 
   const OpenAIService(this.apiKey);
 
-  Future<String> transcribeAudio(String filePath) async {
+  Future<String> transcribeAudio(String filePath, {String? language}) async {
     final request = http.MultipartRequest(
       'POST',
       Uri.parse('https://api.openai.com/v1/audio/transcriptions'),
@@ -15,6 +15,10 @@ class OpenAIService {
       ..headers['Authorization'] = 'Bearer $apiKey'
       ..fields['model'] = 'gpt-4o-transcribe'
       ..files.add(await http.MultipartFile.fromPath('file', filePath));
+
+    if (language != null && language.isNotEmpty) {
+      request.fields['language'] = language;
+    }
 
     final streamed = await request.send();
     final body = await streamed.stream.bytesToString();

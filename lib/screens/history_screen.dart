@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
@@ -9,6 +10,7 @@ import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 import '../models/history_item.dart';
 import '../providers/app_state.dart';
+import '../services/backup_service.dart';
 import '../services/history_service.dart';
 import 'transform_sheet.dart';
 
@@ -28,6 +30,59 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _export(AppLocalizations l10n, HistoryService svc) async {
+    try {
+      final name = await BackupService.export(svc);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.exportDone}: $name'),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+  }
+
+  Future<void> _import(AppLocalizations l10n) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['zip'],
+    );
+    if (result == null || result.files.single.path == null) return;
+    try {
+      final count = await BackupService.import(
+        result.files.single.path!,
+        context.read<HistoryService>(),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${l10n.importDone}: $count'),
+            backgroundColor: Colors.green.shade700,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content:
+                  Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
   }
 
   List<HistoryItem> _filtered(List<HistoryItem> items) {
@@ -58,15 +113,60 @@ class _HistoryScreenState extends State<HistoryScreen> {
         foregroundColor: Colors.white,
         actions: [
           Consumer<HistoryService>(
-            builder: (context, svc, _) {
-              if (svc.items.isEmpty) return const SizedBox.shrink();
-              return IconButton(
-                icon: const Icon(Icons.delete_sweep_outlined),
-                tooltip: l10n.clearAll,
-                onPressed: () =>
-                    _confirmClear(context, svc, l10n, theme.surfaceColor),
-              );
-            },
+            builder: (context, svc, _) => Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  color: theme.surfaceColor,
+                  onSelected: (v) {
+                    if (v == 'export') _export(l10n, svc);
+                    if (v == 'import') _import(l10n);
+                  },
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'export',
+                      enabled: svc.items.isNotEmpty,
+                      child: Row(
+                        children: [
+                          Icon(Icons.upload_rounded,
+                              size: 20,
+                              color: svc.items.isNotEmpty
+                                  ? Colors.white70
+                                  : Colors.white24),
+                          const SizedBox(width: 12),
+                          Text(l10n.exportHistory,
+                              style: TextStyle(
+                                  color: svc.items.isNotEmpty
+                                      ? Colors.white
+                                      : Colors.white38)),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'import',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.download_rounded,
+                              size: 20, color: Colors.white70),
+                          const SizedBox(width: 12),
+                          Text(l10n.importHistory,
+                              style:
+                                  const TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                if (svc.items.isNotEmpty)
+                  IconButton(
+                    icon: const Icon(Icons.delete_sweep_outlined),
+                    tooltip: l10n.clearAll,
+                    onPressed: () => _confirmClear(
+                        context, svc, l10n, theme.surfaceColor),
+                  ),
+              ],
+            ),
           ),
         ],
       ),

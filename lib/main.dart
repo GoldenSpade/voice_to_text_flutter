@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'providers/app_state.dart';
 import 'services/history_service.dart';
+import 'services/transform_presets_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/transcription_screen.dart';
 
@@ -11,12 +12,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final appState = AppState();
   final historyService = HistoryService();
-  await Future.wait([appState.load(), historyService.load()]);
+  final presetsService = TransformPresetsService();
+  await Future.wait([
+    appState.load(),
+    historyService.load(),
+    presetsService.load(),
+  ]);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: appState),
         ChangeNotifierProvider.value(value: historyService),
+        ChangeNotifierProvider.value(value: presetsService),
       ],
       child: const VoiceApp(),
     ),

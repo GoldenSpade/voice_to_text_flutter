@@ -70,6 +70,7 @@ class AppLocalizations {
   String get transforming => _t('transforming');
   String get speechLanguage => _t('speechLanguage');
   String get langAuto => _t('langAuto');
+  String get saveAsPreset => _t('saveAsPreset');
 
   // ── Settings screen ───────────────────────────────────────────────────────
   String get settingsTitle => _t('settingsTitle');
@@ -298,6 +299,7 @@ class AppLocalizations {
       'transforming': 'Transforming...',
       'speechLanguage': 'Speech language',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Save as preset',
       'themeGroupMulti': 'Multicolor',
       'themeGroupMono': 'Monochrome',
       'themePastelMono': 'Pastel Mono',
@@ -437,6 +439,7 @@ class AppLocalizations {
       'transforming': 'Преобразовываю...',
       'speechLanguage': 'Язык речи',
       'langAuto': 'Авто',
+      'saveAsPreset': 'Сохранить как пресет',
       'themeGroupMulti': 'Разноцветные',
       'themeGroupMono': 'Однотонные',
       'themePastelMono': 'Пастель моно',
@@ -577,6 +580,7 @@ class AppLocalizations {
       'transforming': 'Umwandlung...',
       'speechLanguage': 'Sprache der Aufnahme',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Als Vorlage speichern',
       'themeGroupMulti': 'Mehrfarbig',
       'themeGroupMono': 'Einfarbig',
       'themePastelMono': 'Pastell Mono',
@@ -718,6 +722,7 @@ class AppLocalizations {
       'transforming': 'Transformation...',
       'speechLanguage': 'Langue parlée',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Enregistrer comme modèle',
       'themeGroupMulti': 'Multicolore',
       'themeGroupMono': 'Monochrome',
       'themePastelMono': 'Pastel Mono',
@@ -858,6 +863,7 @@ class AppLocalizations {
       'transforming': 'Transformando...',
       'speechLanguage': 'Idioma de la voz',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Guardar como plantilla',
       'themeGroupMulti': 'Multicolor',
       'themeGroupMono': 'Monocromo',
       'themePastelMono': 'Pastel Mono',
@@ -998,6 +1004,7 @@ class AppLocalizations {
       'transforming': 'Trasformazione...',
       'speechLanguage': 'Lingua del parlato',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Salva come modello',
       'themeGroupMulti': 'Multicolore',
       'themeGroupMono': 'Monocolore',
       'themePastelMono': 'Pastello Mono',
@@ -1138,6 +1145,7 @@ class AppLocalizations {
       'transforming': 'Transformando...',
       'speechLanguage': 'Idioma da fala',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Salvar como modelo',
       'themeGroupMulti': 'Multicolor',
       'themeGroupMono': 'Monocromático',
       'themePastelMono': 'Pastel Mono',
@@ -1278,6 +1286,7 @@ class AppLocalizations {
       'transforming': 'Przekształcanie...',
       'speechLanguage': 'Język mówiony',
       'langAuto': 'Auto',
+      'saveAsPreset': 'Zapisz jako szablon',
       'themeGroupMulti': 'Wielobarwne',
       'themeGroupMono': 'Jednobarwne',
       'themePastelMono': 'Pastelowy Mono',
@@ -1413,6 +1422,7 @@ class AppLocalizations {
       'transforming': '转换中...',
       'speechLanguage': '语音语言',
       'langAuto': '自动',
+      'saveAsPreset': '保存为预设',
       'themeGroupMulti': '多色',
       'themeGroupMono': '单色',
       'themePastelMono': '柔和单色',
@@ -1549,6 +1559,7 @@ class AppLocalizations {
       'transforming': '変換中...',
       'speechLanguage': '音声言語',
       'langAuto': '自動',
+      'saveAsPreset': 'プリセットとして保存',
       'themeGroupMulti': 'マルチカラー',
       'themeGroupMono': 'モノクロ',
       'themePastelMono': 'パステルモノ',
@@ -1685,6 +1696,7 @@ class AppLocalizations {
       'transforming': '변환 중...',
       'speechLanguage': '음성 언어',
       'langAuto': '자동',
+      'saveAsPreset': '프리셋으로 저장',
       'themeGroupMulti': '멀티컬러',
       'themeGroupMono': '단색',
       'themePastelMono': '파스텔 모노',
@@ -1825,6 +1837,7 @@ class AppLocalizations {
       'transforming': 'Dönüştürülüyor...',
       'speechLanguage': 'Konuşma dili',
       'langAuto': 'Otomatik',
+      'saveAsPreset': 'Ön ayar olarak kaydet',
       'themeGroupMulti': 'Çok renkli',
       'themeGroupMono': 'Tek renkli',
       'themePastelMono': 'Pastel Mono',

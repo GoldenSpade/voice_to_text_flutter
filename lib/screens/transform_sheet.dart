@@ -6,6 +6,7 @@ import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/transform_presets_service.dart';
 
 enum _TSState { idle, loading, result, error }
 
@@ -87,6 +88,7 @@ class _TransformSheetState extends State<_TransformSheet> {
 
   Widget _buildIdle(theme, l10n) {
     final mq = MediaQuery.of(context);
+    final presets = context.watch<TransformPresetsService>();
     return Padding(
       padding: EdgeInsets.fromLTRB(
           20, 12, 20, mq.viewInsets.bottom + mq.viewPadding.bottom + 24),
@@ -117,6 +119,41 @@ class _TransformSheetState extends State<_TransformSheet> {
                   color: Colors.white54, fontSize: 13, height: 1.4),
             ),
           ),
+          if (presets.presets.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 34,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: presets.presets.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                itemBuilder: (_, i) {
+                  final text = presets.presets[i];
+                  final label = text.length > 30
+                      ? '${text.substring(0, 30)}…'
+                      : text;
+                  return InputChip(
+                    label: Text(label,
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 12)),
+                    onPressed: () {
+                      _ctrl.text = text;
+                      _ctrl.selection = TextSelection.collapsed(
+                          offset: text.length);
+                    },
+                    deleteIcon: const Icon(Icons.close,
+                        size: 14, color: Colors.white38),
+                    onDeleted: () => presets.delete(text),
+                    backgroundColor: Colors.white.withOpacity(0.08),
+                    side: BorderSide(
+                        color: Colors.white.withOpacity(0.2)),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    visualDensity: VisualDensity.compact,
+                  );
+                },
+              ),
+            ),
+          ],
           const SizedBox(height: 14),
           TextField(
             controller: _ctrl,
@@ -141,24 +178,51 @@ class _TransformSheetState extends State<_TransformSheet> {
           const SizedBox(height: 12),
           ValueListenableBuilder<TextEditingValue>(
             valueListenable: _ctrl,
-            builder: (_, value, __) => SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: value.text.trim().isEmpty ? null : _transform,
-                icon: const Icon(Icons.auto_awesome, size: 18),
-                label: Text(l10n.transformBtn),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colors[0],
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor:
-                      theme.colors[0].withOpacity(0.35),
-                  disabledForegroundColor: Colors.white38,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
+            builder: (_, value, __) {
+              final text = value.text.trim();
+              final alreadySaved = presets.contains(text);
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: text.isEmpty ? null : _transform,
+                      icon: const Icon(Icons.auto_awesome, size: 18),
+                      label: Text(l10n.transformBtn),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colors[0],
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor:
+                            theme.colors[0].withOpacity(0.35),
+                        disabledForegroundColor: Colors.white38,
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                  if (text.isNotEmpty && !alreadySaved) ...[
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton.icon(
+                        onPressed: () => presets.add(text),
+                        icon: const Icon(Icons.bookmark_add_outlined,
+                            size: 16),
+                        label: Text(l10n.saveAsPreset),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white38,
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ],
       ),

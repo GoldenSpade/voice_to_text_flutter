@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import '../models/history_item.dart';
 import '../providers/app_state.dart';
+import '../services/history_service.dart';
 import '../services/openai_service.dart';
 
 enum _TSState { idle, loading, result, error }
@@ -52,7 +54,16 @@ class _TransformSheetState extends State<_TransformSheet> {
     try {
       final result = await OpenAIService(appState.apiKey)
           .transformText(widget.sourceText, instruction);
-      if (mounted) setState(() { _state = _TSState.result; _result = result; });
+      if (mounted) {
+        context.read<HistoryService>().add(HistoryItem(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              type: HistoryType.transform,
+              createdAt: DateTime.now(),
+              result: result,
+              original: widget.sourceText,
+            ));
+        setState(() { _state = _TSState.result; _result = result; });
+      }
     } catch (e) {
       if (mounted) setState(() {
         _state = _TSState.error;

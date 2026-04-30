@@ -649,7 +649,10 @@ class _DetailSheetState extends State<_DetailSheet> {
                     color: Colors.white70, fontSize: 15, height: 1.6),
               ),
               const SizedBox(height: 20),
-              Text(widget.l10n.translation,
+              Text(
+                  widget.item.type == HistoryType.transform
+                      ? widget.l10n.result
+                      : widget.l10n.translation,
                   style: const TextStyle(
                     color: Colors.white38,
                     fontSize: 11,
@@ -748,7 +751,9 @@ class _DetailSheetState extends State<_DetailSheet> {
                 Expanded(
                   child: _CopyButton(
                     label: hasOriginal
-                        ? widget.l10n.copyTranslation
+                        ? (widget.item.type == HistoryType.transform
+                            ? widget.l10n.copy
+                            : widget.l10n.copyTranslation)
                         : widget.l10n.copy,
                     text: widget.item.result,
                     parentContext: context,
@@ -785,7 +790,10 @@ class _DetailSheetState extends State<_DetailSheet> {
                       onPressed: () =>
                           Share.share(widget.item.result),
                       icon: const Icon(Icons.share_rounded, size: 16),
-                      label: Text(widget.l10n.shareTranslation,
+                      label: Text(
+                          widget.item.type == HistoryType.transform
+                              ? widget.l10n.shareText
+                              : widget.l10n.shareTranslation,
                           maxLines: 1, overflow: TextOverflow.ellipsis),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white70,

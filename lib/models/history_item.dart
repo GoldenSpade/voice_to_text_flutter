@@ -6,6 +6,7 @@ enum HistoryType {
   transcriptionTranslation,
   fullCycle,
   tts,
+  transform,
 }
 
 extension HistoryTypeX on HistoryType {
@@ -15,6 +16,7 @@ extension HistoryTypeX on HistoryType {
         HistoryType.transcriptionTranslation => 'Транскр. + Перевод',
         HistoryType.fullCycle => 'Полный цикл',
         HistoryType.tts => 'Текст в голос',
+        HistoryType.transform => 'Преобразование',
       };
 
   IconData get icon => switch (this) {
@@ -23,6 +25,7 @@ extension HistoryTypeX on HistoryType {
         HistoryType.transcriptionTranslation => Icons.language,
         HistoryType.fullCycle => Icons.record_voice_over,
         HistoryType.tts => Icons.volume_up,
+        HistoryType.transform => Icons.auto_awesome,
       };
 
   Color get color => switch (this) {
@@ -31,6 +34,7 @@ extension HistoryTypeX on HistoryType {
         HistoryType.transcriptionTranslation => const Color(0xFF00695C),
         HistoryType.fullCycle => const Color(0xFF4A148C),
         HistoryType.tts => const Color(0xFF6A1B9A),
+        HistoryType.transform => const Color(0xFF00838F),
       };
 }
 

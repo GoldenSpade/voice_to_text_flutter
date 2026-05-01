@@ -1,11 +1,11 @@
 {
-    "name": "voice_to_text_app",
-    "short_name": "voice_to_text_app",
+    "name": "Voice Translator AI - Travel & Chat with ChatGPT",
+    "short_name": "Voice Translator AI",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "AI-powered voice translator and transcription app with ChatGPT integration.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

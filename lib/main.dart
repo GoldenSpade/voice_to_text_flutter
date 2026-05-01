@@ -86,7 +86,7 @@ class _VoiceAppState extends State<VoiceApp> {
     final appTheme = context.watch<AppState>().buttonTheme;
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      title: 'Voice Assistant',
+      title: 'Voice Translator AI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

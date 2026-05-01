@@ -189,7 +189,7 @@ class AppLocalizations {
   static const Map<String, Map<String, String>> _strings = {
     // ── English ──────────────────────────────────────────────────────────────
     'en': {
-      'appTitle': 'Voice Assistant',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'History',
       'settingsTooltip': 'Settings',
       'apiKeyMissing': 'OpenAI API key not set. Tap to configure.',
@@ -235,7 +235,7 @@ class AppLocalizations {
       'cancel': 'Cancel',
       'helpTitle': 'Help',
       'helpAboutTitle': 'About the App',
-      'helpAboutBody': 'Voice Assistant uses OpenAI API to transcribe, translate and synthesize speech. Add your API key in Settings before using the app. The key is stored only on your device.',
+      'helpAboutBody': 'Voice Translator AI uses OpenAI API to transcribe, translate and synthesize speech. Add your API key in Settings before using the app. The key is stored only on your device.',
       'helpTranscribeBody': 'Tap the microphone to start recording, tap again to stop. The audio is sent to OpenAI Whisper. Any spoken language is detected automatically.',
       'helpTranslateBody': 'Enter or paste text, choose a target language and tap Translate. Powered by GPT-4o. Results can be copied or shared.',
       'helpBothBody': 'Record your voice, choose a target language, and get both the original transcription and its translation in one step.',
@@ -338,7 +338,7 @@ class AppLocalizations {
 
     // ── Russian ───────────────────────────────────────────────────────────────
     'ru': {
-      'appTitle': 'Голосовой ассистент',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'История',
       'settingsTooltip': 'Настройки',
       'apiKeyMissing': 'OpenAI API ключ не задан. Нажмите для настройки.',
@@ -384,7 +384,7 @@ class AppLocalizations {
       'cancel': 'Отмена',
       'helpTitle': 'Справка',
       'helpAboutTitle': 'О приложении',
-      'helpAboutBody': 'Голосовой ассистент использует OpenAI API для транскрибации, перевода и синтеза речи. Перед использованием добавьте API ключ в Настройках. Ключ хранится только на вашем устройстве.',
+      'helpAboutBody': 'Voice Translator AI использует OpenAI API для транскрибации, перевода и синтеза речи. Перед использованием добавьте API ключ в Настройках. Ключ хранится только на вашем устройстве.',
       'helpTranscribeBody': 'Нажмите на микрофон для начала записи, снова нажмите для остановки. Аудио отправляется в OpenAI Whisper. Язык распознаётся автоматически.',
       'helpTranslateBody': 'Введите или вставьте текст, выберите язык перевода и нажмите «Перевести». Используется GPT-4o. Результат можно скопировать или поделиться.',
       'helpBothBody': 'Запишите голос, выберите язык и получите оригинальную транскрипцию вместе с переводом за один шаг.',
@@ -487,7 +487,7 @@ class AppLocalizations {
 
     // ── German ────────────────────────────────────────────────────────────────
     'de': {
-      'appTitle': 'Sprachassistent',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Verlauf',
       'settingsTooltip': 'Einstellungen',
       'apiKeyMissing':
@@ -534,7 +534,7 @@ class AppLocalizations {
       'cancel': 'Abbrechen',
       'helpTitle': 'Hilfe',
       'helpAboutTitle': 'Über die App',
-      'helpAboutBody': 'Voice Assistant nutzt die OpenAI API für Transkription, Übersetzung und Sprachsynthese. Fügen Sie Ihren API-Schlüssel in den Einstellungen hinzu. Der Schlüssel wird nur auf Ihrem Gerät gespeichert.',
+      'helpAboutBody': 'Voice Translator AI nutzt die OpenAI API für Transkription, Übersetzung und Sprachsynthese. Fügen Sie Ihren API-Schlüssel in den Einstellungen hinzu. Der Schlüssel wird nur auf Ihrem Gerät gespeichert.',
       'helpTranscribeBody': 'Mikrofon-Taste zum Starten, erneut tippen zum Stoppen. Die Aufnahme wird an OpenAI Whisper gesendet. Die Sprache wird automatisch erkannt.',
       'helpTranslateBody': 'Text eingeben, Zielsprache wählen und auf Übersetzen tippen. Basiert auf GPT-4o. Ergebnisse können kopiert oder geteilt werden.',
       'helpBothBody': 'Sprache aufnehmen, Zielsprache wählen und in einem Schritt Transkription und Übersetzung erhalten.',
@@ -637,7 +637,7 @@ class AppLocalizations {
 
     // ── French ────────────────────────────────────────────────────────────────
     'fr': {
-      'appTitle': 'Assistant vocal',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Historique',
       'settingsTooltip': 'Paramètres',
       'apiKeyMissing':
@@ -684,7 +684,7 @@ class AppLocalizations {
       'cancel': 'Annuler',
       'helpTitle': 'Aide',
       'helpAboutTitle': "À propos de l'application",
-      'helpAboutBody': "Voice Assistant utilise l'API OpenAI pour transcrire, traduire et synthétiser la voix. Ajoutez votre clé API dans les Paramètres. La clé est stockée uniquement sur votre appareil.",
+      'helpAboutBody': "Voice Translator AI utilise l'API OpenAI pour transcrire, traduire et synthétiser la voix. Ajoutez votre clé API dans les Paramètres. La clé est stockée uniquement sur votre appareil.",
       'helpTranscribeBody': "Appuyez sur le microphone pour démarrer, appuyez à nouveau pour arrêter. L'audio est envoyé à OpenAI Whisper. La langue est détectée automatiquement.",
       'helpTranslateBody': "Saisissez le texte, choisissez la langue cible et appuyez sur Traduire. Basé sur GPT-4o. Le résultat peut être copié ou partagé.",
       'helpBothBody': "Enregistrez votre voix, choisissez la langue cible et obtenez la transcription originale avec sa traduction en une seule étape.",
@@ -788,7 +788,7 @@ class AppLocalizations {
 
     // ── Spanish ───────────────────────────────────────────────────────────────
     'es': {
-      'appTitle': 'Asistente de voz',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Historial',
       'settingsTooltip': 'Ajustes',
       'apiKeyMissing':
@@ -835,7 +835,7 @@ class AppLocalizations {
       'cancel': 'Cancelar',
       'helpTitle': 'Ayuda',
       'helpAboutTitle': 'Acerca de la App',
-      'helpAboutBody': 'Voice Assistant usa la API de OpenAI para transcribir, traducir y sintetizar voz. Agrega tu clave API en Ajustes. La clave se guarda solo en tu dispositivo.',
+      'helpAboutBody': 'Voice Translator AI usa la API de OpenAI para transcribir, traducir y sintetizar voz. Agrega tu clave API en Ajustes. La clave se guarda solo en tu dispositivo.',
       'helpTranscribeBody': 'Toca el micrófono para comenzar, toca de nuevo para detener. El audio se envía a OpenAI Whisper. El idioma se detecta automáticamente.',
       'helpTranslateBody': 'Escribe el texto, elige el idioma destino y toca Traducir. Basado en GPT-4o. El resultado se puede copiar o compartir.',
       'helpBothBody': 'Graba tu voz, elige el idioma destino y obtén la transcripción original con su traducción en un solo paso.',
@@ -938,7 +938,7 @@ class AppLocalizations {
 
     // ── Italian ───────────────────────────────────────────────────────────────
     'it': {
-      'appTitle': 'Assistente vocale',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Cronologia',
       'settingsTooltip': 'Impostazioni',
       'apiKeyMissing':
@@ -985,7 +985,7 @@ class AppLocalizations {
       'cancel': 'Annulla',
       'helpTitle': 'Guida',
       'helpAboutTitle': "Informazioni sull'App",
-      'helpAboutBody': "Voice Assistant utilizza l'API OpenAI per trascrivere, tradurre e sintetizzare la voce. Aggiungi la tua chiave API nelle Impostazioni. La chiave è memorizzata solo sul tuo dispositivo.",
+      'helpAboutBody': "Voice Translator AI utilizza l'API OpenAI per trascrivere, tradurre e sintetizzare la voce. Aggiungi la tua chiave API nelle Impostazioni. La chiave è memorizzata solo sul tuo dispositivo.",
       'helpTranscribeBody': "Tocca il microfono per iniziare, tocca di nuovo per fermare. L'audio viene inviato a OpenAI Whisper. La lingua viene rilevata automaticamente.",
       'helpTranslateBody': "Inserisci il testo, scegli la lingua di destinazione e tocca Traduci. Basato su GPT-4o. Il risultato può essere copiato o condiviso.",
       'helpBothBody': "Registra la tua voce, scegli la lingua di destinazione e ottieni la trascrizione originale con la traduzione in un unico passaggio.",
@@ -1088,7 +1088,7 @@ class AppLocalizations {
 
     // ── Portuguese ────────────────────────────────────────────────────────────
     'pt': {
-      'appTitle': 'Assistente de voz',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Histórico',
       'settingsTooltip': 'Configurações',
       'apiKeyMissing':
@@ -1135,7 +1135,7 @@ class AppLocalizations {
       'cancel': 'Cancelar',
       'helpTitle': 'Ajuda',
       'helpAboutTitle': 'Sobre o App',
-      'helpAboutBody': 'Voice Assistant usa a API OpenAI para transcrever, traduzir e sintetizar voz. Adicione sua chave API nas Configurações. A chave é armazenada apenas no seu dispositivo.',
+      'helpAboutBody': 'Voice Translator AI usa a API OpenAI para transcrever, traduzir e sintetizar voz. Adicione sua chave API nas Configurações. A chave é armazenada apenas no seu dispositivo.',
       'helpTranscribeBody': 'Toque no microfone para iniciar, toque novamente para parar. O áudio é enviado ao OpenAI Whisper. O idioma é detectado automaticamente.',
       'helpTranslateBody': 'Digite o texto, escolha o idioma de destino e toque em Traduzir. Baseado no GPT-4o. O resultado pode ser copiado ou compartilhado.',
       'helpBothBody': 'Grave sua voz, escolha o idioma de destino e obtenha a transcrição original com sua tradução em uma única etapa.',
@@ -1238,7 +1238,7 @@ class AppLocalizations {
 
         // ── Polish ────────────────────────────────────────────────────────────────
     'pl': {
-      'appTitle': 'Asystent głosowy',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Historia',
       'settingsTooltip': 'Ustawienia',
       'apiKeyMissing':
@@ -1285,7 +1285,7 @@ class AppLocalizations {
       'cancel': 'Anuluj',
       'helpTitle': 'Pomoc',
       'helpAboutTitle': 'O Aplikacji',
-      'helpAboutBody': 'Voice Assistant używa API OpenAI do transkrypcji, tłumaczenia i syntezy mowy. Dodaj klucz API w Ustawieniach. Klucz jest przechowywany tylko na Twoim urządzeniu.',
+      'helpAboutBody': 'Voice Translator AI używa API OpenAI do transkrypcji, tłumaczenia i syntezy mowy. Dodaj klucz API w Ustawieniach. Klucz jest przechowywany tylko na Twoim urządzeniu.',
       'helpTranscribeBody': 'Dotknij mikrofonu, aby rozpocząć, dotknij ponownie, aby zatrzymać. Nagranie jest wysyłane do OpenAI Whisper. Język jest wykrywany automatycznie.',
       'helpTranslateBody': 'Wpisz tekst, wybierz język docelowy i dotknij Przetłumacz. Oparty na GPT-4o. Wynik można skopiować lub udostępnić.',
       'helpBothBody': 'Nagraj swój głos, wybierz język docelowy i otrzymaj oryginalną transkrypcję z tłumaczeniem w jednym kroku.',
@@ -1388,7 +1388,7 @@ class AppLocalizations {
 
     // ── Chinese ───────────────────────────────────────────────────────────────
     'zh': {
-      'appTitle': '语音助手',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': '历史',
       'settingsTooltip': '设置',
       'apiKeyMissing': '未设置 OpenAI API 密钥。点击配置。',
@@ -1431,7 +1431,7 @@ class AppLocalizations {
       'cancel': '取消',
       'helpTitle': '帮助',
       'helpAboutTitle': '关于应用',
-      'helpAboutBody': '语音助手使用 OpenAI API 进行转录、翻译和语音合成。使用前请在设置中添加 API 密钥。密钥仅存储在您的设备上。',
+      'helpAboutBody': 'Voice Translator AI 使用 OpenAI API 进行转录、翻译和语音合成。使用前请在设置中添加 API 密钥。密钥仅存储在您的设备上。',
       'helpTranscribeBody': '点击麦克风开始录音，再次点击停止。音频将发送到 OpenAI Whisper。语言会自动检测。',
       'helpTranslateBody': '输入文本，选择目标语言，点击翻译。基于 GPT-4o。结果可以复制或分享。',
       'helpBothBody': '录制您的声音，选择目标语言，一步获得原始转录和翻译。',
@@ -1533,7 +1533,7 @@ class AppLocalizations {
 
     // ── Japanese ──────────────────────────────────────────────────────────────
     'ja': {
-      'appTitle': '音声アシスタント',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': '履歴',
       'settingsTooltip': '設定',
       'apiKeyMissing': 'OpenAI APIキーが未設定です。タップして設定してください。',
@@ -1577,7 +1577,7 @@ class AppLocalizations {
       'cancel': 'キャンセル',
       'helpTitle': 'ヘルプ',
       'helpAboutTitle': 'アプリについて',
-      'helpAboutBody': 'Voice AssistantはOpenAI APIを使用して文字起こし、翻訳、音声合成を行います。使用前に設定でAPIキーを追加してください。キーはデバイスにのみ保存されます。',
+      'helpAboutBody': 'Voice Translator AIはOpenAI APIを使用して文字起こし、翻訳、音声合成を行います。使用前に設定でAPIキーを追加してください。キーはデバイスにのみ保存されます。',
       'helpTranscribeBody': 'マイクをタップして録音開始、再度タップで停止。音声はOpenAI Whisperに送信されます。言語は自動検出されます。',
       'helpTranslateBody': 'テキストを入力し、翻訳先の言語を選択して翻訳をタップ。GPT-4oを使用。結果はコピーまたは共有できます。',
       'helpBothBody': '声を録音して言語を選択するだけで、元の文字起こしと翻訳を一度に取得できます。',
@@ -1679,7 +1679,7 @@ class AppLocalizations {
 
     // ── Korean ────────────────────────────────────────────────────────────────
     'ko': {
-      'appTitle': '음성 도우미',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': '기록',
       'settingsTooltip': '설정',
       'apiKeyMissing': 'OpenAI API 키가 설정되지 않았습니다. 탭하여 설정하세요.',
@@ -1723,7 +1723,7 @@ class AppLocalizations {
       'cancel': '취소',
       'helpTitle': '도움말',
       'helpAboutTitle': '앱 정보',
-      'helpAboutBody': 'Voice Assistant는 OpenAI API를 사용하여 전사, 번역, 음성 합성을 수행합니다. 사용 전에 설정에서 API 키를 추가하세요. 키는 기기에만 저장됩니다.',
+      'helpAboutBody': 'Voice Translator AI는 OpenAI API를 사용하여 전사, 번역, 음성 합성을 수행합니다. 사용 전에 설정에서 API 키를 추가하세요. 키는 기기에만 저장됩니다.',
       'helpTranscribeBody': '마이크를 탭하여 녹음 시작, 다시 탭하여 중지. 오디오는 OpenAI Whisper로 전송됩니다. 언어는 자동으로 감지됩니다.',
       'helpTranslateBody': '텍스트를 입력하고 대상 언어를 선택한 후 번역을 탭하세요. GPT-4o 기반. 결과를 복사하거나 공유할 수 있습니다.',
       'helpBothBody': '목소리를 녹음하고 대상 언어를 선택하면 원본 전사본과 번역을 한 번에 얻을 수 있습니다.',
@@ -1825,7 +1825,7 @@ class AppLocalizations {
 
     // ── Turkish ───────────────────────────────────────────────────────────────
     'tr': {
-      'appTitle': 'Sesli Asistan',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'Geçmiş',
       'settingsTooltip': 'Ayarlar',
       'apiKeyMissing':
@@ -1872,7 +1872,7 @@ class AppLocalizations {
       'cancel': 'İptal',
       'helpTitle': 'Yardım',
       'helpAboutTitle': 'Uygulama Hakkında',
-      'helpAboutBody': "Voice Assistant, transkripsiyon, çeviri ve konuşma sentezi için OpenAI API kullanır. Kullanmadan önce Ayarlar'dan API anahtarınızı ekleyin. Anahtar yalnızca cihazınızda saklanır.",
+      'helpAboutBody': "Voice Translator AI, transkripsiyon, çeviri ve konuşma sentezi için OpenAI API kullanır. Kullanmadan önce Ayarlar'dan API anahtarınızı ekleyin. Anahtar yalnızca cihazınızda saklanır.",
       'helpTranscribeBody': 'Başlamak için mikrofona dokunun, durdurmak için tekrar dokunun. Ses OpenAI Whisper\'a gönderilir. Dil otomatik olarak algılanır.',
       'helpTranslateBody': 'Metin girin, hedef dili seçin ve Çevir\'e dokunun. GPT-4o tabanlı. Sonuç kopyalanabilir veya paylaşılabilir.',
       'helpBothBody': 'Sesinizi kaydedin, hedef dili seçin ve tek adımda orijinal transkripsiyon ile çeviriyi alın.',
@@ -1975,7 +1975,7 @@ class AppLocalizations {
 
     // ── Hindi ─────────────────────────────────────────────────────────────────
     'hi': {
-      'appTitle': 'वॉयस असिस्टेंट',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'इतिहास',
       'settingsTooltip': 'सेटिंग्स',
       'apiKeyMissing': 'OpenAI API कुंजी सेट नहीं है। कॉन्फ़िगर करने के लिए टैप करें।',
@@ -2018,7 +2018,7 @@ class AppLocalizations {
       'cancel': 'रद्द करें',
       'helpTitle': 'सहायता',
       'helpAboutTitle': 'ऐप के बारे में',
-      'helpAboutBody': 'वॉयस असिस्टेंट ट्रांसक्रिप्शन, अनुवाद और वाक् संश्लेषण के लिए OpenAI API का उपयोग करता है। ऐप का उपयोग करने से पहले सेटिंग्स में अपनी API कुंजी जोड़ें। कुंजी केवल आपके डिवाइस पर संग्रहीत है।',
+      'helpAboutBody': 'Voice Translator AI ट्रांसक्रिप्शन, अनुवाद और वाक् संश्लेषण के लिए OpenAI API का उपयोग करता है। ऐप का उपयोग करने से पहले सेटिंग्स में अपनी API कुंजी जोड़ें। कुंजी केवल आपके डिवाइस पर संग्रहीत है।',
       'helpTranscribeBody': 'रिकॉर्डिंग शुरू करने के लिए माइक्रोफ़ोन पर टैप करें, रोकने के लिए फिर टैप करें। ऑडियो OpenAI Whisper को भेजा जाता है। भाषा स्वचालित रूप से पहचानी जाती है।',
       'helpTranslateBody': 'टेक्स्ट दर्ज करें या पेस्ट करें, लक्षित भाषा चुनें और अनुवाद करें पर टैप करें। GPT-4o द्वारा संचालित। परिणाम कॉपी या शेयर किए जा सकते हैं।',
       'helpBothBody': 'अपनी आवाज़ रिकॉर्ड करें, लक्षित भाषा चुनें, और एक चरण में मूल ट्रांसक्रिप्शन और उसका अनुवाद प्राप्त करें।',
@@ -2120,7 +2120,7 @@ class AppLocalizations {
 
     // ── Arabic ────────────────────────────────────────────────────────────────
     'ar': {
-      'appTitle': 'المساعد الصوتي',
+      'appTitle': 'Voice Translator AI',
       'historyTooltip': 'السجل',
       'settingsTooltip': 'الإعدادات',
       'apiKeyMissing': 'لم يتم تعيين مفتاح OpenAI API. اضغط للإعداد.',
@@ -2163,7 +2163,7 @@ class AppLocalizations {
       'cancel': 'إلغاء',
       'helpTitle': 'مساعدة',
       'helpAboutTitle': 'عن التطبيق',
-      'helpAboutBody': 'يستخدم المساعد الصوتي OpenAI API للتحويل والترجمة وتوليد الصوت. أضف مفتاح API في الإعدادات قبل استخدام التطبيق. يُخزَّن المفتاح على جهازك فقط.',
+      'helpAboutBody': 'يستخدم Voice Translator AI واجهة OpenAI API للتحويل والترجمة وتوليد الصوت. أضف مفتاح API في الإعدادات قبل استخدام التطبيق. يُخزَّن المفتاح على جهازك فقط.',
       'helpTranscribeBody': 'اضغط على الميكروفون لبدء التسجيل، اضغط مجدداً للإيقاف. يُرسَل الصوت إلى OpenAI Whisper. تُكتشف اللغة تلقائياً.',
       'helpTranslateBody': 'أدخل النص أو الصقه، اختر اللغة المستهدفة واضغط ترجمة. مدعوم بـ GPT-4o. يمكن نسخ النتائج أو مشاركتها.',
       'helpBothBody': 'سجّل صوتك، اختر اللغة المستهدفة، واحصل على النص الأصلي وترجمته في خطوة واحدة.',

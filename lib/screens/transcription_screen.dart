@@ -14,6 +14,7 @@ import '../models/transcription_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 import 'transform_sheet.dart';
 import 'translate_sheet.dart';
 
@@ -147,6 +148,10 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               createdAt: DateTime.now(),
               result: text,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.transcription,
+          result: text,
+        );
         setState(() {
           _state = _State.result;
           _resultText = text;
@@ -187,6 +192,10 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
               createdAt: DateTime.now(),
               result: text,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.transcription,
+          result: text,
+        );
         setState(() {
           _state = _State.result;
           _resultText = text;

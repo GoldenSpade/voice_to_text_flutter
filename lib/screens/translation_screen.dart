@@ -9,6 +9,7 @@ import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 import 'transform_sheet.dart';
 
 enum _State { idle, processing, result, error }
@@ -68,6 +69,12 @@ class _TranslationScreenState extends State<TranslationScreen> {
               original: text,
               languageName: _lang.$2,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.translation,
+          result: result,
+          original: text,
+          languageName: _lang.$2,
+        );
         setState(() {
           _state = _State.result;
           _resultText = result;

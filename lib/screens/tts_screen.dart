@@ -10,6 +10,7 @@ import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 
 enum _State { idle, generating, ready, error }
 
@@ -101,6 +102,11 @@ class _TtsScreenState extends State<TtsScreen> {
               voiceName: _voice.$1,
               audioFilePath: path,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.tts,
+          result: text,
+          voiceName: _voice.$1,
+        );
         setState(() {
           _state = _State.ready;
           _filePath = path;

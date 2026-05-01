@@ -6,6 +6,7 @@ import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 import '../services/transform_presets_service.dart';
 
 enum _TSState { idle, loading, result, error }
@@ -63,6 +64,11 @@ class _TransformSheetState extends State<_TransformSheet> {
               result: result,
               original: widget.sourceText,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.transform,
+          result: result,
+          original: widget.sourceText,
+        );
         setState(() { _state = _TSState.result; _result = result; });
       }
     } catch (e) {

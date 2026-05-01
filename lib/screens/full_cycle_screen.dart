@@ -17,6 +17,7 @@ import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 import 'transform_sheet.dart';
 
 enum _Stage { idle, recording, transcribing, translating, generating, result, error }
@@ -201,6 +202,13 @@ class _FullCycleScreenState extends State<FullCycleScreen>
           voiceName: _voice.$1,
           audioFilePath: audioPath,
         ));
+    context.read<TelegramService>().sendResult(
+      type: HistoryType.fullCycle,
+      result: translated,
+      original: original,
+      languageName: _language.$2,
+      voiceName: _voice.$1,
+    );
 
     setState(() {
       _stage = _Stage.result;
@@ -283,6 +291,13 @@ class _FullCycleScreenState extends State<FullCycleScreen>
           voiceName: _voice.$1,
           audioFilePath: audioPath,
         ));
+    context.read<TelegramService>().sendResult(
+      type: HistoryType.fullCycle,
+      result: translated,
+      original: original,
+      languageName: _language.$2,
+      voiceName: _voice.$1,
+    );
 
     setState(() {
       _stage = _Stage.result;

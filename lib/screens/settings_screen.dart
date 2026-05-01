@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../models/app_theme.dart';
 import '../providers/app_state.dart';
+import '../services/telegram_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -401,7 +402,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const Divider(color: Colors.white12),
           const SizedBox(height: 16),
 
-          // ── Color Theme ──────────────────────────────────────────────────
+          _TelegramSection(theme: theme, l10n: l10n),
+
+          const SizedBox(height: 32),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 16),
+
           Text(
             l10n.colorThemeLabel,
             style: const TextStyle(
@@ -433,6 +439,197 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
         ],
       ),
+    );
+  }
+}
+
+class _TelegramSection extends StatefulWidget {
+  final AppButtonTheme theme;
+  final AppLocalizations l10n;
+  const _TelegramSection({required this.theme, required this.l10n});
+
+  @override
+  State<_TelegramSection> createState() => _TelegramSectionState();
+}
+
+class _TelegramSectionState extends State<_TelegramSection> {
+  late TextEditingController _tokenCtrl;
+  late TextEditingController _chatIdCtrl;
+  bool _detecting = false;
+  bool _testing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final tg = context.read<TelegramService>();
+    _tokenCtrl = TextEditingController(text: tg.token);
+    _chatIdCtrl = TextEditingController(text: tg.chatId);
+  }
+
+  @override
+  void dispose() {
+    _tokenCtrl.dispose();
+    _chatIdCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _autoDetect() async {
+    final tg = context.read<TelegramService>();
+    await tg.setToken(_tokenCtrl.text);
+    setState(() => _detecting = true);
+    final id = await tg.fetchChatId();
+    if (!mounted) return;
+    setState(() => _detecting = false);
+    if (id != null) {
+      _chatIdCtrl.text = id;
+      await tg.setChatId(id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(widget.l10n.telegramDetected),
+        backgroundColor: Colors.green,
+      ));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(widget.l10n.telegramNotFound),
+      ));
+    }
+  }
+
+  Future<void> _test() async {
+    final tg = context.read<TelegramService>();
+    await tg.setToken(_tokenCtrl.text);
+    await tg.setChatId(_chatIdCtrl.text);
+    setState(() => _testing = true);
+    final ok = await tg.sendTest();
+    if (!mounted) return;
+    setState(() => _testing = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(ok ? widget.l10n.telegramTestOk : widget.l10n.telegramTestFail),
+      backgroundColor: ok ? Colors.green : null,
+    ));
+  }
+
+  Future<void> _disconnect() async {
+    await context.read<TelegramService>().clear();
+    _tokenCtrl.clear();
+    _chatIdCtrl.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = widget.theme;
+    final l10n = widget.l10n;
+    final tg = context.watch<TelegramService>();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Telegram Bot',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.telegramHint,
+          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _tokenCtrl,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Bot Token',
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+            filled: true,
+            fillColor: theme.surfaceColor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _chatIdCtrl,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Chat ID',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.35)),
+                  filled: true,
+                  fillColor: theme.surfaceColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _detecting ? null : _autoDetect,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.surfaceColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _detecting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text(l10n.telegramAutoDetect,
+                        style: const TextStyle(fontSize: 13)),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          height: 46,
+          child: ElevatedButton(
+            onPressed: _testing ? null : _test,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colors[0],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _testing
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                : Text(l10n.telegramTestBtn,
+                    style: const TextStyle(fontSize: 15)),
+          ),
+        ),
+        if (tg.isConfigured) ...[
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: _disconnect,
+            child: Text(
+              l10n.telegramDisconnect,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

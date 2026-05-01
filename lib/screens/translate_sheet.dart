@@ -8,6 +8,7 @@ import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 
 enum _TrState { idle, loading, result, error }
 
@@ -67,6 +68,12 @@ class _TranslateSheetState extends State<_TranslateSheet> {
               original: widget.sourceText,
               languageName: _lang.$2,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.transcriptionTranslation,
+          result: result,
+          original: widget.sourceText,
+          languageName: _lang.$2,
+        );
         setState(() {
           _state = _TrState.result;
           _result = result;

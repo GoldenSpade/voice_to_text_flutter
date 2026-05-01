@@ -15,6 +15,7 @@ import '../models/translation_languages.dart';
 import '../providers/app_state.dart';
 import '../services/history_service.dart';
 import '../services/openai_service.dart';
+import '../services/telegram_service.dart';
 import 'transform_sheet.dart';
 
 enum _State { idle, recording, transcribing, translating, result, error }
@@ -173,6 +174,12 @@ class _TranscriptionTranslationScreenState
               original: transcribed,
               languageName: _lang.$2,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.transcriptionTranslation,
+          result: translated,
+          original: transcribed,
+          languageName: _lang.$2,
+        );
         setState(() {
           _state = _State.result;
           _translatedText = translated;
@@ -233,6 +240,12 @@ class _TranscriptionTranslationScreenState
               original: transcribed,
               languageName: _lang.$2,
             ));
+        context.read<TelegramService>().sendResult(
+          type: HistoryType.transcriptionTranslation,
+          result: translated,
+          original: transcribed,
+          languageName: _lang.$2,
+        );
         setState(() {
           _state = _State.result;
           _translatedText = translated;

@@ -455,6 +455,8 @@ class _TelegramSection extends StatefulWidget {
 class _TelegramSectionState extends State<_TelegramSection> {
   late TextEditingController _tokenCtrl;
   late TextEditingController _chatIdCtrl;
+  bool _obscureToken = true;
+  bool _obscureChatId = true;
   bool _detecting = false;
   bool _testing = false;
 
@@ -540,6 +542,7 @@ class _TelegramSectionState extends State<_TelegramSection> {
         const SizedBox(height: 16),
         TextField(
           controller: _tokenCtrl,
+          obscureText: _obscureToken,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: 'Bot Token',
@@ -550,6 +553,13 @@ class _TelegramSectionState extends State<_TelegramSection> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureToken ? Icons.visibility_off : Icons.visibility,
+                color: Colors.white54,
+              ),
+              onPressed: () => setState(() => _obscureToken = !_obscureToken),
+            ),
           ),
         ),
         const SizedBox(height: 10),
@@ -558,6 +568,7 @@ class _TelegramSectionState extends State<_TelegramSection> {
             Expanded(
               child: TextField(
                 controller: _chatIdCtrl,
+                obscureText: _obscureChatId,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Chat ID',
@@ -567,6 +578,14 @@ class _TelegramSectionState extends State<_TelegramSection> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureChatId ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white54,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscureChatId = !_obscureChatId),
                   ),
                 ),
               ),

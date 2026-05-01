@@ -102,10 +102,9 @@ class _TtsScreenState extends State<TtsScreen> {
               voiceName: _voice.$1,
               audioFilePath: path,
             ));
-        context.read<TelegramService>().sendResult(
-          type: HistoryType.tts,
-          result: text,
-          voiceName: _voice.$1,
+        context.read<TelegramService>().sendAudioResult(
+          path,
+          caption: '📢 ${_voice.$1}\n\n$text',
         );
         setState(() {
           _state = _State.ready;

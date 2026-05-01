@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,6 +64,11 @@ class TelegramService extends ChangeNotifier {
     _post(_format(type, result, original, languageName, voiceName));
   }
 
+  void sendAudioResult(String filePath, {String? caption}) {
+    if (!isConfigured) return;
+    _postAudio(filePath, caption: caption);
+  }
+
   Future<bool> sendTest() async {
     if (!isConfigured) return false;
     return _post('✅ Voice Translator AI\nBot is connected!');
@@ -100,6 +106,24 @@ class TelegramService extends ChangeNotifier {
         'text': text,
       }).timeout(const Duration(seconds: 10));
       return resp.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> _postAudio(String filePath, {String? caption}) async {
+    try {
+      final uri = Uri.parse('https://api.telegram.org/bot$_token/sendAudio');
+      final request = http.MultipartRequest('POST', uri);
+      request.fields['chat_id'] = _chatId;
+      if (caption != null) request.fields['caption'] = caption;
+      request.files.add(await http.MultipartFile.fromPath(
+        'audio',
+        filePath,
+        filename: File(filePath).uri.pathSegments.last,
+      ));
+      final streamed = await request.send().timeout(const Duration(seconds: 60));
+      return streamed.statusCode == 200;
     } catch (_) {
       return false;
     }

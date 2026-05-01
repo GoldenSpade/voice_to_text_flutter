@@ -202,12 +202,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
           voiceName: _voice.$1,
           audioFilePath: audioPath,
         ));
-    context.read<TelegramService>().sendResult(
-      type: HistoryType.fullCycle,
-      result: translated,
-      original: original,
-      languageName: _language.$2,
-      voiceName: _voice.$1,
+    context.read<TelegramService>().sendAudioResult(
+      audioPath,
+      caption: '🔄 ${_language.$2}\n\n$translated',
     );
 
     setState(() {
@@ -291,12 +288,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
           voiceName: _voice.$1,
           audioFilePath: audioPath,
         ));
-    context.read<TelegramService>().sendResult(
-      type: HistoryType.fullCycle,
-      result: translated,
-      original: original,
-      languageName: _language.$2,
-      voiceName: _voice.$1,
+    context.read<TelegramService>().sendAudioResult(
+      audioPath,
+      caption: '🔄 ${_language.$2}\n\n$translated',
     );
 
     setState(() {

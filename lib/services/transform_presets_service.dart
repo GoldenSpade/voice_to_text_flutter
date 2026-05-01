@@ -28,6 +28,21 @@ class TransformPresetsService extends ChangeNotifier {
 
   bool contains(String text) => _presets.contains(text.trim());
 
+  Future<void> restorePresets(List<String> incoming) async {
+    bool changed = false;
+    for (final p in incoming) {
+      final t = p.trim();
+      if (t.isNotEmpty && !_presets.contains(t)) {
+        _presets.add(t);
+        changed = true;
+      }
+    }
+    if (changed) {
+      await _persist();
+      notifyListeners();
+    }
+  }
+
   Future<void> _persist() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_key, _presets);

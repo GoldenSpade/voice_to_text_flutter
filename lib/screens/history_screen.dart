@@ -14,6 +14,7 @@ import '../providers/app_state.dart';
 import '../services/backup_service.dart';
 import '../services/folder_service.dart';
 import '../services/history_service.dart';
+import '../services/transform_presets_service.dart';
 import 'transform_sheet.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -37,7 +38,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _export(AppLocalizations l10n, HistoryService svc) async {
     try {
-      final name = await BackupService.export(svc);
+      final name = await BackupService.export(
+          svc, context.read<TransformPresetsService>());
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -68,6 +70,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         result.files.single.path!,
         context.read<HistoryService>(),
         context.read<FolderService>(),
+        context.read<TransformPresetsService>(),
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -6,9 +6,11 @@ import '../models/history_folder.dart';
 import '../models/history_item.dart';
 import 'folder_service.dart';
 import 'history_service.dart';
+import 'transform_presets_service.dart';
 
 class BackupService {
-  static Future<String> export(HistoryService history) async {
+  static Future<String> export(
+      HistoryService history, TransformPresetsService presets) async {
     final appDir = await getApplicationDocumentsDirectory();
     final historyFile = File('${appDir.path}/history.json');
     final foldersFile = File('${appDir.path}/folders.json');
@@ -27,6 +29,11 @@ class BackupService {
     if (foldersFile.existsSync()) {
       final bytes = foldersFile.readAsBytesSync();
       archive.addFile(ArchiveFile('folders.json', bytes.length, bytes));
+    }
+
+    if (presets.presets.isNotEmpty) {
+      final bytes = utf8.encode(jsonEncode(presets.presets));
+      archive.addFile(ArchiveFile('presets.json', bytes.length, bytes));
     }
 
     if (audioDir.existsSync()) {
@@ -57,6 +64,7 @@ class BackupService {
     String zipPath,
     HistoryService history,
     FolderService folders,
+    TransformPresetsService presets,
   ) async {
     final appDir = await getApplicationDocumentsDirectory();
     final audioDir = Directory('${appDir.path}/audio');
@@ -67,6 +75,7 @@ class BackupService {
 
     List<HistoryItem>? items;
     List<HistoryFolder>? folderList;
+    List<String>? presetList;
 
     for (final file in archive) {
       if (!file.isFile) continue;
@@ -82,6 +91,9 @@ class BackupService {
         folderList = list
             .map((e) => HistoryFolder.fromJson(e as Map<String, dynamic>))
             .toList();
+      } else if (file.name == 'presets.json') {
+        final list = jsonDecode(utf8.decode(data)) as List;
+        presetList = list.cast<String>();
       } else if (file.name.startsWith('audio/')) {
         final audioName = file.name.replaceFirst('audio/', '');
         if (audioName.isNotEmpty) {
@@ -94,6 +106,9 @@ class BackupService {
 
     if (folderList != null) {
       await folders.restoreFolders(folderList);
+    }
+    if (presetList != null) {
+      await presets.restorePresets(presetList);
     }
 
     final restored = items.map((item) {

@@ -1258,6 +1258,16 @@ class _DetailSheetState extends State<_DetailSheet> {
     widget.service.updateResult(widget.item.id, newText);
   }
 
+  Widget _buildCounter(String text) {
+    final words =
+        text.trim().isEmpty ? 0 : text.trim().split(RegExp(r'\s+')).length;
+    final chars = text.length;
+    return Text(
+      '$words ${widget.l10n.wordsAbbr} · $chars ${widget.l10n.charsAbbr}',
+      style: const TextStyle(color: Colors.white38, fontSize: 11),
+    );
+  }
+
   void _showFolderPicker() {
     final theme = context.read<AppState>().buttonTheme;
     final l10n = widget.l10n;
@@ -1382,6 +1392,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                       controller: _editOrigCtrl,
                       maxLines: null,
                       autofocus: true,
+                      onChanged: (_) => setState(() {}),
                       style: const TextStyle(
                           color: Colors.white70, fontSize: 15, height: 1.6),
                       decoration: const InputDecoration(
@@ -1393,7 +1404,10 @@ class _DetailSheetState extends State<_DetailSheet> {
                   : SelectableText(_currentOriginal,
                       style: const TextStyle(
                           color: Colors.white70, fontSize: 15, height: 1.6)),
-              const SizedBox(height: 20),
+              const SizedBox(height: 4),
+              _buildCounter(
+                  _editingOriginal ? _editOrigCtrl.text : _currentOriginal),
+              const SizedBox(height: 16),
               Row(children: [
                 Expanded(
                     child: Text(
@@ -1450,6 +1464,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                     controller: _editResultCtrl,
                     maxLines: null,
                     autofocus: true,
+                    onChanged: (_) => setState(() {}),
                     style: const TextStyle(
                         color: Colors.white, fontSize: 15, height: 1.6),
                     decoration: const InputDecoration(
@@ -1461,7 +1476,10 @@ class _DetailSheetState extends State<_DetailSheet> {
                 : SelectableText(_currentResult,
                     style: const TextStyle(
                         color: Colors.white, fontSize: 15, height: 1.6)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 4),
+            _buildCounter(
+                _editingResult ? _editResultCtrl.text : _currentResult),
+            const SizedBox(height: 16),
             if (_audioReady) ...[
               const Divider(color: Colors.white12, height: 1),
               const SizedBox(height: 16),

@@ -383,8 +383,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           folder: folder,
                           count: count,
                           color: theme.colors[0],
+                          historyService: svc,
                           onTap: () =>
                               setState(() => _activeFolderId = folder.id),
+                          onLongPress: () => _showFolderContextMenu(
+                              context, folder, l10n, theme.surfaceColor),
                         );
                       },
                     ),
@@ -530,6 +533,71 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  void _showFolderContextMenu(BuildContext context, HistoryFolder folder,
+      AppLocalizations l10n, Color surfaceColor) {
+    final color = context.read<AppState>().buttonTheme.colors[0];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        minimum: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(children: [
+                Icon(Icons.folder_rounded, color: color, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(folder.name,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600)),
+                ),
+              ]),
+            ),
+            const Divider(color: Colors.white12),
+            ListTile(
+              leading: const Icon(Icons.drive_file_rename_outline,
+                  color: Colors.white70),
+              title: Text(l10n.rename,
+                  style: const TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _renameFolder(folder, l10n, surfaceColor);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.delete_outline, color: Colors.redAccent),
+              title: Text(l10n.delete,
+                  style: const TextStyle(color: Colors.redAccent)),
+              onTap: () {
+                Navigator.pop(context);
+                _deleteFolder(folder, l10n, surfaceColor);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _deleteFolder(
       HistoryFolder folder, AppLocalizations l10n, Color surfaceColor) {
     showDialog(
@@ -571,27 +639,42 @@ class _FolderCard extends StatelessWidget {
   final int count;
   final Color color;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final HistoryService historyService;
 
   const _FolderCard({
     required this.folder,
     required this.count,
     required this.color,
     required this.onTap,
+    required this.historyService,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 120,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Column(
+    return DragTarget<HistoryItem>(
+      onAcceptWithDetails: (details) =>
+          historyService.moveToFolder(details.data.id, folder.id),
+      builder: (context, candidateData, _) {
+        final hovering = candidateData.isNotEmpty;
+        return GestureDetector(
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 120,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: hovering
+                  ? color.withOpacity(0.35)
+                  : color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: hovering ? color : color.withOpacity(0.3),
+                  width: hovering ? 2 : 1),
+            ),
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -628,7 +711,9 @@ class _FolderCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -695,6 +780,49 @@ class _HistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.watch<AppState>().l10n;
     final theme = context.read<AppState>().buttonTheme;
+    return LongPressDraggable<HistoryItem>(
+      data: item,
+      delay: const Duration(milliseconds: 350),
+      feedback: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 250,
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+          decoration: BoxDecoration(
+            color: theme.surfaceColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: const [
+              BoxShadow(
+                  color: Colors.black45,
+                  blurRadius: 16,
+                  offset: Offset(0, 6)),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(item.type.icon, color: item.type.color, size: 18),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  item.result,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      childWhenDragging: Opacity(
+          opacity: 0.35, child: _buildDismissible(context, l10n, theme)),
+      child: _buildDismissible(context, l10n, theme),
+    );
+  }
+
+  Widget _buildDismissible(
+      BuildContext context, AppLocalizations l10n, dynamic theme) {
     return Dismissible(
       key: ValueKey(item.id),
       direction: DismissDirection.endToStart,

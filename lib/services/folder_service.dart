@@ -56,6 +56,13 @@ class FolderService extends ChangeNotifier {
     await _persist();
   }
 
+  Future<void> clearAll() async {
+    if (_folders.isEmpty) return;
+    _folders.clear();
+    notifyListeners();
+    await _persist();
+  }
+
   Future<int> restoreFolders(List<HistoryFolder> folders) async {
     final existingIds = _folders.map((f) => f.id).toSet();
     int added = 0;

@@ -483,6 +483,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           TextButton(
             onPressed: () {
               svc.clear();
+              context.read<FolderService>().clearAll();
               Navigator.pop(context);
             },
             child: Text(l10n.delete,

@@ -22,4 +22,9 @@ const kTranslationLanguages = <(String, String, String)>[
   ('zh', '中文', 'Chinese'),
   ('ja', '日本語', 'Japanese'),
   ('ko', '한국어', 'Korean'),
+  ('hi', 'हिन्दी', 'Hindi'),
+  ('id', 'Bahasa Indonesia', 'Indonesian'),
+  ('vi', 'Tiếng Việt', 'Vietnamese'),
+  ('th', 'ภาษาไทย', 'Thai'),
+  ('el', 'Ελληνικά', 'Greek'),
 ];

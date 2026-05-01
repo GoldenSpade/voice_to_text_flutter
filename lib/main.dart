@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'providers/app_state.dart';
+import 'services/folder_service.dart';
 import 'services/history_service.dart';
 import 'services/transform_presets_service.dart';
 import 'screens/home_screen.dart';
@@ -13,10 +14,12 @@ void main() async {
   final appState = AppState();
   final historyService = HistoryService();
   final presetsService = TransformPresetsService();
+  final folderService = FolderService();
   await Future.wait([
     appState.load(),
     historyService.load(),
     presetsService.load(),
+    folderService.load(),
   ]);
   runApp(
     MultiProvider(
@@ -24,6 +27,7 @@ void main() async {
         ChangeNotifierProvider.value(value: appState),
         ChangeNotifierProvider.value(value: historyService),
         ChangeNotifierProvider.value(value: presetsService),
+        ChangeNotifierProvider.value(value: folderService),
       ],
       child: const VoiceApp(),
     ),

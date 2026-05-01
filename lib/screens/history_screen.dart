@@ -8,9 +8,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
+import '../models/history_folder.dart';
 import '../models/history_item.dart';
 import '../providers/app_state.dart';
 import '../services/backup_service.dart';
+import '../services/folder_service.dart';
 import '../services/history_service.dart';
 import 'transform_sheet.dart';
 
@@ -25,6 +27,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final _searchController = TextEditingController();
   String _query = '';
   HistoryType? _activeFilter;
+  String? _activeFolderId;
 
   @override
   void dispose() {
@@ -86,7 +89,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   List<HistoryItem> _filtered(List<HistoryItem> items) {
-    var result = items.toList();
+    var result = _activeFolderId == null
+        ? items.where((e) => e.folderId == null).toList()
+        : items.where((e) => e.folderId == _activeFolderId).toList();
     if (_activeFilter != null) {
       result = result.where((e) => e.type == _activeFilter).toList();
     }
@@ -100,163 +105,312 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return result;
   }
 
+  void _createFolder(AppLocalizations l10n, Color surfaceColor) {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: surfaceColor,
+        title: Text(l10n.newFolder,
+            style: const TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: l10n.folderNameHint,
+            hintStyle: const TextStyle(color: Colors.white38),
+            enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white24)),
+            focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white54)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              final name = ctrl.text.trim();
+              if (name.isNotEmpty) {
+                context.read<FolderService>().add(name);
+              }
+              Navigator.pop(context);
+            },
+            child: Text(l10n.save,
+                style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = context.watch<AppState>();
     final l10n = state.l10n;
     final theme = state.buttonTheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.historyTitle),
-        backgroundColor: theme.appBarColor,
-        foregroundColor: Colors.white,
-        actions: [
-          Consumer<HistoryService>(
-            builder: (context, svc, _) => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert),
-                  color: theme.surfaceColor,
-                  onSelected: (v) {
-                    if (v == 'export') _export(l10n, svc);
-                    if (v == 'import') _import(l10n);
+    return PopScope(
+      canPop: _activeFolderId == null,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) setState(() => _activeFolderId = null);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: theme.appBarColor,
+          foregroundColor: Colors.white,
+          leading: _activeFolderId != null
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => setState(() => _activeFolderId = null),
+                )
+              : null,
+          title: _activeFolderId != null
+              ? Consumer<FolderService>(
+                  builder: (_, fs, __) {
+                    final folder = fs.folders
+                        .where((f) => f.id == _activeFolderId)
+                        .firstOrNull;
+                    return Text(folder?.name ?? '');
                   },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: 'export',
-                      enabled: svc.items.isNotEmpty,
-                      child: Row(
-                        children: [
-                          Icon(Icons.upload_rounded,
-                              size: 20,
-                              color: svc.items.isNotEmpty
-                                  ? Colors.white70
-                                  : Colors.white24),
-                          const SizedBox(width: 12),
-                          Text(l10n.exportHistory,
-                              style: TextStyle(
-                                  color: svc.items.isNotEmpty
-                                      ? Colors.white
-                                      : Colors.white38)),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'import',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.download_rounded,
+                )
+              : Text(l10n.historyTitle),
+          actions: [
+            if (_activeFolderId != null)
+              Consumer<FolderService>(
+                builder: (_, fs, __) {
+                  final folder = fs.folders
+                      .where((f) => f.id == _activeFolderId)
+                      .firstOrNull;
+                  if (folder == null) return const SizedBox.shrink();
+                  return PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    color: theme.surfaceColor,
+                    onSelected: (v) {
+                      if (v == 'rename') _renameFolder(folder, l10n, theme.surfaceColor);
+                      if (v == 'delete') _deleteFolder(folder, l10n, theme.surfaceColor);
+                    },
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'rename',
+                        child: Row(children: [
+                          const Icon(Icons.drive_file_rename_outline,
                               size: 20, color: Colors.white70),
                           const SizedBox(width: 12),
-                          Text(l10n.importHistory,
-                              style:
-                                  const TextStyle(color: Colors.white)),
-                        ],
+                          Text(l10n.rename,
+                              style: const TextStyle(color: Colors.white)),
+                        ]),
                       ),
-                    ),
-                  ],
-                ),
-                if (svc.items.isNotEmpty)
-                  IconButton(
-                    icon: const Icon(Icons.delete_sweep_outlined),
-                    tooltip: l10n.clearAll,
-                    onPressed: () => _confirmClear(
-                        context, svc, l10n, theme.surfaceColor),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: Consumer<HistoryService>(
-        builder: (context, svc, _) {
-          if (svc.items.isEmpty) return _buildEmpty(l10n);
-
-          final filtered = _filtered(svc.items);
-
-          return Column(
-            children: [
-              // ── Search bar ──────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-                child: TextField(
-                  controller: _searchController,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                  onChanged: (v) => setState(() => _query = v),
-                  decoration: InputDecoration(
-                    hintText: l10n.searchHint,
-                    hintStyle: TextStyle(
-                        color: Colors.white.withOpacity(0.3), fontSize: 14),
-                    prefixIcon: const Icon(Icons.search,
-                        color: Colors.white38, size: 20),
-                    suffixIcon: _query.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear,
-                                color: Colors.white38, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _query = '');
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: theme.surfaceColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    isDense: true,
-                  ),
-                ),
-              ),
-
-              // ── Filter chips ────────────────────────────────────────────
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-                child: Row(
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(children: [
+                          const Icon(Icons.delete_outline,
+                              size: 20, color: Colors.redAccent),
+                          const SizedBox(width: 12),
+                          Text(l10n.delete,
+                              style: const TextStyle(color: Colors.redAccent)),
+                        ]),
+                      ),
+                    ],
+                  );
+                },
+              )
+            else
+              Consumer<HistoryService>(
+                builder: (context, svc, _) => Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _FilterPill(
-                      label: l10n.filterAll,
-                      selected: _activeFilter == null,
-                      color: theme.colors[0],
-                      onTap: () => setState(() => _activeFilter = null),
-                    ),
-                    const SizedBox(width: 6),
-                    ...HistoryType.values.map((type) => Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: _FilterPill(
-                            label: l10n.historyTypeLabel(type),
-                            selected: _activeFilter == type,
-                            color: type.color,
-                            onTap: () => setState(() => _activeFilter =
-                                _activeFilter == type ? null : type),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      color: theme.surfaceColor,
+                      onSelected: (v) {
+                        if (v == 'export') _export(l10n, svc);
+                        if (v == 'import') _import(l10n);
+                        if (v == 'newfolder')
+                          _createFolder(l10n, theme.surfaceColor);
+                      },
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: 'newfolder',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.create_new_folder_outlined,
+                                  size: 20, color: Colors.white70),
+                              const SizedBox(width: 12),
+                              Text(l10n.newFolder,
+                                  style: const TextStyle(color: Colors.white)),
+                            ],
                           ),
-                        )),
+                        ),
+                        PopupMenuItem(
+                          value: 'export',
+                          enabled: svc.items.isNotEmpty,
+                          child: Row(
+                            children: [
+                              Icon(Icons.upload_rounded,
+                                  size: 20,
+                                  color: svc.items.isNotEmpty
+                                      ? Colors.white70
+                                      : Colors.white24),
+                              const SizedBox(width: 12),
+                              Text(l10n.exportHistory,
+                                  style: TextStyle(
+                                      color: svc.items.isNotEmpty
+                                          ? Colors.white
+                                          : Colors.white38)),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'import',
+                          child: Row(
+                            children: [
+                              const Icon(Icons.download_rounded,
+                                  size: 20, color: Colors.white70),
+                              const SizedBox(width: 12),
+                              Text(l10n.importHistory,
+                                  style:
+                                      const TextStyle(color: Colors.white)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (svc.items.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.delete_sweep_outlined),
+                        tooltip: l10n.clearAll,
+                        onPressed: () => _confirmClear(
+                            context, svc, l10n, theme.surfaceColor),
+                      ),
                   ],
                 ),
               ),
+          ],
+        ),
+        body: Consumer2<HistoryService, FolderService>(
+          builder: (context, svc, fs, _) {
+            if (svc.items.isEmpty && fs.folders.isEmpty) {
+              return _buildEmpty(l10n);
+            }
 
-              // ── List ────────────────────────────────────────────────────
-              Expanded(
-                child: filtered.isEmpty
-                    ? _buildNoResults(l10n)
-                    : ListView.separated(
-                        padding:
-                            const EdgeInsets.only(top: 4, bottom: 100),
-                        itemCount: filtered.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: 4),
-                        itemBuilder: (context, i) =>
-                            _HistoryCard(item: filtered[i], service: svc),
+            final filtered = _filtered(svc.items);
+
+            return Column(
+              children: [
+                // ── Search bar ──────────────────────────────────────────
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                  child: TextField(
+                    controller: _searchController,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    onChanged: (v) => setState(() => _query = v),
+                    decoration: InputDecoration(
+                      hintText: l10n.searchHint,
+                      hintStyle: TextStyle(
+                          color: Colors.white.withOpacity(0.3), fontSize: 14),
+                      prefixIcon: const Icon(Icons.search,
+                          color: Colors.white38, size: 20),
+                      suffixIcon: _query.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear,
+                                  color: Colors.white38, size: 18),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _query = '');
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: theme.surfaceColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
-              ),
-            ],
-          );
-        },
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 10),
+                      isDense: true,
+                    ),
+                  ),
+                ),
+
+                // ── Filter chips ────────────────────────────────────────
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                  child: Row(
+                    children: [
+                      _FilterPill(
+                        label: l10n.filterAll,
+                        selected: _activeFilter == null,
+                        color: theme.colors[0],
+                        onTap: () => setState(() => _activeFilter = null),
+                      ),
+                      const SizedBox(width: 6),
+                      ...HistoryType.values.map((type) => Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: _FilterPill(
+                              label: l10n.historyTypeLabel(type),
+                              selected: _activeFilter == type,
+                              color: type.color,
+                              onTap: () => setState(() => _activeFilter =
+                                  _activeFilter == type ? null : type),
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
+
+                // ── Folder row (root only) ──────────────────────────────
+                if (_activeFolderId == null && fs.folders.isNotEmpty)
+                  SizedBox(
+                    height: 80,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+                      itemCount: fs.folders.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (_, i) {
+                        final folder = fs.folders[i];
+                        final count = svc.items
+                            .where((e) => e.folderId == folder.id)
+                            .length;
+                        return _FolderCard(
+                          folder: folder,
+                          count: count,
+                          color: theme.colors[0],
+                          onTap: () =>
+                              setState(() => _activeFolderId = folder.id),
+                        );
+                      },
+                    ),
+                  ),
+
+                // ── List ────────────────────────────────────────────────
+                Expanded(
+                  child: filtered.isEmpty
+                      ? _buildNoResults(l10n)
+                      : ListView.separated(
+                          padding:
+                              const EdgeInsets.only(top: 4, bottom: 100),
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 4),
+                          itemBuilder: (context, i) => _HistoryCard(
+                            item: filtered[i],
+                            service: svc,
+                            folderService: fs,
+                          ),
+                        ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -331,6 +485,152 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     );
   }
+
+  void _renameFolder(
+      HistoryFolder folder, AppLocalizations l10n, Color surfaceColor) {
+    final ctrl = TextEditingController(text: folder.name);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: surfaceColor,
+        title: Text(l10n.rename,
+            style: const TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: l10n.folderNameHint,
+            hintStyle: const TextStyle(color: Colors.white38),
+            enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white24)),
+            focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white54)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              final name = ctrl.text.trim();
+              if (name.isNotEmpty) {
+                context.read<FolderService>().rename(folder.id, name);
+              }
+              Navigator.pop(context);
+            },
+            child: Text(l10n.save,
+                style: const TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteFolder(
+      HistoryFolder folder, AppLocalizations l10n, Color surfaceColor) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: surfaceColor,
+        title: Text(l10n.delete,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(
+          '"${folder.name}"',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<HistoryService>().moveAllFromFolder(folder.id);
+              context.read<FolderService>().delete(folder.id);
+              setState(() => _activeFolderId = null);
+              Navigator.pop(context);
+            },
+            child: Text(l10n.delete,
+                style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Folder card ───────────────────────────────────────────────────────────────
+
+class _FolderCard extends StatelessWidget {
+  final HistoryFolder folder;
+  final int count;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _FolderCard({
+    required this.folder,
+    required this.count,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 120,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.folder_rounded, color: color, size: 24),
+                const Spacer(),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$count',
+                    style: TextStyle(
+                        color: color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              folder.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // ── Filter pill ───────────────────────────────────────────────────────────────
@@ -383,8 +683,13 @@ class _FilterPill extends StatelessWidget {
 class _HistoryCard extends StatelessWidget {
   final HistoryItem item;
   final HistoryService service;
+  final FolderService folderService;
 
-  const _HistoryCard({required this.item, required this.service});
+  const _HistoryCard({
+    required this.item,
+    required this.service,
+    required this.folderService,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -504,6 +809,7 @@ class _HistoryCard extends StatelessWidget {
       builder: (_) => _DetailSheet(
         item: item,
         service: service,
+        folderService: folderService,
         l10n: l10n,
         outerContext: context,
       ),
@@ -555,12 +861,14 @@ class _HistoryCard extends StatelessWidget {
 class _DetailSheet extends StatefulWidget {
   final HistoryItem item;
   final HistoryService service;
+  final FolderService folderService;
   final AppLocalizations l10n;
   final BuildContext outerContext;
 
   const _DetailSheet({
     required this.item,
     required this.service,
+    required this.folderService,
     required this.l10n,
     required this.outerContext,
   });
@@ -681,7 +989,10 @@ class _DetailSheetState extends State<_DetailSheet> {
 
   void _finishEditOriginal() {
     final newText = _editOrigCtrl.text;
-    setState(() { _currentOriginal = newText; _editingOriginal = false; });
+    setState(() {
+      _currentOriginal = newText;
+      _editingOriginal = false;
+    });
     widget.service.updateOriginal(widget.item.id, newText);
   }
 
@@ -692,8 +1003,34 @@ class _DetailSheetState extends State<_DetailSheet> {
 
   void _finishEditResult() {
     final newText = _editResultCtrl.text;
-    setState(() { _currentResult = newText; _editingResult = false; });
+    setState(() {
+      _currentResult = newText;
+      _editingResult = false;
+    });
     widget.service.updateResult(widget.item.id, newText);
+  }
+
+  void _showFolderPicker() {
+    final theme = context.read<AppState>().buttonTheme;
+    final l10n = widget.l10n;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _FolderPickerSheet(
+        folders: widget.folderService.folders,
+        currentFolderId: widget.item.folderId,
+        l10n: l10n,
+        theme: theme,
+        onPick: (folderId) {
+          widget.service.moveToFolder(widget.item.id, folderId);
+          Navigator.pop(context);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   @override
@@ -769,15 +1106,25 @@ class _DetailSheetState extends State<_DetailSheet> {
             const Divider(color: Colors.white12, height: 24),
             if (hasOriginal) ...[
               Row(children: [
-                Expanded(child: Text(widget.l10n.original,
-                    style: const TextStyle(color: Colors.white38, fontSize: 11,
-                        fontWeight: FontWeight.w600, letterSpacing: 1))),
+                Expanded(
+                    child: Text(widget.l10n.original,
+                        style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1))),
                 GestureDetector(
-                  onTap: _editingOriginal ? _finishEditOriginal : _startEditOriginal,
+                  onTap: _editingOriginal
+                      ? _finishEditOriginal
+                      : _startEditOriginal,
                   child: Icon(
-                    _editingOriginal ? Icons.check_rounded : Icons.edit_rounded,
+                    _editingOriginal
+                        ? Icons.check_rounded
+                        : Icons.edit_rounded,
                     size: 16,
-                    color: _editingOriginal ? Colors.greenAccent : Colors.white38,
+                    color: _editingOriginal
+                        ? Colors.greenAccent
+                        : Colors.white38,
                   ),
                 ),
               ]),
@@ -800,19 +1147,27 @@ class _DetailSheetState extends State<_DetailSheet> {
                           color: Colors.white70, fontSize: 15, height: 1.6)),
               const SizedBox(height: 20),
               Row(children: [
-                Expanded(child: Text(
+                Expanded(
+                    child: Text(
                   widget.item.type == HistoryType.transform
                       ? widget.l10n.result
                       : widget.l10n.translation,
-                  style: const TextStyle(color: Colors.white38, fontSize: 11,
-                      fontWeight: FontWeight.w600, letterSpacing: 1),
+                  style: const TextStyle(
+                      color: Colors.white38,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1),
                 )),
                 GestureDetector(
-                  onTap: _editingResult ? _finishEditResult : _startEditResult,
+                  onTap:
+                      _editingResult ? _finishEditResult : _startEditResult,
                   child: Icon(
-                    _editingResult ? Icons.check_rounded : Icons.edit_rounded,
+                    _editingResult
+                        ? Icons.check_rounded
+                        : Icons.edit_rounded,
                     size: 16,
-                    color: _editingResult ? Colors.greenAccent : Colors.white38,
+                    color:
+                        _editingResult ? Colors.greenAccent : Colors.white38,
                   ),
                 ),
               ]),
@@ -820,15 +1175,23 @@ class _DetailSheetState extends State<_DetailSheet> {
             ],
             if (!hasOriginal) ...[
               Row(children: [
-                Expanded(child: Text(widget.l10n.result,
-                    style: const TextStyle(color: Colors.white38, fontSize: 11,
-                        fontWeight: FontWeight.w600, letterSpacing: 1))),
+                Expanded(
+                    child: Text(widget.l10n.result,
+                        style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1))),
                 GestureDetector(
-                  onTap: _editingResult ? _finishEditResult : _startEditResult,
+                  onTap:
+                      _editingResult ? _finishEditResult : _startEditResult,
                   child: Icon(
-                    _editingResult ? Icons.check_rounded : Icons.edit_rounded,
+                    _editingResult
+                        ? Icons.check_rounded
+                        : Icons.edit_rounded,
                     size: 16,
-                    color: _editingResult ? Colors.greenAccent : Colors.white38,
+                    color:
+                        _editingResult ? Colors.greenAccent : Colors.white38,
                   ),
                 ),
               ]),
@@ -865,9 +1228,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                     size: 22,
                   ),
                   label: Text(
-                    _isPlaying
-                        ? widget.l10n.pause
-                        : widget.l10n.play,
+                    _isPlaying ? widget.l10n.pause : widget.l10n.play,
                     style: const TextStyle(fontSize: 15),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -952,8 +1313,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () =>
-                          Share.share(_currentOriginal),
+                      onPressed: () => Share.share(_currentOriginal),
                       icon: const Icon(Icons.share_rounded, size: 16),
                       label: Text(widget.l10n.shareOriginal,
                           maxLines: 1, overflow: TextOverflow.ellipsis),
@@ -971,8 +1331,7 @@ class _DetailSheetState extends State<_DetailSheet> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () =>
-                          Share.share(_currentResult),
+                      onPressed: () => Share.share(_currentResult),
                       icon: const Icon(Icons.share_rounded, size: 16),
                       label: Text(
                           widget.item.type == HistoryType.transform
@@ -1029,6 +1388,22 @@ class _DetailSheetState extends State<_DetailSheet> {
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _showFolderPicker,
+                icon: const Icon(Icons.drive_file_move_outlined, size: 18),
+                label: Text(widget.l10n.moveToFolder),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
               child: TextButton.icon(
                 onPressed: () {
                   widget.service.delete(widget.item.id);
@@ -1062,6 +1437,98 @@ class _DetailSheetState extends State<_DetailSheet> {
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}, '
         '${dt.hour.toString().padLeft(2, '0')}:'
         '${dt.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// ── Folder picker sheet ───────────────────────────────────────────────────────
+
+class _FolderPickerSheet extends StatelessWidget {
+  final List<HistoryFolder> folders;
+  final String? currentFolderId;
+  final AppLocalizations l10n;
+  final dynamic theme;
+  final void Function(String? folderId) onPick;
+
+  const _FolderPickerSheet({
+    required this.folders,
+    required this.currentFolderId,
+    required this.l10n,
+    required this.theme,
+    required this.onPick,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.5,
+      minChildSize: 0.3,
+      maxChildSize: 0.85,
+      expand: false,
+      builder: (_, controller) => Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Text(
+              l10n.moveToFolder,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              controller: controller,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.folder_off_outlined,
+                      color: currentFolderId == null
+                          ? theme.colors[0]
+                          : Colors.white38),
+                  title: Text(l10n.noFolder,
+                      style: const TextStyle(color: Colors.white)),
+                  trailing: currentFolderId == null
+                      ? Icon(Icons.check, color: theme.colors[0])
+                      : null,
+                  tileColor: currentFolderId == null
+                      ? theme.colors[0].withOpacity(0.15)
+                      : null,
+                  onTap: () => onPick(null),
+                ),
+                ...folders.map((folder) {
+                  final isSelected = folder.id == currentFolderId;
+                  return ListTile(
+                    leading: Icon(Icons.folder_rounded,
+                        color: isSelected
+                            ? theme.colors[0]
+                            : Colors.white54),
+                    title: Text(folder.name,
+                        style: const TextStyle(color: Colors.white)),
+                    trailing: isSelected
+                        ? Icon(Icons.check, color: theme.colors[0])
+                        : null,
+                    tileColor: isSelected
+                        ? theme.colors[0].withOpacity(0.15)
+                        : null,
+                    onTap: () => onPick(folder.id),
+                  );
+                }),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

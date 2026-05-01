@@ -55,6 +55,7 @@ class HistoryService extends ChangeNotifier {
           languageName: item.languageName,
           voiceName: item.voiceName,
           audioFilePath: dest,
+          folderId: item.folderId,
         );
       } catch (_) {
         savedItem = HistoryItem(
@@ -65,6 +66,7 @@ class HistoryService extends ChangeNotifier {
           original: item.original,
           languageName: item.languageName,
           voiceName: item.voiceName,
+          folderId: item.folderId,
         );
       }
     }
@@ -117,6 +119,7 @@ class HistoryService extends ChangeNotifier {
       languageName: old.languageName,
       voiceName: old.voiceName,
       audioFilePath: old.audioFilePath,
+      folderId: old.folderId,
     );
     notifyListeners();
     await _persist();
@@ -135,9 +138,54 @@ class HistoryService extends ChangeNotifier {
       languageName: old.languageName,
       voiceName: old.voiceName,
       audioFilePath: old.audioFilePath,
+      folderId: old.folderId,
     );
     notifyListeners();
     await _persist();
+  }
+
+  Future<void> moveToFolder(String id, String? folderId) async {
+    final idx = _items.indexWhere((e) => e.id == id);
+    if (idx == -1) return;
+    final old = _items[idx];
+    _items[idx] = HistoryItem(
+      id: old.id,
+      type: old.type,
+      createdAt: old.createdAt,
+      result: old.result,
+      original: old.original,
+      languageName: old.languageName,
+      voiceName: old.voiceName,
+      audioFilePath: old.audioFilePath,
+      folderId: folderId,
+    );
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> moveAllFromFolder(String folderId) async {
+    bool changed = false;
+    for (int i = 0; i < _items.length; i++) {
+      if (_items[i].folderId == folderId) {
+        final old = _items[i];
+        _items[i] = HistoryItem(
+          id: old.id,
+          type: old.type,
+          createdAt: old.createdAt,
+          result: old.result,
+          original: old.original,
+          languageName: old.languageName,
+          voiceName: old.voiceName,
+          audioFilePath: old.audioFilePath,
+          folderId: null,
+        );
+        changed = true;
+      }
+    }
+    if (changed) {
+      notifyListeners();
+      await _persist();
+    }
   }
 
   Future<int> restoreItems(List<HistoryItem> items) async {

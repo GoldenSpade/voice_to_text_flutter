@@ -89,6 +89,25 @@ class HistoryService extends ChangeNotifier {
     await _persist();
   }
 
+  Future<HistoryItem?> softDelete(String id) async {
+    final idx = _items.indexWhere((e) => e.id == id);
+    if (idx == -1) return null;
+    final item = _items[idx];
+    _items.removeAt(idx);
+    notifyListeners();
+    await _persist();
+    return item;
+  }
+
+  Future<void> undoDelete(HistoryItem item) async {
+    _items.insert(0, item);
+    _items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    notifyListeners();
+    await _persist();
+  }
+
+  void deleteAudioFile(HistoryItem item) => _deleteAudioFile(item);
+
   Future<void> clear() async {
     for (final item in _items) {
       _deleteAudioFile(item);

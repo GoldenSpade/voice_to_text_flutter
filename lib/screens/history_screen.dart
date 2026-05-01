@@ -17,6 +17,32 @@ import '../services/history_service.dart';
 import '../services/transform_presets_service.dart';
 import 'transform_sheet.dart';
 
+void _showDeleteUndo(
+  ScaffoldMessengerState messenger,
+  HistoryItem item,
+  HistoryService service,
+  AppLocalizations l10n,
+) {
+  messenger.hideCurrentSnackBar();
+  messenger
+      .showSnackBar(
+        SnackBar(
+          content: Text(l10n.deleted),
+          action: SnackBarAction(
+            label: l10n.undo,
+            onPressed: () => service.undoDelete(item),
+          ),
+          duration: const Duration(seconds: 4),
+        ),
+      )
+      .closed
+      .then((reason) {
+    if (reason != SnackBarClosedReason.action) {
+      service.deleteAudioFile(item);
+    }
+  });
+}
+
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
@@ -411,6 +437,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             item: filtered[i],
                             service: svc,
                             folderService: fs,
+                            isInFolder: _activeFolderId != null,
                           ),
                         ),
                 ),
@@ -774,17 +801,27 @@ class _HistoryCard extends StatelessWidget {
   final HistoryItem item;
   final HistoryService service;
   final FolderService folderService;
+  final bool isInFolder;
 
   const _HistoryCard({
     required this.item,
     required this.service,
     required this.folderService,
+    this.isInFolder = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.watch<AppState>().l10n;
     final theme = context.read<AppState>().buttonTheme;
+
+    if (isInFolder) {
+      return GestureDetector(
+        onLongPress: () => _showItemMenu(context, l10n, theme),
+        child: _buildDismissible(context, l10n, theme),
+      );
+    }
+
     return LongPressDraggable<HistoryItem>(
       data: item,
       delay: const Duration(milliseconds: 350),
@@ -826,6 +863,99 @@ class _HistoryCard extends StatelessWidget {
     );
   }
 
+  void _showItemMenu(
+      BuildContext context, AppLocalizations l10n, dynamic theme) {
+    final messenger = ScaffoldMessenger.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        minimum: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(children: [
+                Icon(item.type.icon, color: item.type.color, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    item.result,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ]),
+            ),
+            const Divider(color: Colors.white12),
+            ListTile(
+              leading: const Icon(Icons.drive_file_move_outlined,
+                  color: Colors.white70),
+              title: Text(l10n.moveToFolder,
+                  style: const TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _showFolderPicker(context, l10n, theme);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.delete_outline, color: Colors.redAccent),
+              title: Text(l10n.delete,
+                  style: const TextStyle(color: Colors.redAccent)),
+              onTap: () async {
+                Navigator.pop(context);
+                final deleted = await service.softDelete(item.id);
+                if (deleted != null) {
+                  _showDeleteUndo(messenger, deleted, service, l10n);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFolderPicker(
+      BuildContext context, AppLocalizations l10n, dynamic theme) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _FolderPickerSheet(
+        folders: folderService.folders,
+        currentFolderId: item.folderId,
+        l10n: l10n,
+        theme: theme,
+        onPick: (folderId) {
+          service.moveToFolder(item.id, folderId);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+
   Widget _buildDismissible(
       BuildContext context, AppLocalizations l10n, dynamic theme) {
     return Dismissible(
@@ -841,7 +971,13 @@ class _HistoryCard extends StatelessWidget {
         ),
         child: const Icon(Icons.delete_outline, color: Colors.white),
       ),
-      onDismissed: (_) => service.delete(item.id),
+      onDismissed: (_) async {
+        final messenger = ScaffoldMessenger.of(context);
+        final deleted = await service.softDelete(item.id);
+        if (deleted != null) {
+          _showDeleteUndo(messenger, deleted, service, l10n);
+        }
+      },
       child: InkWell(
         onTap: () => _showDetail(context, l10n),
         borderRadius: BorderRadius.circular(12),
@@ -951,31 +1087,10 @@ class _HistoryCard extends StatelessWidget {
 
   void _confirmDelete(
       BuildContext context, AppLocalizations l10n, Color surfaceColor) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: surfaceColor,
-        title: Text(l10n.deleteRecordTitle,
-            style: const TextStyle(color: Colors.white)),
-        content: Text(l10n.deleteRecordMsg,
-            style: const TextStyle(color: Colors.white70)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel,
-                style: const TextStyle(color: Colors.white54)),
-          ),
-          TextButton(
-            onPressed: () {
-              service.delete(item.id);
-              Navigator.pop(context);
-            },
-            child: Text(l10n.delete,
-                style: const TextStyle(color: Colors.redAccent)),
-          ),
-        ],
-      ),
-    );
+    final messenger = ScaffoldMessenger.of(context);
+    service.softDelete(item.id).then((deleted) {
+      if (deleted != null) _showDeleteUndo(messenger, deleted, service, l10n);
+    });
   }
 
   String _formatDate(DateTime dt) {
@@ -1538,9 +1653,16 @@ class _DetailSheetState extends State<_DetailSheet> {
             SizedBox(
               width: double.infinity,
               child: TextButton.icon(
-                onPressed: () {
-                  widget.service.delete(widget.item.id);
-                  Navigator.pop(context);
+                onPressed: () async {
+                  final messenger =
+                      ScaffoldMessenger.of(widget.outerContext);
+                  final deleted =
+                      await widget.service.softDelete(widget.item.id);
+                  if (mounted) Navigator.pop(context);
+                  if (deleted != null) {
+                    _showDeleteUndo(
+                        messenger, deleted, widget.service, widget.l10n);
+                  }
                 },
                 icon: const Icon(Icons.delete_outline,
                     size: 18, color: Colors.redAccent),

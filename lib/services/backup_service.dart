@@ -2,13 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:path_provider/path_provider.dart';
+import '../models/history_folder.dart';
 import '../models/history_item.dart';
+import 'folder_service.dart';
 import 'history_service.dart';
 
 class BackupService {
   static Future<String> export(HistoryService history) async {
     final appDir = await getApplicationDocumentsDirectory();
     final historyFile = File('${appDir.path}/history.json');
+    final foldersFile = File('${appDir.path}/folders.json');
     final audioDir = Directory('${appDir.path}/audio');
 
     final archive = Archive();
@@ -17,10 +20,13 @@ class BackupService {
       final bytes = historyFile.readAsBytesSync();
       archive.addFile(ArchiveFile('history.json', bytes.length, bytes));
     } else {
-      // Export empty history
-      const raw = '[]';
-      final bytes = utf8.encode(raw);
+      final bytes = utf8.encode('[]');
       archive.addFile(ArchiveFile('history.json', bytes.length, bytes));
+    }
+
+    if (foldersFile.existsSync()) {
+      final bytes = foldersFile.readAsBytesSync();
+      archive.addFile(ArchiveFile('folders.json', bytes.length, bytes));
     }
 
     if (audioDir.existsSync()) {
@@ -47,7 +53,11 @@ class BackupService {
     return fileName;
   }
 
-  static Future<int> import(String zipPath, HistoryService history) async {
+  static Future<int> import(
+    String zipPath,
+    HistoryService history,
+    FolderService folders,
+  ) async {
     final appDir = await getApplicationDocumentsDirectory();
     final audioDir = Directory('${appDir.path}/audio');
     if (!audioDir.existsSync()) audioDir.createSync(recursive: true);
@@ -56,6 +66,7 @@ class BackupService {
     final archive = ZipDecoder().decodeBytes(bytes);
 
     List<HistoryItem>? items;
+    List<HistoryFolder>? folderList;
 
     for (final file in archive) {
       if (!file.isFile) continue;
@@ -65,6 +76,11 @@ class BackupService {
         final list = jsonDecode(utf8.decode(data)) as List;
         items = list
             .map((e) => HistoryItem.fromJson(e as Map<String, dynamic>))
+            .toList();
+      } else if (file.name == 'folders.json') {
+        final list = jsonDecode(utf8.decode(data)) as List;
+        folderList = list
+            .map((e) => HistoryFolder.fromJson(e as Map<String, dynamic>))
             .toList();
       } else if (file.name.startsWith('audio/')) {
         final audioName = file.name.replaceFirst('audio/', '');
@@ -76,8 +92,23 @@ class BackupService {
 
     if (items == null) throw Exception('Invalid backup: history.json not found');
 
+    if (folderList != null) {
+      await folders.restoreFolders(folderList);
+    }
+
     final restored = items.map((item) {
-      if (item.audioFilePath == null) return item;
+      if (item.audioFilePath == null) {
+        return HistoryItem(
+          id: item.id,
+          type: item.type,
+          createdAt: item.createdAt,
+          result: item.result,
+          original: item.original,
+          languageName: item.languageName,
+          voiceName: item.voiceName,
+          folderId: item.folderId,
+        );
+      }
       final fileName = item.audioFilePath!.split('/').last;
       final localPath = '${audioDir.path}/$fileName';
       return HistoryItem(
@@ -89,6 +120,7 @@ class BackupService {
         languageName: item.languageName,
         voiceName: item.voiceName,
         audioFilePath: File(localPath).existsSync() ? localPath : null,
+        folderId: item.folderId,
       );
     }).toList();
 

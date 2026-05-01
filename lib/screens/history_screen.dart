@@ -67,6 +67,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       final count = await BackupService.import(
         result.files.single.path!,
         context.read<HistoryService>(),
+        context.read<FolderService>(),
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -618,7 +619,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ),
           TextButton(
             onPressed: () {
-              context.read<HistoryService>().moveAllFromFolder(folder.id);
+              context.read<HistoryService>().deleteAllFromFolder(folder.id);
               context.read<FolderService>().delete(folder.id);
               setState(() => _activeFolderId = null);
               Navigator.pop(context);

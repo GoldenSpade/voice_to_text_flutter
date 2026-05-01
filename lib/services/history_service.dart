@@ -163,29 +163,15 @@ class HistoryService extends ChangeNotifier {
     await _persist();
   }
 
-  Future<void> moveAllFromFolder(String folderId) async {
-    bool changed = false;
-    for (int i = 0; i < _items.length; i++) {
-      if (_items[i].folderId == folderId) {
-        final old = _items[i];
-        _items[i] = HistoryItem(
-          id: old.id,
-          type: old.type,
-          createdAt: old.createdAt,
-          result: old.result,
-          original: old.original,
-          languageName: old.languageName,
-          voiceName: old.voiceName,
-          audioFilePath: old.audioFilePath,
-          folderId: null,
-        );
-        changed = true;
-      }
+  Future<void> deleteAllFromFolder(String folderId) async {
+    final toDelete = _items.where((e) => e.folderId == folderId).toList();
+    if (toDelete.isEmpty) return;
+    for (final item in toDelete) {
+      _deleteAudioFile(item);
     }
-    if (changed) {
-      notifyListeners();
-      await _persist();
-    }
+    _items.removeWhere((e) => e.folderId == folderId);
+    notifyListeners();
+    await _persist();
   }
 
   Future<int> restoreItems(List<HistoryItem> items) async {

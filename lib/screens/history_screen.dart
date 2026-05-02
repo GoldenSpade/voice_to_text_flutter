@@ -55,6 +55,85 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _query = '';
   HistoryType? _activeFilter;
   String? _activeFolderId;
+  final Set<String> _selectedIds = {};
+  bool get _selectMode => _selectedIds.isNotEmpty;
+
+  void _toggleSelect(String id) {
+    setState(() {
+      if (_selectedIds.contains(id)) {
+        _selectedIds.remove(id);
+      } else {
+        _selectedIds.add(id);
+      }
+    });
+  }
+
+  void _startSelect(String id) {
+    setState(() => _selectedIds.add(id));
+  }
+
+  void _selectAll(List<HistoryItem> items) {
+    setState(() => _selectedIds.addAll(items.map((e) => e.id)));
+  }
+
+  void _clearSelection() {
+    setState(() => _selectedIds.clear());
+  }
+
+  void _deleteSelectedBatch(HistoryService svc, AppLocalizations l10n) {
+    if (_selectedIds.isEmpty) return;
+    final ids = List<String>.from(_selectedIds);
+    _clearSelection();
+    final messenger = ScaffoldMessenger.of(context);
+    final deleted = svc.softDeleteBatch(ids);
+    if (deleted.isEmpty) return;
+    messenger.hideCurrentSnackBar();
+    messenger
+        .showSnackBar(SnackBar(
+          content: Text('${l10n.deleted}: ${deleted.length}'),
+          action: SnackBarAction(
+            label: l10n.undo,
+            onPressed: () => svc.undoDeleteBatch(deleted),
+          ),
+          duration: const Duration(seconds: 4),
+        ))
+        .closed
+        .then((reason) {
+      if (reason != SnackBarClosedReason.action) {
+        for (final item in deleted) {
+          svc.deleteAudioFile(item);
+        }
+      }
+    });
+  }
+
+  void _moveBatchToFolder(String? folderId, HistoryService svc) {
+    svc.moveToFolderBatch(List<String>.from(_selectedIds), folderId);
+    _clearSelection();
+  }
+
+  void _showBatchFolderPicker(
+      BuildContext context, AppLocalizations l10n, dynamic theme) {
+    final fs = context.read<FolderService>();
+    final svc = context.read<HistoryService>();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _FolderPickerSheet(
+        folders: fs.folders,
+        currentFolderId: null,
+        l10n: l10n,
+        theme: theme,
+        onPick: (folderId) {
+          Navigator.pop(context);
+          _moveBatchToFolder(folderId, svc);
+        },
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -185,142 +264,191 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final theme = state.buttonTheme;
 
     return PopScope(
-      canPop: _activeFolderId == null,
+      canPop: _activeFolderId == null && !_selectMode,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) setState(() => _activeFolderId = null);
+        if (!didPop) {
+          if (_selectMode) {
+            _clearSelection();
+          } else {
+            setState(() => _activeFolderId = null);
+          }
+        }
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: theme.appBarColor,
+          backgroundColor: _selectMode
+              ? theme.colors[0].withOpacity(0.25)
+              : theme.appBarColor,
           foregroundColor: Colors.white,
-          leading: _activeFolderId != null
+          leading: _selectMode
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => setState(() => _activeFolderId = null),
+                  icon: const Icon(Icons.close),
+                  onPressed: _clearSelection,
                 )
-              : null,
-          title: _activeFolderId != null
-              ? Consumer<FolderService>(
-                  builder: (_, fs, __) {
-                    final folder = fs.folders
-                        .where((f) => f.id == _activeFolderId)
-                        .firstOrNull;
-                    return Text(folder?.name ?? '');
-                  },
-                )
-              : Text(l10n.historyTitle),
-          actions: [
-            if (_activeFolderId != null)
-              Consumer<FolderService>(
-                builder: (_, fs, __) {
-                  final folder = fs.folders
-                      .where((f) => f.id == _activeFolderId)
-                      .firstOrNull;
-                  if (folder == null) return const SizedBox.shrink();
-                  return PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert),
-                    color: theme.surfaceColor,
-                    onSelected: (v) {
-                      if (v == 'rename') _renameFolder(folder, l10n, theme.surfaceColor);
-                      if (v == 'delete') _deleteFolder(folder, l10n, theme.surfaceColor);
-                    },
-                    itemBuilder: (_) => [
-                      PopupMenuItem(
-                        value: 'rename',
-                        child: Row(children: [
-                          const Icon(Icons.drive_file_rename_outline,
-                              size: 20, color: Colors.white70),
-                          const SizedBox(width: 12),
-                          Text(l10n.rename,
-                              style: const TextStyle(color: Colors.white)),
-                        ]),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(children: [
-                          const Icon(Icons.delete_outline,
-                              size: 20, color: Colors.redAccent),
-                          const SizedBox(width: 12),
-                          Text(l10n.delete,
-                              style: const TextStyle(color: Colors.redAccent)),
-                        ]),
-                      ),
-                    ],
-                  );
-                },
-              )
-            else
-              Consumer<HistoryService>(
-                builder: (context, svc, _) => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert),
-                      color: theme.surfaceColor,
-                      onSelected: (v) {
-                        if (v == 'export') _export(l10n, svc);
-                        if (v == 'import') _import(l10n);
-                        if (v == 'newfolder')
-                          _createFolder(l10n, theme.surfaceColor);
+              : (_activeFolderId != null
+                  ? IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () => setState(() => _activeFolderId = null),
+                    )
+                  : null),
+          title: _selectMode
+              ? Text('${_selectedIds.length} ${l10n.selected}')
+              : (_activeFolderId != null
+                  ? Consumer<FolderService>(
+                      builder: (_, fs, __) {
+                        final folder = fs.folders
+                            .where((f) => f.id == _activeFolderId)
+                            .firstOrNull;
+                        return Text(folder?.name ?? '');
                       },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          value: 'newfolder',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.create_new_folder_outlined,
-                                  size: 20, color: Colors.white70),
-                              const SizedBox(width: 12),
-                              Text(l10n.newFolder,
-                                  style: const TextStyle(color: Colors.white)),
-                            ],
-                          ),
+                    )
+                  : Text(l10n.historyTitle)),
+          actions: _selectMode
+              ? [
+                  Consumer2<HistoryService, FolderService>(
+                    builder: (_, svc, fs, __) => Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.select_all),
+                          tooltip: l10n.selectAll,
+                          onPressed: () =>
+                              _selectAll(_filtered(svc.items)),
                         ),
-                        PopupMenuItem(
-                          value: 'export',
-                          enabled: svc.items.isNotEmpty,
-                          child: Row(
-                            children: [
-                              Icon(Icons.upload_rounded,
-                                  size: 20,
-                                  color: svc.items.isNotEmpty
-                                      ? Colors.white70
-                                      : Colors.white24),
-                              const SizedBox(width: 12),
-                              Text(l10n.exportHistory,
-                                  style: TextStyle(
-                                      color: svc.items.isNotEmpty
-                                          ? Colors.white
-                                          : Colors.white38)),
-                            ],
+                        if (fs.folders.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(
+                                Icons.drive_file_move_outlined),
+                            onPressed: () => _showBatchFolderPicker(
+                                context, l10n, theme),
                           ),
-                        ),
-                        PopupMenuItem(
-                          value: 'import',
-                          child: Row(
-                            children: [
-                              const Icon(Icons.download_rounded,
-                                  size: 20, color: Colors.white70),
-                              const SizedBox(width: 12),
-                              Text(l10n.importHistory,
-                                  style:
-                                      const TextStyle(color: Colors.white)),
-                            ],
-                          ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline),
+                          color: Colors.redAccent,
+                          onPressed: () =>
+                              _deleteSelectedBatch(svc, l10n),
                         ),
                       ],
                     ),
-                    if (svc.items.isNotEmpty)
-                      IconButton(
-                        icon: const Icon(Icons.delete_sweep_outlined),
-                        tooltip: l10n.clearAll,
-                        onPressed: () => _confirmClear(
-                            context, svc, l10n, theme.surfaceColor),
+                  ),
+                ]
+              : [
+                  if (_activeFolderId != null)
+                    Consumer<FolderService>(
+                      builder: (_, fs, __) {
+                        final folder = fs.folders
+                            .where((f) => f.id == _activeFolderId)
+                            .firstOrNull;
+                        if (folder == null) return const SizedBox.shrink();
+                        return PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert),
+                          color: theme.surfaceColor,
+                          onSelected: (v) {
+                            if (v == 'rename')
+                              _renameFolder(
+                                  folder, l10n, theme.surfaceColor);
+                            if (v == 'delete')
+                              _deleteFolder(
+                                  folder, l10n, theme.surfaceColor);
+                          },
+                          itemBuilder: (_) => [
+                            PopupMenuItem(
+                              value: 'rename',
+                              child: Row(children: [
+                                const Icon(
+                                    Icons.drive_file_rename_outline,
+                                    size: 20,
+                                    color: Colors.white70),
+                                const SizedBox(width: 12),
+                                Text(l10n.rename,
+                                    style: const TextStyle(
+                                        color: Colors.white)),
+                              ]),
+                            ),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Row(children: [
+                                const Icon(Icons.delete_outline,
+                                    size: 20, color: Colors.redAccent),
+                                const SizedBox(width: 12),
+                                Text(l10n.delete,
+                                    style: const TextStyle(
+                                        color: Colors.redAccent)),
+                              ]),
+                            ),
+                          ],
+                        );
+                      },
+                    )
+                  else
+                    Consumer<HistoryService>(
+                      builder: (context, svc, _) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert),
+                            color: theme.surfaceColor,
+                            onSelected: (v) {
+                              if (v == 'export') _export(l10n, svc);
+                              if (v == 'import') _import(l10n);
+                              if (v == 'newfolder')
+                                _createFolder(l10n, theme.surfaceColor);
+                            },
+                            itemBuilder: (_) => [
+                              PopupMenuItem(
+                                value: 'newfolder',
+                                child: Row(children: [
+                                  const Icon(
+                                      Icons.create_new_folder_outlined,
+                                      size: 20,
+                                      color: Colors.white70),
+                                  const SizedBox(width: 12),
+                                  Text(l10n.newFolder,
+                                      style: const TextStyle(
+                                          color: Colors.white)),
+                                ]),
+                              ),
+                              PopupMenuItem(
+                                value: 'export',
+                                enabled: svc.items.isNotEmpty,
+                                child: Row(children: [
+                                  Icon(Icons.upload_rounded,
+                                      size: 20,
+                                      color: svc.items.isNotEmpty
+                                          ? Colors.white70
+                                          : Colors.white24),
+                                  const SizedBox(width: 12),
+                                  Text(l10n.exportHistory,
+                                      style: TextStyle(
+                                          color: svc.items.isNotEmpty
+                                              ? Colors.white
+                                              : Colors.white38)),
+                                ]),
+                              ),
+                              PopupMenuItem(
+                                value: 'import',
+                                child: Row(children: [
+                                  const Icon(Icons.download_rounded,
+                                      size: 20, color: Colors.white70),
+                                  const SizedBox(width: 12),
+                                  Text(l10n.importHistory,
+                                      style: const TextStyle(
+                                          color: Colors.white)),
+                                ]),
+                              ),
+                            ],
+                          ),
+                          if (svc.items.isNotEmpty)
+                            IconButton(
+                              icon: const Icon(Icons.delete_sweep_outlined),
+                              tooltip: l10n.clearAll,
+                              onPressed: () => _confirmClear(
+                                  context, svc, l10n, theme.surfaceColor),
+                            ),
+                        ],
                       ),
-                  ],
-                ),
-              ),
-          ],
+                    ),
+                ],
         ),
         body: Consumer2<HistoryService, FolderService>(
           builder: (context, svc, fs, _) {
@@ -438,6 +566,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             service: svc,
                             folderService: fs,
                             isInFolder: _activeFolderId != null,
+                            selectMode: _selectMode,
+                            isSelected: _selectedIds.contains(filtered[i].id),
+                            onToggleSelect: () => _toggleSelect(filtered[i].id),
+                            onStartSelect: () => _startSelect(filtered[i].id),
                           ),
                         ),
                 ),
@@ -802,12 +934,20 @@ class _HistoryCard extends StatelessWidget {
   final HistoryService service;
   final FolderService folderService;
   final bool isInFolder;
+  final bool selectMode;
+  final bool isSelected;
+  final VoidCallback onToggleSelect;
+  final VoidCallback onStartSelect;
 
   const _HistoryCard({
     required this.item,
     required this.service,
     required this.folderService,
     this.isInFolder = false,
+    this.selectMode = false,
+    this.isSelected = false,
+    required this.onToggleSelect,
+    required this.onStartSelect,
   });
 
   @override
@@ -815,119 +955,141 @@ class _HistoryCard extends StatelessWidget {
     final l10n = context.watch<AppState>().l10n;
     final theme = context.read<AppState>().buttonTheme;
 
+    if (selectMode) {
+      return _buildSelectableCard(context, l10n, theme);
+    }
+
     if (isInFolder) {
       return GestureDetector(
-        onLongPress: () => _showItemMenu(context, l10n, theme),
+        onLongPress: onStartSelect,
         child: _buildDismissible(context, l10n, theme),
       );
     }
 
-    return LongPressDraggable<HistoryItem>(
-      data: item,
-      delay: const Duration(milliseconds: 350),
-      feedback: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: 250,
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-          decoration: BoxDecoration(
-            color: theme.surfaceColor,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                  color: Colors.black45,
-                  blurRadius: 16,
-                  offset: Offset(0, 6)),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(item.type.icon, color: item.type.color, size: 18),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  item.result,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      childWhenDragging: Opacity(
-          opacity: 0.35, child: _buildDismissible(context, l10n, theme)),
-      child: _buildDismissible(context, l10n, theme),
-    );
-  }
-
-  void _showItemMenu(
-      BuildContext context, AppLocalizations l10n, dynamic theme) {
-    final messenger = ScaffoldMessenger.of(context);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: theme.surfaceColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SafeArea(
-        minimum: const EdgeInsets.only(bottom: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(2)),
+    return GestureDetector(
+      onLongPress: onStartSelect,
+      child: LongPressDraggable<HistoryItem>(
+        data: item,
+        delay: const Duration(milliseconds: 350),
+        feedback: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 250,
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+            decoration: BoxDecoration(
+              color: theme.surfaceColor,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                    color: Colors.black45,
+                    blurRadius: 16,
+                    offset: Offset(0, 6)),
+              ],
             ),
-            const SizedBox(height: 12),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-              child: Row(children: [
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Icon(item.type.icon, color: item.type.color, size: 18),
                 const SizedBox(width: 10),
-                Expanded(
+                Flexible(
                   child: Text(
                     item.result,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
                   ),
                 ),
-              ]),
+              ],
             ),
-            const Divider(color: Colors.white12),
-            ListTile(
-              leading: const Icon(Icons.drive_file_move_outlined,
-                  color: Colors.white70),
-              title: Text(l10n.moveToFolder,
-                  style: const TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                _showFolderPicker(context, l10n, theme);
-              },
+          ),
+        ),
+        childWhenDragging: Opacity(
+            opacity: 0.35, child: _buildDismissible(context, l10n, theme)),
+        child: _buildDismissible(context, l10n, theme),
+      ),
+    );
+  }
+
+  Widget _buildSelectableCard(
+      BuildContext context, AppLocalizations l10n, dynamic theme) {
+    return GestureDetector(
+      onTap: onToggleSelect,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colors[0].withOpacity(0.18)
+              : theme.surfaceColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? theme.colors[0] : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.colors[0].withOpacity(0.3)
+                    : item.type.color.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: isSelected
+                  ? Icon(Icons.check_rounded, color: theme.colors[0], size: 20)
+                  : Icon(item.type.icon, color: item.type.color, size: 20),
             ),
-            ListTile(
-              leading:
-                  const Icon(Icons.delete_outline, color: Colors.redAccent),
-              title: Text(l10n.delete,
-                  style: const TextStyle(color: Colors.redAccent)),
-              onTap: () async {
-                Navigator.pop(context);
-                final deleted = await service.softDelete(item.id);
-                if (deleted != null) {
-                  _showDeleteUndo(messenger, deleted, service, l10n);
-                }
-              },
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l10n.historyTypeLabel(item.type),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (item.languageName != null) ...[
+                        const SizedBox(width: 6),
+                        _Badge(item.languageName!),
+                      ],
+                      if (item.voiceName != null) ...[
+                        const SizedBox(width: 6),
+                        _Badge(item.voiceName!),
+                      ],
+                      const Spacer(),
+                      Text(
+                        _formatDate(item.createdAt),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.35),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.result,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

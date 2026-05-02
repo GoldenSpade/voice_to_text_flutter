@@ -108,6 +108,52 @@ class HistoryService extends ChangeNotifier {
 
   void deleteAudioFile(HistoryItem item) => _deleteAudioFile(item);
 
+  List<HistoryItem> softDeleteBatch(List<String> ids) {
+    final deleted = <HistoryItem>[];
+    for (final id in ids) {
+      final idx = _items.indexWhere((e) => e.id == id);
+      if (idx != -1) {
+        deleted.add(_items[idx]);
+        _items.removeAt(idx);
+      }
+    }
+    if (deleted.isNotEmpty) {
+      notifyListeners();
+      _persist();
+    }
+    return deleted;
+  }
+
+  Future<void> undoDeleteBatch(List<HistoryItem> items) async {
+    for (final item in items) {
+      _items.insert(0, item);
+    }
+    _items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> moveToFolderBatch(List<String> ids, String? folderId) async {
+    for (final id in ids) {
+      final idx = _items.indexWhere((e) => e.id == id);
+      if (idx == -1) continue;
+      final old = _items[idx];
+      _items[idx] = HistoryItem(
+        id: old.id,
+        type: old.type,
+        createdAt: old.createdAt,
+        result: old.result,
+        original: old.original,
+        languageName: old.languageName,
+        voiceName: old.voiceName,
+        audioFilePath: old.audioFilePath,
+        folderId: folderId,
+      );
+    }
+    notifyListeners();
+    await _persist();
+  }
+
   Future<void> clear() async {
     for (final item in _items) {
       _deleteAudioFile(item);

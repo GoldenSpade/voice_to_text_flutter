@@ -265,8 +265,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         setState(() => _correcting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text(e.toString().replaceFirst('Exception: ', '')),
+            content: Text(appState.l10n.resolveApiError(
+                e.toString().replaceFirst('Exception: ', ''))),
           ),
         );
       }
@@ -754,7 +754,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
             ),
             const SizedBox(height: 12),
             Text(
-              _errorMessage ?? l10n.unknownError,
+              l10n.resolveApiError(_errorMessage),
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white.withOpacity(0.6),

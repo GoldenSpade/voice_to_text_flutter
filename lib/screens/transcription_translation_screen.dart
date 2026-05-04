@@ -772,7 +772,7 @@ class _TranscriptionTranslationScreenState
             ),
             const SizedBox(height: 12),
             Text(
-              _errorMessage ?? l10n.unknownError,
+              l10n.resolveApiError(_errorMessage),
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.white.withOpacity(0.6),

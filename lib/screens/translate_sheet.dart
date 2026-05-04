@@ -349,7 +349,7 @@ class _TranslateSheetState extends State<_TranslateSheet> {
           const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
           const SizedBox(height: 12),
           Text(
-            _error ?? l10n.unknownError,
+            l10n.resolveApiError(_error),
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.white.withOpacity(0.7),

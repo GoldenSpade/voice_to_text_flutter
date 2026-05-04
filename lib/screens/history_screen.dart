@@ -541,7 +541,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           folder: folder,
                           count: count,
                           color: theme.colors[0],
-                          historyService: svc,
                           onTap: () =>
                               setState(() => _activeFolderId = folder.id),
                           onLongPress: () => _showFolderContextMenu(
@@ -565,7 +564,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             item: filtered[i],
                             service: svc,
                             folderService: fs,
-                            isInFolder: _activeFolderId != null,
                             selectMode: _selectMode,
                             isSelected: _selectedIds.contains(filtered[i].id),
                             onToggleSelect: () => _toggleSelect(filtered[i].id),
@@ -804,41 +802,30 @@ class _FolderCard extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
-  final HistoryService historyService;
 
   const _FolderCard({
     required this.folder,
     required this.count,
     required this.color,
     required this.onTap,
-    required this.historyService,
     this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DragTarget<HistoryItem>(
-      onAcceptWithDetails: (details) =>
-          historyService.moveToFolder(details.data.id, folder.id),
-      builder: (context, candidateData, _) {
-        final hovering = candidateData.isNotEmpty;
-        return GestureDetector(
-          onTap: onTap,
-          onLongPress: onLongPress,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            width: 120,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: hovering
-                  ? color.withOpacity(0.35)
-                  : color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                  color: hovering ? color : color.withOpacity(0.3),
-                  width: hovering ? 2 : 1),
-            ),
-            child: Column(
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 120,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.3), width: 1),
+        ),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -875,9 +862,7 @@ class _FolderCard extends StatelessWidget {
             ),
           ],
         ),
-          ),
-        );
-      },
+      ),
     );
   }
 }
@@ -933,7 +918,6 @@ class _HistoryCard extends StatelessWidget {
   final HistoryItem item;
   final HistoryService service;
   final FolderService folderService;
-  final bool isInFolder;
   final bool selectMode;
   final bool isSelected;
   final VoidCallback onToggleSelect;
@@ -943,7 +927,6 @@ class _HistoryCard extends StatelessWidget {
     required this.item,
     required this.service,
     required this.folderService,
-    this.isInFolder = false,
     this.selectMode = false,
     this.isSelected = false,
     required this.onToggleSelect,
@@ -959,54 +942,9 @@ class _HistoryCard extends StatelessWidget {
       return _buildSelectableCard(context, l10n, theme);
     }
 
-    if (isInFolder) {
-      return GestureDetector(
-        onLongPress: onStartSelect,
-        child: _buildDismissible(context, l10n, theme),
-      );
-    }
-
     return GestureDetector(
       onLongPress: onStartSelect,
-      child: LongPressDraggable<HistoryItem>(
-        data: item,
-        delay: const Duration(milliseconds: 350),
-        feedback: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: 250,
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-            decoration: BoxDecoration(
-              color: theme.surfaceColor,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black45,
-                    blurRadius: 16,
-                    offset: Offset(0, 6)),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(item.type.icon, color: item.type.color, size: 18),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    item.result,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        childWhenDragging: Opacity(
-            opacity: 0.35, child: _buildDismissible(context, l10n, theme)),
-        child: _buildDismissible(context, l10n, theme),
-      ),
+      child: _buildDismissible(context, l10n, theme),
     );
   }
 

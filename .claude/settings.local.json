@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(dart analyze *)",
-      "Bash(flutter analyze *)"
+      "Bash(flutter analyze *)",
+      "Read(//c/Users/user/AppData/Local/Pub/Cache/hosted/pub.dev/record-6.2.0/lib/src/**)"
     ]
   }
 }

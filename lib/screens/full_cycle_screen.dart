@@ -19,6 +19,7 @@ import '../services/history_service.dart';
 import '../services/openai_service.dart';
 import '../services/telegram_service.dart';
 import 'transform_sheet.dart';
+import '../widgets/waveform_widget.dart';
 
 enum _Stage { idle, recording, transcribing, translating, generating, result, error }
 
@@ -64,6 +65,8 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   late final AnimationController _pulseCtrl;
   late final Animation<double> _pulseAnim;
   StreamSubscription<PlayerState>? _playerSub;
+  final List<double> _waveData = [];
+  StreamSubscription<Amplitude>? _amplitudeSub;
 
   @override
   void initState() {
@@ -102,6 +105,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
 
   @override
   void dispose() {
+    _amplitudeSub?.cancel();
     _pulseCtrl.dispose();
     _editOrigCtrl.dispose();
     _playerSub?.cancel();
@@ -130,10 +134,22 @@ class _FullCycleScreenState extends State<FullCycleScreen>
           encoder: AudioEncoder.aacLc, sampleRate: 16000, numChannels: 1),
       path: path,
     );
+
+    _waveData.clear();
+    _amplitudeSub = _recorder
+        .onAmplitudeChanged(const Duration(milliseconds: 80))
+        .listen((amp) {
+      if (!mounted) return;
+      final norm = ((amp.current.clamp(-60.0, 0.0) + 60.0) / 60.0);
+      setState(() => _waveData.add(norm));
+    });
+
     setState(() => _stage = _Stage.recording);
   }
 
   Future<void> _stopAndProcess() async {
+    _amplitudeSub?.cancel();
+    _amplitudeSub = null;
     final recPath = await _recorder.stop();
     if (recPath == null || !mounted) return;
 
@@ -571,6 +587,8 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          WaveformWidget(data: _waveData, color: Colors.redAccent, height: 56),
+          const SizedBox(height: 28),
           ScaleTransition(
             scale: _pulseAnim,
             child: GestureDetector(
@@ -589,15 +607,16 @@ class _FullCycleScreenState extends State<FullCycleScreen>
                     ),
                   ],
                 ),
-                child:
-                    const Icon(Icons.stop_rounded, color: Colors.white, size: 48),
+                child: const Icon(Icons.stop_rounded,
+                    color: Colors.white, size: 48),
               ),
             ),
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 20),
           Text(
             l10n.tapToStop,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(
+                color: Colors.white.withOpacity(0.45), fontSize: 13),
           ),
         ],
       ),

@@ -17,6 +17,7 @@ import '../services/history_service.dart';
 import '../services/openai_service.dart';
 import '../services/telegram_service.dart';
 import 'transform_sheet.dart';
+import '../widgets/waveform_widget.dart';
 
 enum _State { idle, recording, transcribing, translating, result, error }
 
@@ -44,6 +45,8 @@ class _TranscriptionTranslationScreenState
   var _lang = kTranslationLanguages[1];
   var _speechLang = kTranscriptionLanguages[0];
   late AppButtonTheme _theme;
+  final List<double> _waveData = [];
+  StreamSubscription<Amplitude>? _amplitudeSub;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -72,6 +75,7 @@ class _TranscriptionTranslationScreenState
 
   @override
   void dispose() {
+    _amplitudeSub?.cancel();
     _pulseController.dispose();
     _editOrigCtrl.dispose();
     _timer?.cancel();
@@ -112,12 +116,23 @@ class _TranscriptionTranslationScreenState
       },
     );
 
+    _waveData.clear();
+    _amplitudeSub = _recorder
+        .onAmplitudeChanged(const Duration(milliseconds: 80))
+        .listen((amp) {
+      if (!mounted) return;
+      final norm = ((amp.current.clamp(-60.0, 0.0) + 60.0) / 60.0);
+      setState(() => _waveData.add(norm));
+    });
+
     _pulseController.repeat(reverse: true);
     setState(() => _state = _State.recording);
   }
 
   Future<void> _stopRecording() async {
     _timer?.cancel();
+    _amplitudeSub?.cancel();
+    _amplitudeSub = null;
     _pulseController.stop();
     _pulseController.reset();
 
@@ -512,6 +527,8 @@ class _TranscriptionTranslationScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          WaveformWidget(data: _waveData, color: Colors.redAccent),
+          const SizedBox(height: 28),
           ScaleTransition(
             scale: _pulseAnimation,
             child: GestureDetector(
@@ -535,21 +552,21 @@ class _TranscriptionTranslationScreenState
               ),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 20),
           Text(
             _formatTime(_seconds),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.w200,
-              letterSpacing: 6,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 22,
+              fontWeight: FontWeight.w300,
+              letterSpacing: 5,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             l10n.tapToStop,
             style: TextStyle(
-                color: Colors.white.withOpacity(0.55), fontSize: 14),
+                color: Colors.white.withOpacity(0.45), fontSize: 13),
           ),
         ],
       ),

@@ -1238,10 +1238,35 @@ class _HistoryCard extends StatelessWidget {
 
   void _confirmDelete(
       BuildContext context, AppLocalizations l10n, Color surfaceColor) {
-    final messenger = ScaffoldMessenger.of(context);
-    service.softDelete(item.id).then((deleted) {
-      if (deleted != null) _showDeleteUndo(messenger, deleted, service, l10n);
-    });
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: surfaceColor,
+        title: Text(l10n.deleteRecordTitle,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.deleteRecordMsg,
+            style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final messenger = ScaffoldMessenger.of(context);
+              final deleted = await service.softDelete(item.id);
+              if (deleted != null) {
+                _showDeleteUndo(messenger, deleted, service, l10n);
+              }
+            },
+            child: Text(l10n.delete,
+                style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatDate(DateTime dt) {

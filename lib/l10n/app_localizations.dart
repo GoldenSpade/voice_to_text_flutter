@@ -185,6 +185,7 @@ class AppLocalizations {
   String get deleteEntry => _t('deleteEntry');
   String get original => _t('original');
   String get translation => _t('translation');
+  String get favorites => _t('favorites');
 
   // ── History type labels ───────────────────────────────────────────────────
   String historyTypeLabel(HistoryType type) => switch (type) {
@@ -235,6 +236,7 @@ class AppLocalizations {
       'errorOccurred': 'An error occurred',
       'unknownError': 'Unknown error',
       'noInternet': 'No internet connection. Check your network and try again.',
+      'favorites': 'Favorites',
       'tryAgain': 'Try Again',
       'noMicPermission':
           'No microphone access. Please allow in phone settings.',
@@ -395,6 +397,7 @@ class AppLocalizations {
       'errorOccurred': 'Произошла ошибка',
       'unknownError': 'Неизвестная ошибка',
       'noInternet': 'Нет подключения к интернету. Проверьте соединение и попробуйте снова.',
+      'favorites': 'Избранное',
       'tryAgain': 'Попробовать снова',
       'noMicPermission':
           'Нет доступа к микрофону. Разрешите в настройках телефона.',
@@ -556,6 +559,7 @@ class AppLocalizations {
       'errorOccurred': 'Ein Fehler ist aufgetreten',
       'unknownError': 'Unbekannter Fehler',
       'noInternet': 'Keine Internetverbindung. Netzwerk prüfen und erneut versuchen.',
+      'favorites': 'Favoriten',
       'tryAgain': 'Erneut versuchen',
       'noMicPermission':
           'Kein Mikrofonzugriff. Bitte in den Einstellungen erlauben.',
@@ -717,6 +721,7 @@ class AppLocalizations {
       'errorOccurred': "Une erreur s'est produite",
       'unknownError': 'Erreur inconnue',
       'noInternet': 'Pas de connexion Internet. Vérifiez votre réseau et réessayez.',
+      'favorites': 'Favoris',
       'tryAgain': 'Réessayer',
       'noMicPermission':
           'Pas d\'accès au microphone. Autorisez dans les paramètres.',
@@ -879,6 +884,7 @@ class AppLocalizations {
       'errorOccurred': 'Se produjo un error',
       'unknownError': 'Error desconocido',
       'noInternet': 'Sin conexión a Internet. Comprueba la red e inténtalo de nuevo.',
+      'favorites': 'Favoritos',
       'tryAgain': 'Intentar de nuevo',
       'noMicPermission':
           'Sin acceso al micrófono. Permite en los ajustes del teléfono.',
@@ -1040,6 +1046,7 @@ class AppLocalizations {
       'errorOccurred': 'Si è verificato un errore',
       'unknownError': 'Errore sconosciuto',
       'noInternet': 'Nessuna connessione Internet. Controlla la rete e riprova.',
+      'favorites': 'Preferiti',
       'tryAgain': 'Riprova',
       'noMicPermission':
           'Nessun accesso al microfono. Consenti nelle impostazioni.',
@@ -1201,6 +1208,7 @@ class AppLocalizations {
       'errorOccurred': 'Ocorreu um erro',
       'unknownError': 'Erro desconhecido',
       'noInternet': 'Sem conexão com a Internet. Verifique a rede e tente novamente.',
+      'favorites': 'Favoritos',
       'tryAgain': 'Tentar novamente',
       'noMicPermission':
           'Sem acesso ao microfone. Permita nas configurações do telefone.',
@@ -1362,6 +1370,7 @@ class AppLocalizations {
       'errorOccurred': 'Wystąpił błąd',
       'unknownError': 'Nieznany błąd',
       'noInternet': 'Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.',
+      'favorites': 'Ulubione',
       'tryAgain': 'Spróbuj ponownie',
       'noMicPermission':
           'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
@@ -1522,6 +1531,7 @@ class AppLocalizations {
       'errorOccurred': '发生错误',
       'unknownError': '未知错误',
       'noInternet': '无网络连接。请检查网络后重试。',
+      'favorites': '收藏',
       'tryAgain': '重试',
       'noMicPermission': '无麦克风权限，请在手机设置中允许。',
       'uploadFile': '上传文件',
@@ -1678,6 +1688,7 @@ class AppLocalizations {
       'errorOccurred': 'エラーが発生しました',
       'unknownError': '不明なエラー',
       'noInternet': 'インターネット接続がありません。ネットワークを確認してもう一度お試しください。',
+      'favorites': 'お気に入り',
       'tryAgain': '再試行',
       'noMicPermission': 'マイクへのアクセスがありません。設定で許可してください。',
       'uploadFile': 'ファイルを選択',
@@ -1835,6 +1846,7 @@ class AppLocalizations {
       'errorOccurred': '오류가 발생했습니다',
       'unknownError': '알 수 없는 오류',
       'noInternet': '인터넷 연결이 없습니다. 네트워크를 확인하고 다시 시도하세요.',
+      'favorites': '즐겨찾기',
       'tryAgain': '다시 시도',
       'noMicPermission': '마이크 접근 권한이 없습니다. 설정에서 허용해주세요.',
       'uploadFile': '파일 업로드',
@@ -1993,6 +2005,7 @@ class AppLocalizations {
       'errorOccurred': 'Bir hata oluştu',
       'unknownError': 'Bilinmeyen hata',
       'noInternet': 'İnternet bağlantısı yok. Ağı kontrol edip tekrar deneyin.',
+      'favorites': 'Favoriler',
       'tryAgain': 'Tekrar dene',
       'noMicPermission':
           'Mikrofon erişimi yok. Lütfen telefon ayarlarından izin verin.',
@@ -2153,6 +2166,7 @@ class AppLocalizations {
       'errorOccurred': 'एक त्रुटि हुई',
       'unknownError': 'अज्ञात त्रुटि',
       'noInternet': 'इंटरनेट कनेक्शन नहीं है। नेटवर्क जांचें और पुनः प्रयास करें।',
+      'favorites': 'पसंदीदा',
       'tryAgain': 'पुनः प्रयास करें',
       'noMicPermission': 'माइक्रोफ़ोन की अनुमति नहीं है। फ़ोन सेटिंग्स में अनुमति दें।',
       'uploadFile': 'फ़ाइल अपलोड करें',
@@ -2309,6 +2323,7 @@ class AppLocalizations {
       'errorOccurred': 'حدث خطأ',
       'unknownError': 'خطأ غير معروف',
       'noInternet': 'لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مجدداً.',
+      'favorites': 'المفضلة',
       'tryAgain': 'حاول مجدداً',
       'noMicPermission': 'لا يوجد وصول للميكروفون. يرجى السماح في إعدادات الهاتف.',
       'uploadFile': 'رفع ملف',

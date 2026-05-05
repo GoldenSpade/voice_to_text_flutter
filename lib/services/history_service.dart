@@ -56,6 +56,7 @@ class HistoryService extends ChangeNotifier {
           voiceName: item.voiceName,
           audioFilePath: dest,
           folderId: item.folderId,
+          isFavorite: item.isFavorite,
         );
       } catch (_) {
         savedItem = HistoryItem(
@@ -67,6 +68,7 @@ class HistoryService extends ChangeNotifier {
           languageName: item.languageName,
           voiceName: item.voiceName,
           folderId: item.folderId,
+          isFavorite: item.isFavorite,
         );
       }
     }
@@ -75,6 +77,26 @@ class HistoryService extends ChangeNotifier {
     if (_items.length > _maxItems) {
       _deleteAudioFile(_items.removeLast());
     }
+    notifyListeners();
+    await _persist();
+  }
+
+  Future<void> toggleFavorite(String id) async {
+    final idx = _items.indexWhere((e) => e.id == id);
+    if (idx == -1) return;
+    final old = _items[idx];
+    _items[idx] = HistoryItem(
+      id: old.id,
+      type: old.type,
+      createdAt: old.createdAt,
+      result: old.result,
+      original: old.original,
+      languageName: old.languageName,
+      voiceName: old.voiceName,
+      audioFilePath: old.audioFilePath,
+      folderId: old.folderId,
+      isFavorite: !old.isFavorite,
+    );
     notifyListeners();
     await _persist();
   }
@@ -148,6 +170,7 @@ class HistoryService extends ChangeNotifier {
         voiceName: old.voiceName,
         audioFilePath: old.audioFilePath,
         folderId: folderId,
+        isFavorite: old.isFavorite,
       );
     }
     notifyListeners();
@@ -185,6 +208,7 @@ class HistoryService extends ChangeNotifier {
       voiceName: old.voiceName,
       audioFilePath: old.audioFilePath,
       folderId: old.folderId,
+      isFavorite: old.isFavorite,
     );
     notifyListeners();
     await _persist();
@@ -204,6 +228,7 @@ class HistoryService extends ChangeNotifier {
       voiceName: old.voiceName,
       audioFilePath: old.audioFilePath,
       folderId: old.folderId,
+      isFavorite: old.isFavorite,
     );
     notifyListeners();
     await _persist();
@@ -223,6 +248,7 @@ class HistoryService extends ChangeNotifier {
       voiceName: old.voiceName,
       audioFilePath: old.audioFilePath,
       folderId: folderId,
+      isFavorite: old.isFavorite,
     );
     notifyListeners();
     await _persist();

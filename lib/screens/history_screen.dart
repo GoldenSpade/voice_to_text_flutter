@@ -57,6 +57,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String? _activeFolderId;
   final Set<String> _selectedIds = {};
   bool get _selectMode => _selectedIds.isNotEmpty;
+  bool _showFavoritesOnly = false;
 
   void _toggleSelect(String id) {
     setState(() {
@@ -201,6 +202,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     var result = _activeFolderId == null
         ? items.where((e) => e.folderId == null).toList()
         : items.where((e) => e.folderId == _activeFolderId).toList();
+    if (_showFavoritesOnly) {
+      result = result.where((e) => e.isFavorite).toList();
+    }
     if (_activeFilter != null) {
       result = result.where((e) => e.type == _activeFilter).toList();
     }
@@ -504,9 +508,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     children: [
                       _FilterPill(
                         label: l10n.filterAll,
-                        selected: _activeFilter == null,
+                        selected: _activeFilter == null && !_showFavoritesOnly,
                         color: theme.colors[0],
-                        onTap: () => setState(() => _activeFilter = null),
+                        onTap: () => setState(() {
+                          _activeFilter = null;
+                          _showFavoritesOnly = false;
+                        }),
+                      ),
+                      const SizedBox(width: 6),
+                      _FilterPill(
+                        icon: Icons.star_rounded,
+                        label: l10n.favorites,
+                        selected: _showFavoritesOnly,
+                        color: Colors.amber,
+                        onTap: () => setState(
+                            () => _showFavoritesOnly = !_showFavoritesOnly),
                       ),
                       const SizedBox(width: 6),
                       ...HistoryType.values.map((type) => Padding(
@@ -874,12 +890,14 @@ class _FilterPill extends StatelessWidget {
   final bool selected;
   final Color color;
   final VoidCallback onTap;
+  final IconData? icon;
 
   const _FilterPill({
     required this.label,
     required this.selected,
     required this.color,
     required this.onTap,
+    this.icon,
   });
 
   @override
@@ -899,13 +917,23 @@ class _FilterPill extends StatelessWidget {
             width: selected ? 1.5 : 1,
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? color : Colors.white54,
-            fontSize: 12,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon,
+                  size: 12, color: selected ? color : Colors.white54),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? color : Colors.white54,
+                fontSize: 12,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1152,12 +1180,35 @@ class _HistoryCard extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.delete_outline,
-                    size: 18, color: Colors.white.withOpacity(0.3)),
-                splashRadius: 20,
-                onPressed: () =>
-                    _confirmDelete(context, l10n, theme.surfaceColor),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () => service.toggleFavorite(item.id),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
+                      child: Icon(
+                        item.isFavorite
+                            ? Icons.star_rounded
+                            : Icons.star_outline_rounded,
+                        size: 18,
+                        color: item.isFavorite
+                            ? Colors.amber
+                            : Colors.white24,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () =>
+                        _confirmDelete(context, l10n, theme.surfaceColor),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 2, 8, 8),
+                      child: Icon(Icons.delete_outline,
+                          size: 18,
+                          color: Colors.white.withOpacity(0.25)),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -1231,6 +1282,7 @@ class _DetailSheetState extends State<_DetailSheet> {
   bool _audioReady = false;
   StreamSubscription<PlayerState>? _playerSub;
 
+  late bool _isFavorite;
   late String _currentOriginal;
   late String _currentResult;
   final _editOrigCtrl = TextEditingController();
@@ -1241,6 +1293,7 @@ class _DetailSheetState extends State<_DetailSheet> {
   @override
   void initState() {
     super.initState();
+    _isFavorite = widget.item.isFavorite;
     _currentOriginal = widget.item.original ?? '';
     _currentResult = widget.item.result;
     if (widget.item.audioFilePath != null) _initPlayer();
@@ -1453,6 +1506,23 @@ class _DetailSheetState extends State<_DetailSheet> {
                   const SizedBox(width: 8),
                   _Badge(widget.item.voiceName!),
                 ],
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    widget.service.toggleFavorite(widget.item.id);
+                    setState(() => _isFavorite = !_isFavorite);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      _isFavorite
+                          ? Icons.star_rounded
+                          : Icons.star_outline_rounded,
+                      color: _isFavorite ? Colors.amber : Colors.white38,
+                      size: 24,
+                    ),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 4),

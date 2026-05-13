@@ -154,6 +154,9 @@ class AppLocalizations {
   String get translateInputHint => _t('translateInputHint');
   String get selectLanguage => _t('selectLanguage');
   String get sourceLanguage => _t('sourceLanguage');
+  String get conversationTranslator => _t('conversationTranslator');
+  String get conversationTranslatorSub => _t('conversationTranslatorSub');
+  String get conversationEmpty => _t('conversationEmpty');
   String get translateBtn => _t('translateBtn');
   String get translating => _t('translating');
   String get sendingText => _t('sendingText');
@@ -239,6 +242,9 @@ class AppLocalizations {
       'noInternet': 'No internet connection. Check your network and try again.',
       'favorites': 'Favorites',
       'sourceLanguage': 'Source language',
+      'conversationTranslator': 'Conversation Translator',
+      'conversationTranslatorSub': 'Two-way voice translation',
+      'conversationEmpty': 'Press a button below to start',
       'tryAgain': 'Try Again',
       'noMicPermission':
           'No microphone access. Please allow in phone settings.',
@@ -401,6 +407,9 @@ class AppLocalizations {
       'noInternet': 'Нет подключения к интернету. Проверьте соединение и попробуйте снова.',
       'favorites': 'Избранное',
       'sourceLanguage': 'Исходный язык',
+      'conversationTranslator': 'Разговорный переводчик',
+      'conversationTranslatorSub': 'Голосовой переводчик для двух',
+      'conversationEmpty': 'Нажмите кнопку ниже, чтобы начать',
       'tryAgain': 'Попробовать снова',
       'noMicPermission':
           'Нет доступа к микрофону. Разрешите в настройках телефона.',
@@ -564,6 +573,9 @@ class AppLocalizations {
       'noInternet': 'Keine Internetverbindung. Netzwerk prüfen und erneut versuchen.',
       'favorites': 'Favoriten',
       'sourceLanguage': 'Ausgangssprache',
+      'conversationTranslator': 'Konversationsübersetzer',
+      'conversationTranslatorSub': 'Zweiseitige Sprachübersetzung',
+      'conversationEmpty': 'Unten tippen zum Starten',
       'tryAgain': 'Erneut versuchen',
       'noMicPermission':
           'Kein Mikrofonzugriff. Bitte in den Einstellungen erlauben.',
@@ -727,6 +739,9 @@ class AppLocalizations {
       'noInternet': 'Pas de connexion Internet. Vérifiez votre réseau et réessayez.',
       'favorites': 'Favoris',
       'sourceLanguage': 'Langue source',
+      'conversationTranslator': 'Traducteur de conversation',
+      'conversationTranslatorSub': 'Traduction vocale bidirectionnelle',
+      'conversationEmpty': 'Appuyez sur un bouton pour commencer',
       'tryAgain': 'Réessayer',
       'noMicPermission':
           'Pas d\'accès au microphone. Autorisez dans les paramètres.',
@@ -891,6 +906,9 @@ class AppLocalizations {
       'noInternet': 'Sin conexión a Internet. Comprueba la red e inténtalo de nuevo.',
       'favorites': 'Favoritos',
       'sourceLanguage': 'Idioma de origen',
+      'conversationTranslator': 'Traductor de conversación',
+      'conversationTranslatorSub': 'Traducción de voz bidireccional',
+      'conversationEmpty': 'Pulse un botón para empezar',
       'tryAgain': 'Intentar de nuevo',
       'noMicPermission':
           'Sin acceso al micrófono. Permite en los ajustes del teléfono.',
@@ -1054,6 +1072,9 @@ class AppLocalizations {
       'noInternet': 'Nessuna connessione Internet. Controlla la rete e riprova.',
       'favorites': 'Preferiti',
       'sourceLanguage': 'Lingua di origine',
+      'conversationTranslator': 'Traduttore di conversazione',
+      'conversationTranslatorSub': 'Traduzione vocale bidirezionale',
+      'conversationEmpty': 'Premi un pulsante per iniziare',
       'tryAgain': 'Riprova',
       'noMicPermission':
           'Nessun accesso al microfono. Consenti nelle impostazioni.',
@@ -1217,6 +1238,9 @@ class AppLocalizations {
       'noInternet': 'Sem conexão com a Internet. Verifique a rede e tente novamente.',
       'favorites': 'Favoritos',
       'sourceLanguage': 'Língua de origem',
+      'conversationTranslator': 'Tradutor de conversa',
+      'conversationTranslatorSub': 'Tradução de voz bidirecional',
+      'conversationEmpty': 'Pressione um botão para começar',
       'tryAgain': 'Tentar novamente',
       'noMicPermission':
           'Sem acesso ao microfone. Permita nas configurações do telefone.',
@@ -1380,6 +1404,9 @@ class AppLocalizations {
       'noInternet': 'Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.',
       'favorites': 'Ulubione',
       'sourceLanguage': 'Język źródłowy',
+      'conversationTranslator': 'Tłumacz rozmów',
+      'conversationTranslatorSub': 'Dwukierunkowe tłumaczenie głosowe',
+      'conversationEmpty': 'Naciśnij przycisk, aby rozpocząć',
       'tryAgain': 'Spróbuj ponownie',
       'noMicPermission':
           'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
@@ -1542,6 +1569,9 @@ class AppLocalizations {
       'noInternet': '无网络连接。请检查网络后重试。',
       'favorites': '收藏',
       'sourceLanguage': '源语言',
+      'conversationTranslator': '对话翻译',
+      'conversationTranslatorSub': '双向语音翻译',
+      'conversationEmpty': '按下按钮开始',
       'tryAgain': '重试',
       'noMicPermission': '无麦克风权限，请在手机设置中允许。',
       'uploadFile': '上传文件',
@@ -1700,6 +1730,9 @@ class AppLocalizations {
       'noInternet': 'インターネット接続がありません。ネットワークを確認してもう一度お試しください。',
       'favorites': 'お気に入り',
       'sourceLanguage': '元の言語',
+      'conversationTranslator': '会話翻訳',
+      'conversationTranslatorSub': '双方向音声翻訳',
+      'conversationEmpty': 'ボタンを押して開始',
       'tryAgain': '再試行',
       'noMicPermission': 'マイクへのアクセスがありません。設定で許可してください。',
       'uploadFile': 'ファイルを選択',
@@ -1859,6 +1892,9 @@ class AppLocalizations {
       'noInternet': '인터넷 연결이 없습니다. 네트워크를 확인하고 다시 시도하세요.',
       'favorites': '즐겨찾기',
       'sourceLanguage': '소스 언어',
+      'conversationTranslator': '대화 번역기',
+      'conversationTranslatorSub': '양방향 음성 번역',
+      'conversationEmpty': '아래 버튼을 눌러 시작하세요',
       'tryAgain': '다시 시도',
       'noMicPermission': '마이크 접근 권한이 없습니다. 설정에서 허용해주세요.',
       'uploadFile': '파일 업로드',
@@ -2019,6 +2055,9 @@ class AppLocalizations {
       'noInternet': 'İnternet bağlantısı yok. Ağı kontrol edip tekrar deneyin.',
       'favorites': 'Favoriler',
       'sourceLanguage': 'Kaynak dil',
+      'conversationTranslator': 'Konuşma Çevirmeni',
+      'conversationTranslatorSub': 'İki yönlü sesli çeviri',
+      'conversationEmpty': 'Başlamak için bir düğmeye basın',
       'tryAgain': 'Tekrar dene',
       'noMicPermission':
           'Mikrofon erişimi yok. Lütfen telefon ayarlarından izin verin.',
@@ -2181,6 +2220,9 @@ class AppLocalizations {
       'noInternet': 'इंटरनेट कनेक्शन नहीं है। नेटवर्क जांचें और पुनः प्रयास करें।',
       'favorites': 'पसंदीदा',
       'sourceLanguage': 'स्रोत भाषा',
+      'conversationTranslator': 'वार्तालाप अनुवादक',
+      'conversationTranslatorSub': 'दोतरफा आवाज़ अनुवाद',
+      'conversationEmpty': 'शुरू करने के लिए नीचे बटन दबाएं',
       'tryAgain': 'पुनः प्रयास करें',
       'noMicPermission': 'माइक्रोफ़ोन की अनुमति नहीं है। फ़ोन सेटिंग्स में अनुमति दें।',
       'uploadFile': 'फ़ाइल अपलोड करें',
@@ -2339,6 +2381,9 @@ class AppLocalizations {
       'noInternet': 'لا يوجد اتصال بالإنترنت. تحقق من الشبكة وحاول مجدداً.',
       'favorites': 'المفضلة',
       'sourceLanguage': 'لغة المصدر',
+      'conversationTranslator': 'مترجم المحادثة',
+      'conversationTranslatorSub': 'ترجمة صوتية ثنائية الاتجاه',
+      'conversationEmpty': 'اضغط على زر أدناه للبدء',
       'tryAgain': 'حاول مجدداً',
       'noMicPermission': 'لا يوجد وصول للميكروفون. يرجى السماح في إعدادات الهاتف.',
       'uploadFile': 'رفع ملف',

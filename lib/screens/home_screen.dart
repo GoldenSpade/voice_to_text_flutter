@@ -9,6 +9,7 @@ import 'full_cycle_screen.dart';
 import 'transcription_translation_screen.dart';
 import 'translation_screen.dart';
 import 'tts_screen.dart';
+import 'conversation_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -149,6 +150,24 @@ class HomeScreen extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const TtsScreen(),
+                              ),
+                            )
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  _MenuButton(
+                    icon: Icons.forum_rounded,
+                    label: l10n.conversationTranslator,
+                    subtitle: l10n.conversationTranslatorSub,
+                    color: colors[5 % colors.length],
+                    textColor: theme.textPrimary,
+                    subtitleColor: theme.textSecondary,
+                    iconColor: theme.accentColor,
+                    onTap: hasKey
+                        ? () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ConversationScreen(),
                               ),
                             )
                         : null,

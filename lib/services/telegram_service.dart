@@ -159,6 +159,9 @@ class TelegramService extends ChangeNotifier {
         buf.write('✨ Text Transform');
         if (original != null) buf.write('\n\nOriginal:\n$original');
         buf.write('\n\nResult:\n$result');
+      case HistoryType.conversation:
+        buf.write('💬 Conversation');
+        if (languageName != null) buf.write(' ($languageName)');
     }
     return buf.toString();
   }

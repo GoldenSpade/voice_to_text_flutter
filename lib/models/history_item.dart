@@ -18,6 +18,7 @@ extension HistoryTypeX on HistoryType {
         HistoryType.fullCycle => 'Полный цикл',
         HistoryType.tts => 'Текст в голос',
         HistoryType.transform => 'Преобразование',
+        HistoryType.conversation => 'Разговор',
       };
 
   IconData get icon => switch (this) {

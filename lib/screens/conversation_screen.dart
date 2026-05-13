@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -565,6 +566,17 @@ class _ConversationScreenState extends State<ConversationScreen>
   }
 }
 
+void _copy(BuildContext context, String text) {
+  Clipboard.setData(ClipboardData(text: text));
+  final l10n = context.read<AppState>().l10n;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(l10n.copied),
+      duration: const Duration(seconds: 1),
+    ),
+  );
+}
+
 class _TurnBubble extends StatelessWidget {
   final _Turn turn;
   final int index;
@@ -622,14 +634,24 @@ class _TurnBubble extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              fromLang.$2,
-              style: TextStyle(
-                color: color,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5,
-              ),
+            Row(
+              children: [
+                Text(
+                  fromLang.$2,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _copy(context, turn.original),
+                  child: Icon(Icons.copy_rounded,
+                      size: 13, color: color.withOpacity(0.45)),
+                ),
+              ],
             ),
             const SizedBox(height: 4),
             Text(
@@ -651,6 +673,12 @@ class _TurnBubble extends StatelessWidget {
                       color: Colors.white38,
                       fontSize: 10,
                       letterSpacing: 0.5),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _copy(context, turn.translated),
+                  child: const Icon(Icons.copy_rounded,
+                      size: 13, color: Colors.white24),
                 ),
               ],
             ),

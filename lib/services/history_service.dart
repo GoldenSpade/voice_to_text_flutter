@@ -192,6 +192,17 @@ class HistoryService extends ChangeNotifier {
         File(item.audioFilePath!).deleteSync();
       } catch (_) {}
     }
+    if (item.type == HistoryType.conversation) {
+      try {
+        final data = jsonDecode(item.result) as Map<String, dynamic>;
+        for (final turn in (data['turns'] as List)) {
+          final path = (turn as Map)['audioPath'] as String?;
+          if (path != null) {
+            try { File(path).deleteSync(); } catch (_) {}
+          }
+        }
+      } catch (_) {}
+    }
   }
 
   Future<void> updateResult(String id, String newResult) async {

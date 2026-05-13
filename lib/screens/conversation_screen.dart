@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +70,7 @@ class _ConversationScreenState extends State<ConversationScreen>
   StreamSubscription<PlayerState>? _playerSub;
   String? _status;
   int? _playingTurnIdx;
+  HistoryService? _historySvc;
 
   late AppButtonTheme _theme;
   late AnimationController _pulseCtrl;
@@ -116,7 +118,14 @@ class _ConversationScreenState extends State<ConversationScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _historySvc ??= context.read<HistoryService>();
+  }
+
+  @override
   void dispose() {
+    _saveConversation();
     _ampSub?.cancel();
     _pulseCtrl.dispose();
     _playerSub?.cancel();
@@ -124,6 +133,28 @@ class _ConversationScreenState extends State<ConversationScreen>
     _recorder.dispose();
     _scroll.dispose();
     super.dispose();
+  }
+
+  void _saveConversation() {
+    if (_turns.isEmpty || _historySvc == null) return;
+    _historySvc!.add(HistoryItem(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      type: HistoryType.conversation,
+      createdAt: DateTime.now(),
+      result: jsonEncode({
+        'langAName': _langA.$2,
+        'langBName': _langB.$2,
+        'turns': _turns
+            .map((t) => {
+                  'isA': t.isA,
+                  'original': t.original,
+                  'translated': t.translated,
+                  'audioPath': t.audioPath,
+                })
+            .toList(),
+      }),
+      languageName: '${_langA.$2} ↔ ${_langB.$2}',
+    ));
   }
 
   Future<void> _startRecording(bool isA) async {
@@ -252,16 +283,6 @@ class _ConversationScreenState extends State<ConversationScreen>
       return;
     }
     if (!mounted) return;
-
-    context.read<HistoryService>().add(HistoryItem(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          type: HistoryType.transcriptionTranslation,
-          createdAt: DateTime.now(),
-          result: translated,
-          original: original,
-          languageName: toLang.$2,
-          audioFilePath: audioPath,
-        ));
 
     final turnIdx = _turns.length;
     setState(() {

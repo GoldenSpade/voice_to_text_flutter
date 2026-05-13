@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -1168,7 +1169,9 @@ class _HistoryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      item.result,
+                      item.type == HistoryType.conversation
+                          ? _conversationPreview(item.result)
+                          : item.result,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -1226,14 +1229,27 @@ class _HistoryCard extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => _DetailSheet(
-        item: item,
-        service: service,
-        folderService: folderService,
-        l10n: l10n,
-        outerContext: context,
-      ),
+      builder: (_) => item.type == HistoryType.conversation
+          ? _ConversationDetailSheet(item: item, service: service, l10n: l10n)
+          : _DetailSheet(
+              item: item,
+              service: service,
+              folderService: folderService,
+              l10n: l10n,
+              outerContext: context,
+            ),
     );
+  }
+
+  static String _conversationPreview(String result) {
+    try {
+      final data = jsonDecode(result) as Map<String, dynamic>;
+      final turns = data['turns'] as List;
+      if (turns.isNotEmpty) {
+        return turns.first['original'] as String? ?? '';
+      }
+    } catch (_) {}
+    return '';
   }
 
   void _confirmDelete(
@@ -2036,6 +2052,364 @@ class _CopyButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+}
+
+// ── Conversation detail sheet ─────────────────────────────────────────────────
+
+class _ConversationDetailSheet extends StatefulWidget {
+  final HistoryItem item;
+  final HistoryService service;
+  final AppLocalizations l10n;
+
+  const _ConversationDetailSheet({
+    required this.item,
+    required this.service,
+    required this.l10n,
+  });
+
+  @override
+  State<_ConversationDetailSheet> createState() =>
+      _ConversationDetailSheetState();
+}
+
+class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
+  late List<Map<String, dynamic>> _turns;
+  late String _langAName;
+  late String _langBName;
+  late bool _isFavorite;
+
+  final _player = AudioPlayer();
+  int? _playingIdx;
+  StreamSubscription<PlayerState>? _playerSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.item.isFavorite;
+    try {
+      final data =
+          jsonDecode(widget.item.result) as Map<String, dynamic>;
+      _turns =
+          (data['turns'] as List).cast<Map<String, dynamic>>();
+      _langAName = data['langAName'] as String? ?? '';
+      _langBName = data['langBName'] as String? ?? '';
+    } catch (_) {
+      _turns = [];
+      _langAName = '';
+      _langBName = '';
+    }
+    _playerSub = _player.playerStateStream.listen((s) {
+      if (!mounted) return;
+      if (s.processingState == ProcessingState.completed) {
+        _player.pause();
+        _player.seek(Duration.zero);
+        if (mounted) setState(() => _playingIdx = null);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _playerSub?.cancel();
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playTurn(int idx) async {
+    final path = _turns[idx]['audioPath'] as String?;
+    if (path == null || !File(path).existsSync()) return;
+    if (_playingIdx != null) {
+      await _player.stop();
+      if (_playingIdx == idx) {
+        setState(() => _playingIdx = null);
+        return;
+      }
+    }
+    await _player.setFilePath(path);
+    setState(() => _playingIdx = idx);
+    await _player.play();
+  }
+
+  String _formatDateFull(DateTime dt) {
+    const months = [
+      'янв', 'фев', 'мар', 'апр', 'май', 'июн',
+      'июл', 'авг', 'сен', 'окт', 'ноя', 'дек',
+    ];
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}, '
+        '${dt.hour.toString().padLeft(2, '0')}:'
+        '${dt.minute.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.read<AppState>().buttonTheme;
+    final colors = theme.colors;
+    final colorA = colors[0];
+    final colorB = colors.length > 1 ? colors[1] : colors[0];
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (_, scrollController) => Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(HistoryType.conversation.icon,
+                        color: HistoryType.conversation.color, size: 22),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.l10n.historyTypeLabel(HistoryType.conversation),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (widget.item.languageName != null) ...[
+                      const SizedBox(width: 8),
+                      _Badge(widget.item.languageName!),
+                    ],
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        widget.service.toggleFavorite(widget.item.id);
+                        setState(() => _isFavorite = !_isFavorite);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Icon(
+                          _isFavorite
+                              ? Icons.star_rounded
+                              : Icons.star_outline_rounded,
+                          color:
+                              _isFavorite ? Colors.amber : Colors.white38,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _formatDateFull(widget.item.createdAt),
+                  style:
+                      const TextStyle(color: Colors.white38, fontSize: 12),
+                ),
+                const Divider(color: Colors.white12, height: 20),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _turns.isEmpty
+                ? const Center(
+                    child: Icon(Icons.forum_outlined,
+                        color: Colors.white12, size: 48),
+                  )
+                : ListView.builder(
+                    controller: scrollController,
+                    padding: EdgeInsets.fromLTRB(
+                      12, 0, 12,
+                      24 + MediaQuery.of(context).viewPadding.bottom,
+                    ),
+                    itemCount: _turns.length,
+                    itemBuilder: (_, i) {
+                      final t = _turns[i];
+                      final isA = t['isA'] as bool;
+                      final original = t['original'] as String? ?? '';
+                      final translated = t['translated'] as String? ?? '';
+                      final audioPath = t['audioPath'] as String?;
+                      final hasAudio = audioPath != null &&
+                          File(audioPath).existsSync();
+                      return _ConvHistoryBubble(
+                        isA: isA,
+                        original: original,
+                        translated: translated,
+                        fromLangName: isA ? _langAName : _langBName,
+                        toLangName: isA ? _langBName : _langAName,
+                        colorA: colorA,
+                        colorB: colorB,
+                        isPlaying: _playingIdx == i,
+                        canPlay: hasAudio &&
+                            (_playingIdx == null || _playingIdx == i),
+                        onPlay: hasAudio ? () => _playTurn(i) : null,
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ConvHistoryBubble extends StatelessWidget {
+  final bool isA;
+  final String original;
+  final String translated;
+  final String fromLangName;
+  final String toLangName;
+  final Color colorA;
+  final Color colorB;
+  final bool isPlaying;
+  final bool canPlay;
+  final VoidCallback? onPlay;
+
+  const _ConvHistoryBubble({
+    required this.isA,
+    required this.original,
+    required this.translated,
+    required this.fromLangName,
+    required this.toLangName,
+    required this.colorA,
+    required this.colorB,
+    required this.isPlaying,
+    required this.canPlay,
+    this.onPlay,
+  });
+
+  void _copy(BuildContext context, String text) {
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(context.read<AppState>().l10n.copied),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isA ? colorA : colorB;
+
+    return Align(
+      alignment: isA ? Alignment.centerLeft : Alignment.centerRight,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.85,
+        ),
+        margin: EdgeInsets.only(
+          bottom: 10,
+          left: isA ? 0 : 32,
+          right: isA ? 32 : 0,
+        ),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.12),
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(14),
+            topRight: const Radius.circular(14),
+            bottomLeft: isA ? Radius.zero : const Radius.circular(14),
+            bottomRight: isA ? const Radius.circular(14) : Radius.zero,
+          ),
+          border: Border.all(color: color.withOpacity(0.22), width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  fromLangName,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _copy(context, original),
+                  child: Icon(Icons.copy_rounded,
+                      size: 13, color: color.withOpacity(0.45)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            SelectableText(
+              original,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 14, height: 1.5),
+            ),
+            const SizedBox(height: 8),
+            Container(height: 0.5, color: Colors.white12),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.arrow_forward_rounded,
+                    size: 10, color: Colors.white38),
+                const SizedBox(width: 4),
+                Text(
+                  toLangName,
+                  style: const TextStyle(
+                      color: Colors.white38,
+                      fontSize: 10,
+                      letterSpacing: 0.5),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _copy(context, translated),
+                  child: const Icon(Icons.copy_rounded,
+                      size: 13, color: Colors.white24),
+                ),
+              ],
+            ),
+            const SizedBox(height: 3),
+            SelectableText(
+              translated,
+              style: const TextStyle(
+                  color: Colors.white70, fontSize: 14, height: 1.5),
+            ),
+            if (onPlay != null) ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: GestureDetector(
+                  onTap: canPlay ? onPlay : null,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: isPlaying
+                          ? color.withOpacity(0.25)
+                          : color.withOpacity(0.10),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      isPlaying
+                          ? Icons.stop_rounded
+                          : Icons.play_arrow_rounded,
+                      size: 16,
+                      color: isPlaying ? color : color.withOpacity(0.6),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ enum HistoryType {
   fullCycle,
   tts,
   transform,
+  conversation,
 }
 
 extension HistoryTypeX on HistoryType {
@@ -26,6 +27,7 @@ extension HistoryTypeX on HistoryType {
         HistoryType.fullCycle => Icons.record_voice_over,
         HistoryType.tts => Icons.volume_up,
         HistoryType.transform => Icons.auto_awesome,
+        HistoryType.conversation => Icons.forum_rounded,
       };
 
   Color get color => switch (this) {
@@ -35,6 +37,7 @@ extension HistoryTypeX on HistoryType {
         HistoryType.fullCycle => const Color(0xFF4A148C),
         HistoryType.tts => const Color(0xFF6A1B9A),
         HistoryType.transform => const Color(0xFF00838F),
+        HistoryType.conversation => const Color(0xFF2E7D32),
       };
 }
 

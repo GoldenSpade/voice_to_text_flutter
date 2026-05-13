@@ -27,6 +27,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
   String? _resultText;
   String? _errorMessage;
   var _lang = kTranslationLanguages[1];
+  (String, String, String)? _sourceLang;
   late AppButtonTheme _theme;
 
   @override
@@ -35,7 +36,15 @@ class _TranslationScreenState extends State<TranslationScreen> {
     SharedPreferences.getInstance().then((prefs) {
       final idx = (prefs.getInt('pref_trans_lang') ?? 1)
           .clamp(0, kTranslationLanguages.length - 1);
-      if (mounted) setState(() => _lang = kTranslationLanguages[idx]);
+      final srcIdx = prefs.getInt('pref_trans_src_lang') ?? -1;
+      if (mounted) {
+        setState(() {
+          _lang = kTranslationLanguages[idx];
+          _sourceLang = srcIdx >= 0 && srcIdx < kTranslationLanguages.length
+              ? kTranslationLanguages[srcIdx]
+              : null;
+        });
+      }
     });
   }
 
@@ -57,8 +66,11 @@ class _TranslationScreenState extends State<TranslationScreen> {
 
     final appState = context.read<AppState>();
     try {
-      final result =
-          await OpenAIService(appState.apiKey).translateText(text, _lang.$3);
+      final result = await OpenAIService(appState.apiKey).translateText(
+        text,
+        _lang.$3,
+        sourceLanguage: _sourceLang?.$3,
+      );
 
       if (mounted) {
         context.read<HistoryService>().add(HistoryItem(
@@ -88,6 +100,27 @@ class _TranslationScreenState extends State<TranslationScreen> {
         });
       }
     }
+  }
+
+  void _showSourceLanguagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: _theme.surfaceColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _SourceLanguagePicker(
+        selected: _sourceLang,
+        onPick: (lang) {
+          final idx =
+              lang != null ? kTranslationLanguages.indexOf(lang) : -1;
+          SharedPreferences.getInstance()
+              .then((p) => p.setInt('pref_trans_src_lang', idx));
+          setState(() => _sourceLang = lang);
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   void _showLanguagePicker() {
@@ -180,6 +213,41 @@ class _TranslationScreenState extends State<TranslationScreen> {
             },
           ),
           const SizedBox(height: 10),
+          InkWell(
+            onTap: _showSourceLanguagePicker,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: _theme.surfaceColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.text_fields,
+                      color: Colors.white54, size: 20),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${l10n.sourceLanguage}:',
+                    style: TextStyle(
+                        color: Colors.white.withOpacity(0.5), fontSize: 13),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _sourceLang?.$2 ?? l10n.langAuto,
+                      style: const TextStyle(
+                          color: Colors.white, fontSize: 15),
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios,
+                      color: Colors.white38, size: 16),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           InkWell(
             onTap: _showLanguagePicker,
             borderRadius: BorderRadius.circular(12),
@@ -509,6 +577,75 @@ class _CopyButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+}
+
+class _SourceLanguagePicker extends StatelessWidget {
+  final (String, String, String)? selected;
+  final void Function((String, String, String)?) onPick;
+
+  const _SourceLanguagePicker({required this.selected, required this.onPick});
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = context.read<AppState>();
+    final theme = appState.buttonTheme;
+    final l10n = appState.l10n;
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (_, controller) => Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: ListView.builder(
+              controller: controller,
+              itemCount: kTranslationLanguages.length + 1,
+              itemBuilder: (_, i) {
+                if (i == 0) {
+                  final isAuto = selected == null;
+                  return ListTile(
+                    title: Text(l10n.langAuto,
+                        style: const TextStyle(color: Colors.white)),
+                    trailing: isAuto
+                        ? Icon(Icons.check, color: theme.colors[0])
+                        : null,
+                    tileColor: isAuto
+                        ? theme.colors[0].withOpacity(0.15)
+                        : null,
+                    onTap: () => onPick(null),
+                  );
+                }
+                final lang = kTranslationLanguages[i - 1];
+                final isSelected = selected?.$1 == lang.$1;
+                return ListTile(
+                  title: Text(lang.$2,
+                      style: const TextStyle(color: Colors.white)),
+                  trailing: isSelected
+                      ? Icon(Icons.check, color: theme.colors[0])
+                      : null,
+                  tileColor: isSelected
+                      ? theme.colors[0].withOpacity(0.15)
+                      : null,
+                  onTap: () => onPick(lang),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

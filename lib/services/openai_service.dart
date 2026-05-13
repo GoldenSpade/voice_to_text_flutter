@@ -58,8 +58,14 @@ class OpenAIService {
         throw Exception(_parseError(body, streamed.statusCode));
       });
 
-  Future<String> translateText(String text, String targetLanguage) =>
+  Future<String> translateText(
+    String text,
+    String targetLanguage, {
+    String? sourceLanguage,
+  }) =>
       _call(() async {
+        final from =
+            sourceLanguage != null ? 'from $sourceLanguage ' : '';
         final response = await http.post(
           Uri.parse('https://api.openai.com/v1/chat/completions'),
           headers: {
@@ -73,7 +79,7 @@ class OpenAIService {
               {
                 'role': 'system',
                 'content':
-                    'Translate the following text to $targetLanguage. '
+                    'Translate the following text ${from}to $targetLanguage. '
                         'Return only the translated text, no explanations.',
               },
               {'role': 'user', 'content': text},

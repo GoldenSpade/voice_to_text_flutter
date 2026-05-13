@@ -161,7 +161,25 @@ class _TranslationScreenState extends State<TranslationScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _controller,
+            builder: (_, value, __) {
+              final chars = value.text.length;
+              final tokens = chars ~/ 4;
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '$chars симв · ~$tokens токенов',
+                    style: const TextStyle(
+                        color: Colors.white38, fontSize: 11),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
           InkWell(
             onTap: _showLanguagePicker,
             borderRadius: BorderRadius.circular(12),

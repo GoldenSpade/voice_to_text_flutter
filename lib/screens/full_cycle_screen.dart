@@ -67,6 +67,9 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   StreamSubscription<PlayerState>? _playerSub;
   final List<double> _waveData = [];
   StreamSubscription<Amplitude>? _amplitudeSub;
+  String? _recordingPath;
+  double _fileSizeMb = 0;
+  bool _isPaused = false;
 
   @override
   void initState() {
@@ -74,7 +77,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     _pulseCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
+    );
     _pulseAnim = Tween<double>(begin: 1.0, end: 1.18).animate(
       CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
     );
@@ -135,21 +138,35 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       path: path,
     );
 
+    _recordingPath = path;
+    _fileSizeMb = 0;
+    _isPaused = false;
     _waveData.clear();
     _amplitudeSub = _recorder
         .onAmplitudeChanged(const Duration(milliseconds: 80))
         .listen((amp) {
-      if (!mounted) return;
+      if (!mounted || _isPaused) return;
       final norm = ((amp.current.clamp(-60.0, 0.0) + 60.0) / 60.0);
-      setState(() => _waveData.add(norm));
+      double newSize = _fileSizeMb;
+      try {
+        newSize = File(_recordingPath!).lengthSync() / (1024 * 1024);
+      } catch (_) {}
+      setState(() {
+        _waveData.add(norm);
+        _fileSizeMb = newSize;
+      });
     });
 
+    _pulseCtrl.repeat(reverse: true);
     setState(() => _stage = _Stage.recording);
   }
 
   Future<void> _stopAndProcess() async {
     _amplitudeSub?.cancel();
     _amplitudeSub = null;
+    _pulseCtrl.stop();
+    _pulseCtrl.reset();
+    _isPaused = false;
     final recPath = await _recorder.stop();
     if (recPath == null || !mounted) return;
 
@@ -230,6 +247,19 @@ class _FullCycleScreenState extends State<FullCycleScreen>
       _audioPath = audioPath;
       _historyItemId = id;
     });
+  }
+
+  Future<void> _pauseRecording() async {
+    _pulseCtrl.stop();
+    _pulseCtrl.reset();
+    await _recorder.pause();
+    setState(() => _isPaused = true);
+  }
+
+  Future<void> _resumeRecording() async {
+    await _recorder.resume();
+    _pulseCtrl.repeat(reverse: true);
+    setState(() => _isPaused = false);
   }
 
   Future<void> _pickAndProcess() async {
@@ -588,35 +618,72 @@ class _FullCycleScreenState extends State<FullCycleScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           WaveformWidget(data: _waveData, color: Colors.redAccent, height: 56),
-          const SizedBox(height: 28),
-          ScaleTransition(
-            scale: _pulseAnim,
-            child: GestureDetector(
-              onTap: _stopAndProcess,
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.redAccent.withOpacity(0.5),
-                      blurRadius: 28,
-                      spreadRadius: 6,
-                    ),
-                  ],
+          const SizedBox(height: 6),
+          Text(
+            '${_fileSizeMb.toStringAsFixed(1)} МБ / 25 МБ',
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: _isPaused ? _resumeRecording : _pauseRecording,
+                child: Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white24, width: 1.5),
+                  ),
+                  child: Icon(
+                    _isPaused
+                        ? Icons.play_arrow_rounded
+                        : Icons.pause_rounded,
+                    color: Colors.white60,
+                    size: 28,
+                  ),
                 ),
-                child: const Icon(Icons.stop_rounded,
-                    color: Colors.white, size: 48),
               ),
-            ),
+              const SizedBox(width: 24),
+              ScaleTransition(
+                scale: _isPaused
+                    ? AlwaysStoppedAnimation<double>(1.0)
+                    : _pulseAnim,
+                child: GestureDetector(
+                  onTap: _stopAndProcess,
+                  child: Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.redAccent
+                              .withOpacity(_isPaused ? 0.2 : 0.5),
+                          blurRadius: 28,
+                          spreadRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.stop_rounded,
+                        color: Colors.white, size: 40),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           Text(
             l10n.tapToStop,
             style: TextStyle(
-                color: Colors.white.withOpacity(0.45), fontSize: 13),
+              color: _isPaused
+                  ? Colors.amber.withOpacity(0.7)
+                  : Colors.white.withOpacity(0.45),
+              fontSize: 13,
+            ),
           ),
         ],
       ),

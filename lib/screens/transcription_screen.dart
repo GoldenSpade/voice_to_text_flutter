@@ -46,6 +46,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
   late AppButtonTheme _theme;
   final List<double> _waveData = [];
   StreamSubscription<Amplitude>? _amplitudeSub;
+  String? _recordingPath;
+  double _fileSizeMb = 0;
+  bool _isPaused = false;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -107,6 +110,9 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
       path: path,
     );
 
+    _recordingPath = path;
+    _fileSizeMb = 0;
+    _isPaused = false;
     _seconds = 0;
     _timer = Timer.periodic(
       const Duration(seconds: 1),
@@ -119,9 +125,16 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     _amplitudeSub = _recorder
         .onAmplitudeChanged(const Duration(milliseconds: 80))
         .listen((amp) {
-      if (!mounted) return;
+      if (!mounted || _isPaused) return;
       final norm = ((amp.current.clamp(-60.0, 0.0) + 60.0) / 60.0);
-      setState(() => _waveData.add(norm));
+      double newSize = _fileSizeMb;
+      try {
+        newSize = File(_recordingPath!).lengthSync() / (1024 * 1024);
+      } catch (_) {}
+      setState(() {
+        _waveData.add(norm);
+        _fileSizeMb = newSize;
+      });
     });
 
     _pulseController.repeat(reverse: true);
@@ -185,6 +198,23 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         });
       }
     }
+  }
+
+  Future<void> _pauseRecording() async {
+    _timer?.cancel();
+    _pulseController.stop();
+    _pulseController.reset();
+    await _recorder.pause();
+    setState(() => _isPaused = true);
+  }
+
+  Future<void> _resumeRecording() async {
+    await _recorder.resume();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() => _seconds++);
+    });
+    _pulseController.repeat(reverse: true);
+    setState(() => _isPaused = false);
   }
 
   Future<void> _transcribeFromPath(String path) async {
@@ -457,42 +487,87 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           WaveformWidget(data: _waveData, color: Colors.redAccent),
-          const SizedBox(height: 28),
-          ScaleTransition(
-            scale: _pulseAnimation,
-            child: GestureDetector(
-              onTap: _stopRecording,
-              child: Container(
-                width: 128,
-                height: 128,
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.redAccent.withOpacity(0.5),
-                      blurRadius: 36,
-                      spreadRadius: 10,
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.stop_rounded,
-                  color: Colors.white,
-                  size: 56,
+          const SizedBox(height: 6),
+          Text(
+            '${_fileSizeMb.toStringAsFixed(1)} МБ / 25 МБ',
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: _isPaused ? _resumeRecording : _pauseRecording,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.08),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white24, width: 1.5),
+                  ),
+                  child: Icon(
+                    _isPaused
+                        ? Icons.play_arrow_rounded
+                        : Icons.pause_rounded,
+                    color: Colors.white60,
+                    size: 30,
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 28),
+              ScaleTransition(
+                scale: _isPaused
+                    ? AlwaysStoppedAnimation<double>(1.0)
+                    : _pulseAnimation,
+                child: GestureDetector(
+                  onTap: _stopRecording,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.redAccent
+                              .withOpacity(_isPaused ? 0.2 : 0.5),
+                          blurRadius: 36,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.stop_rounded,
+                      color: Colors.white,
+                      size: 48,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
-          Text(
-            _formatTime(_seconds),
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
-              fontSize: 22,
-              fontWeight: FontWeight.w300,
-              letterSpacing: 5,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_isPaused) ...[
+                const Icon(Icons.pause_rounded,
+                    color: Colors.amber, size: 14),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                _formatTime(_seconds),
+                style: TextStyle(
+                  color: _isPaused
+                      ? Colors.amber.withOpacity(0.8)
+                      : Colors.white.withOpacity(0.7),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 5,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(

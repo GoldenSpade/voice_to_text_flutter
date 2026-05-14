@@ -8,6 +8,7 @@ import 'services/history_service.dart';
 import 'services/telegram_service.dart';
 import 'services/transform_presets_service.dart';
 import 'screens/home_screen.dart';
+import 'screens/share_text_screen.dart';
 import 'screens/transcription_screen.dart';
 
 void main() async {
@@ -60,7 +61,7 @@ class _VoiceAppState extends State<VoiceApp> {
         await ReceiveSharingIntent.instance.getInitialMedia();
     if (initial.isNotEmpty && initial.first.path.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _openTranscription(initial.first.path);
+        _handleSharedMedia(initial.first);
       });
     }
     await ReceiveSharingIntent.instance.reset();
@@ -68,9 +69,24 @@ class _VoiceAppState extends State<VoiceApp> {
     _sharingSub =
         ReceiveSharingIntent.instance.getMediaStream().listen((files) {
       if (files.isNotEmpty && files.first.path.isNotEmpty) {
-        _openTranscription(files.first.path);
+        _handleSharedMedia(files.first);
       }
     });
+  }
+
+  void _handleSharedMedia(SharedMediaFile media) {
+    if (media.type == SharedMediaType.text ||
+        media.type == SharedMediaType.url) {
+      _openShareText(media.path);
+    } else {
+      _openTranscription(media.path);
+    }
+  }
+
+  void _openShareText(String text) {
+    _navigatorKey.currentState?.push(MaterialPageRoute(
+      builder: (_) => ShareTextScreen(text: text),
+    ));
   }
 
   void _openTranscription(String filePath) {

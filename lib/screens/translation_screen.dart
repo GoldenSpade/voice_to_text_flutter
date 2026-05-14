@@ -15,7 +15,8 @@ import 'transform_sheet.dart';
 enum _State { idle, processing, result, error }
 
 class TranslationScreen extends StatefulWidget {
-  const TranslationScreen({super.key});
+  final String? initialText;
+  const TranslationScreen({super.key, this.initialText});
 
   @override
   State<TranslationScreen> createState() => _TranslationScreenState();
@@ -33,6 +34,9 @@ class _TranslationScreenState extends State<TranslationScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialText != null && widget.initialText!.isNotEmpty) {
+      _controller.text = widget.initialText!;
+    }
     SharedPreferences.getInstance().then((prefs) {
       final idx = (prefs.getInt('pref_trans_lang') ?? 1)
           .clamp(0, kTranslationLanguages.length - 1);

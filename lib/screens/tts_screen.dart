@@ -27,7 +27,8 @@ const _kVoices = <(String, String)>[
 ];
 
 class TtsScreen extends StatefulWidget {
-  const TtsScreen({super.key});
+  final String? initialText;
+  const TtsScreen({super.key, this.initialText});
 
   @override
   State<TtsScreen> createState() => _TtsScreenState();
@@ -47,6 +48,9 @@ class _TtsScreenState extends State<TtsScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialText != null && widget.initialText!.isNotEmpty) {
+      _controller.text = widget.initialText!;
+    }
     _playerSub = _player.playerStateStream.listen((s) {
       if (!mounted) return;
       if (s.processingState == ProcessingState.completed) {

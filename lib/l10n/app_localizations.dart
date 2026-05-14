@@ -158,6 +158,8 @@ class AppLocalizations {
   String get conversationTranslatorSub => _t('conversationTranslatorSub');
   String get conversationEmpty => _t('conversationEmpty');
   String get continueConversation => _t('continueConversation');
+  String get sharedText => _t('sharedText');
+  String get shareTextAction => _t('shareTextAction');
   String get translateBtn => _t('translateBtn');
   String get translating => _t('translating');
   String get sendingText => _t('sendingText');
@@ -248,6 +250,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Two-way voice translation',
       'conversationEmpty': 'Press a button below to start',
       'continueConversation': 'Continue',
+      'sharedText': 'Received text',
+      'shareTextAction': 'What to do with this text?',
       'tryAgain': 'Try Again',
       'noMicPermission':
           'No microphone access. Please allow in phone settings.',
@@ -415,6 +419,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Голосовой переводчик для двух',
       'conversationEmpty': 'Нажмите кнопку ниже, чтобы начать',
       'continueConversation': 'Продолжить',
+      'sharedText': 'Получен текст',
+      'shareTextAction': 'Что сделать с этим текстом?',
       'tryAgain': 'Попробовать снова',
       'noMicPermission':
           'Нет доступа к микрофону. Разрешите в настройках телефона.',
@@ -583,6 +589,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Zweiseitige Sprachübersetzung',
       'conversationEmpty': 'Unten tippen zum Starten',
       'continueConversation': 'Fortsetzen',
+      'sharedText': 'Erhaltener Text',
+      'shareTextAction': 'Was soll mit dem Text passieren?',
       'tryAgain': 'Erneut versuchen',
       'noMicPermission':
           'Kein Mikrofonzugriff. Bitte in den Einstellungen erlauben.',
@@ -751,6 +759,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Traduction vocale bidirectionnelle',
       'conversationEmpty': 'Appuyez sur un bouton pour commencer',
       'continueConversation': 'Continuer',
+      'sharedText': 'Texte reçu',
+      'shareTextAction': 'Que faire avec ce texte ?',
       'tryAgain': 'Réessayer',
       'noMicPermission':
           'Pas d\'accès au microphone. Autorisez dans les paramètres.',
@@ -920,6 +930,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Traducción de voz bidireccional',
       'conversationEmpty': 'Pulse un botón para empezar',
       'continueConversation': 'Continuar',
+      'sharedText': 'Texto recibido',
+      'shareTextAction': '¿Qué hacer con este texto?',
       'tryAgain': 'Intentar de nuevo',
       'noMicPermission':
           'Sin acceso al micrófono. Permite en los ajustes del teléfono.',
@@ -1088,6 +1100,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Traduzione vocale bidirezionale',
       'conversationEmpty': 'Premi un pulsante per iniziare',
       'continueConversation': 'Continua',
+      'sharedText': 'Testo ricevuto',
+      'shareTextAction': 'Cosa fare con questo testo?',
       'tryAgain': 'Riprova',
       'noMicPermission':
           'Nessun accesso al microfono. Consenti nelle impostazioni.',
@@ -1256,6 +1270,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Tradução de voz bidirecional',
       'conversationEmpty': 'Pressione um botão para começar',
       'continueConversation': 'Continuar',
+      'sharedText': 'Texto recebido',
+      'shareTextAction': 'O que fazer com este texto?',
       'tryAgain': 'Tentar novamente',
       'noMicPermission':
           'Sem acesso ao microfone. Permita nas configurações do telefone.',
@@ -1424,6 +1440,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'Dwukierunkowe tłumaczenie głosowe',
       'conversationEmpty': 'Naciśnij przycisk, aby rozpocząć',
       'continueConversation': 'Kontynuuj',
+      'sharedText': 'Otrzymany tekst',
+      'shareTextAction': 'Co zrobić z tym tekstem?',
       'tryAgain': 'Spróbuj ponownie',
       'noMicPermission':
           'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
@@ -1591,6 +1609,8 @@ class AppLocalizations {
       'conversationTranslatorSub': '双向语音翻译',
       'conversationEmpty': '按下按钮开始',
       'continueConversation': '继续',
+      'sharedText': '收到的文本',
+      'shareTextAction': '如何处理此文本？',
       'tryAgain': '重试',
       'noMicPermission': '无麦克风权限，请在手机设置中允许。',
       'uploadFile': '上传文件',
@@ -1754,6 +1774,8 @@ class AppLocalizations {
       'conversationTranslatorSub': '双方向音声翻訳',
       'conversationEmpty': 'ボタンを押して開始',
       'continueConversation': '続ける',
+      'sharedText': '受け取ったテキスト',
+      'shareTextAction': 'このテキストをどう処理しますか？',
       'tryAgain': '再試行',
       'noMicPermission': 'マイクへのアクセスがありません。設定で許可してください。',
       'uploadFile': 'ファイルを選択',
@@ -1918,6 +1940,8 @@ class AppLocalizations {
       'conversationTranslatorSub': '양방향 음성 번역',
       'conversationEmpty': '아래 버튼을 눌러 시작하세요',
       'continueConversation': '계속',
+      'sharedText': '수신된 텍스트',
+      'shareTextAction': '이 텍스트를 어떻게 처리할까요?',
       'tryAgain': '다시 시도',
       'noMicPermission': '마이크 접근 권한이 없습니다. 설정에서 허용해주세요.',
       'uploadFile': '파일 업로드',
@@ -2083,6 +2107,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'İki yönlü sesli çeviri',
       'conversationEmpty': 'Başlamak için bir düğmeye basın',
       'continueConversation': 'Devam et',
+      'sharedText': 'Alınan metin',
+      'shareTextAction': 'Bu metinle ne yapmak istersiniz?',
       'tryAgain': 'Tekrar dene',
       'noMicPermission':
           'Mikrofon erişimi yok. Lütfen telefon ayarlarından izin verin.',
@@ -2250,6 +2276,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'दोतरफा आवाज़ अनुवाद',
       'conversationEmpty': 'शुरू करने के लिए नीचे बटन दबाएं',
       'continueConversation': 'जारी रखें',
+      'sharedText': 'प्राप्त पाठ',
+      'shareTextAction': 'इस टेक्स्ट के साथ क्या करना है?',
       'tryAgain': 'पुनः प्रयास करें',
       'noMicPermission': 'माइक्रोफ़ोन की अनुमति नहीं है। फ़ोन सेटिंग्स में अनुमति दें।',
       'uploadFile': 'फ़ाइल अपलोड करें',
@@ -2413,6 +2441,8 @@ class AppLocalizations {
       'conversationTranslatorSub': 'ترجمة صوتية ثنائية الاتجاه',
       'conversationEmpty': 'اضغط على زر أدناه للبدء',
       'continueConversation': 'متابعة',
+      'sharedText': 'النص المستلم',
+      'shareTextAction': 'ماذا تريد أن تفعل بهذا النص؟',
       'tryAgain': 'حاول مجدداً',
       'noMicPermission': 'لا يوجد وصول للميكروفون. يرجى السماح في إعدادات الهاتف.',
       'uploadFile': 'رفع ملف',

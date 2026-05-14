@@ -160,6 +160,7 @@ class AppLocalizations {
   String get continueConversation => _t('continueConversation');
   String get sharedText => _t('sharedText');
   String get shareTextAction => _t('shareTextAction');
+  String get exportConversation => _t('exportConversation');
   String get translateBtn => _t('translateBtn');
   String get translating => _t('translating');
   String get sendingText => _t('sendingText');
@@ -252,6 +253,7 @@ class AppLocalizations {
       'continueConversation': 'Continue',
       'sharedText': 'Received text',
       'shareTextAction': 'What to do with this text?',
+      'exportConversation': 'Export as text',
       'tryAgain': 'Try Again',
       'noMicPermission':
           'No microphone access. Please allow in phone settings.',
@@ -421,6 +423,7 @@ class AppLocalizations {
       'continueConversation': 'Продолжить',
       'sharedText': 'Получен текст',
       'shareTextAction': 'Что сделать с этим текстом?',
+      'exportConversation': 'Экспортировать текст',
       'tryAgain': 'Попробовать снова',
       'noMicPermission':
           'Нет доступа к микрофону. Разрешите в настройках телефона.',
@@ -591,6 +594,7 @@ class AppLocalizations {
       'continueConversation': 'Fortsetzen',
       'sharedText': 'Erhaltener Text',
       'shareTextAction': 'Was soll mit dem Text passieren?',
+      'exportConversation': 'Als Text exportieren',
       'tryAgain': 'Erneut versuchen',
       'noMicPermission':
           'Kein Mikrofonzugriff. Bitte in den Einstellungen erlauben.',
@@ -761,6 +765,7 @@ class AppLocalizations {
       'continueConversation': 'Continuer',
       'sharedText': 'Texte reçu',
       'shareTextAction': 'Que faire avec ce texte ?',
+      'exportConversation': 'Exporter en texte',
       'tryAgain': 'Réessayer',
       'noMicPermission':
           'Pas d\'accès au microphone. Autorisez dans les paramètres.',
@@ -932,6 +937,7 @@ class AppLocalizations {
       'continueConversation': 'Continuar',
       'sharedText': 'Texto recibido',
       'shareTextAction': '¿Qué hacer con este texto?',
+      'exportConversation': 'Exportar como texto',
       'tryAgain': 'Intentar de nuevo',
       'noMicPermission':
           'Sin acceso al micrófono. Permite en los ajustes del teléfono.',
@@ -1102,6 +1108,7 @@ class AppLocalizations {
       'continueConversation': 'Continua',
       'sharedText': 'Testo ricevuto',
       'shareTextAction': 'Cosa fare con questo testo?',
+      'exportConversation': 'Esporta come testo',
       'tryAgain': 'Riprova',
       'noMicPermission':
           'Nessun accesso al microfono. Consenti nelle impostazioni.',
@@ -1272,6 +1279,7 @@ class AppLocalizations {
       'continueConversation': 'Continuar',
       'sharedText': 'Texto recebido',
       'shareTextAction': 'O que fazer com este texto?',
+      'exportConversation': 'Exportar como texto',
       'tryAgain': 'Tentar novamente',
       'noMicPermission':
           'Sem acesso ao microfone. Permita nas configurações do telefone.',
@@ -1442,6 +1450,7 @@ class AppLocalizations {
       'continueConversation': 'Kontynuuj',
       'sharedText': 'Otrzymany tekst',
       'shareTextAction': 'Co zrobić z tym tekstem?',
+      'exportConversation': 'Eksportuj jako tekst',
       'tryAgain': 'Spróbuj ponownie',
       'noMicPermission':
           'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
@@ -1611,6 +1620,7 @@ class AppLocalizations {
       'continueConversation': '继续',
       'sharedText': '收到的文本',
       'shareTextAction': '如何处理此文本？',
+      'exportConversation': '导出为文本',
       'tryAgain': '重试',
       'noMicPermission': '无麦克风权限，请在手机设置中允许。',
       'uploadFile': '上传文件',
@@ -1776,6 +1786,7 @@ class AppLocalizations {
       'continueConversation': '続ける',
       'sharedText': '受け取ったテキスト',
       'shareTextAction': 'このテキストをどう処理しますか？',
+      'exportConversation': 'テキストとしてエクスポート',
       'tryAgain': '再試行',
       'noMicPermission': 'マイクへのアクセスがありません。設定で許可してください。',
       'uploadFile': 'ファイルを選択',
@@ -1942,6 +1953,7 @@ class AppLocalizations {
       'continueConversation': '계속',
       'sharedText': '수신된 텍스트',
       'shareTextAction': '이 텍스트를 어떻게 처리할까요?',
+      'exportConversation': '텍스트로 내보내기',
       'tryAgain': '다시 시도',
       'noMicPermission': '마이크 접근 권한이 없습니다. 설정에서 허용해주세요.',
       'uploadFile': '파일 업로드',
@@ -2109,6 +2121,7 @@ class AppLocalizations {
       'continueConversation': 'Devam et',
       'sharedText': 'Alınan metin',
       'shareTextAction': 'Bu metinle ne yapmak istersiniz?',
+      'exportConversation': 'Metin olarak dışa aktar',
       'tryAgain': 'Tekrar dene',
       'noMicPermission':
           'Mikrofon erişimi yok. Lütfen telefon ayarlarından izin verin.',
@@ -2278,6 +2291,7 @@ class AppLocalizations {
       'continueConversation': 'जारी रखें',
       'sharedText': 'प्राप्त पाठ',
       'shareTextAction': 'इस टेक्स्ट के साथ क्या करना है?',
+      'exportConversation': 'टेक्स्ट के रूप में निर्यात करें',
       'tryAgain': 'पुनः प्रयास करें',
       'noMicPermission': 'माइक्रोफ़ोन की अनुमति नहीं है। फ़ोन सेटिंग्स में अनुमति दें।',
       'uploadFile': 'फ़ाइल अपलोड करें',
@@ -2443,6 +2457,7 @@ class AppLocalizations {
       'continueConversation': 'متابعة',
       'sharedText': 'النص المستلم',
       'shareTextAction': 'ماذا تريد أن تفعل بهذا النص؟',
+      'exportConversation': 'تصدير كنص',
       'tryAgain': 'حاول مجدداً',
       'noMicPermission': 'لا يوجد وصول للميكروفون. يرجى السماح في إعدادات الهاتف.',
       'uploadFile': 'رفع ملف',

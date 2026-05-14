@@ -2147,6 +2147,46 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
         '${dt.minute.toString().padLeft(2, '0')}';
   }
 
+  Future<void> _exportAsText() async {
+    if (_turns.isEmpty) return;
+    final buf = StringBuffer();
+    buf.writeln('$_langAName ↔ $_langBName');
+    buf.writeln(_formatDateFull(widget.item.createdAt));
+    buf.writeln('─' * 36);
+    buf.writeln();
+    for (final t in _turns) {
+      final isA = t['isA'] as bool;
+      final original = t['original'] as String? ?? '';
+      final translated = t['translated'] as String? ?? '';
+      final fromLang = isA ? _langAName : _langBName;
+      final toLang = isA ? _langBName : _langAName;
+      buf.writeln('[$fromLang]');
+      buf.writeln(original);
+      buf.writeln();
+      buf.writeln('[$toLang]');
+      buf.writeln(translated);
+      buf.writeln();
+      buf.writeln('─' * 36);
+      buf.writeln();
+    }
+    try {
+      final dir = await getTemporaryDirectory();
+      final ts = DateTime.now().millisecondsSinceEpoch;
+      final file = File('${dir.path}/conversation_$ts.txt');
+      await file.writeAsString(buf.toString());
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        subject: '$_langAName ↔ $_langBName',
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = context.read<AppState>().buttonTheme;
@@ -2265,29 +2305,46 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
               20,
               16 + MediaQuery.of(context).viewPadding.bottom,
             ),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.of(widget.outerContext).push(
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          ConversationScreen(initialItem: widget.item),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_turns.isNotEmpty)
+                  OutlinedButton.icon(
+                    onPressed: _exportAsText,
+                    icon: const Icon(Icons.share_rounded, size: 18),
+                    label: Text(widget.l10n.exportConversation),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white70,
+                      side: BorderSide(color: Colors.white.withOpacity(0.25)),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.forum_rounded, size: 18),
-                label: Text(widget.l10n.continueConversation),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: HistoryType.conversation.color,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  ),
+                if (_turns.isNotEmpty) const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.of(widget.outerContext).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ConversationScreen(initialItem: widget.item),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.forum_rounded, size: 18),
+                  label: Text(widget.l10n.continueConversation),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: HistoryType.conversation.color,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
         ],

@@ -16,6 +16,7 @@ import '../services/backup_service.dart';
 import '../services/folder_service.dart';
 import '../services/history_service.dart';
 import '../services/transform_presets_service.dart';
+import 'conversation_screen.dart';
 import 'transform_sheet.dart';
 
 void _showDeleteUndo(
@@ -1230,7 +1231,8 @@ class _HistoryCard extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => item.type == HistoryType.conversation
-          ? _ConversationDetailSheet(item: item, service: service, l10n: l10n)
+          ? _ConversationDetailSheet(
+              item: item, service: service, l10n: l10n, outerContext: context)
           : _DetailSheet(
               item: item,
               service: service,
@@ -2063,11 +2065,13 @@ class _ConversationDetailSheet extends StatefulWidget {
   final HistoryItem item;
   final HistoryService service;
   final AppLocalizations l10n;
+  final BuildContext outerContext;
 
   const _ConversationDetailSheet({
     required this.item,
     required this.service,
     required this.l10n,
+    required this.outerContext,
   });
 
   @override
@@ -2228,10 +2232,7 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
                   )
                 : ListView.builder(
                     controller: scrollController,
-                    padding: EdgeInsets.fromLTRB(
-                      12, 0, 12,
-                      24 + MediaQuery.of(context).viewPadding.bottom,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                     itemCount: _turns.length,
                     itemBuilder: (_, i) {
                       final t = _turns[i];
@@ -2256,6 +2257,38 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
                       );
                     },
                   ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              8,
+              20,
+              16 + MediaQuery.of(context).viewPadding.bottom,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.of(widget.outerContext).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          ConversationScreen(initialItem: widget.item),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.forum_rounded, size: 18),
+                label: Text(widget.l10n.continueConversation),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: HistoryType.conversation.color,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

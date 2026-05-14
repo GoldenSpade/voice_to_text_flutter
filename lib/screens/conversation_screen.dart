@@ -44,7 +44,8 @@ class _Turn {
 }
 
 class ConversationScreen extends StatefulWidget {
-  const ConversationScreen({super.key});
+  final HistoryItem? initialItem;
+  const ConversationScreen({super.key, this.initialItem});
 
   @override
   State<ConversationScreen> createState() => _ConversationScreenState();
@@ -71,6 +72,8 @@ class _ConversationScreenState extends State<ConversationScreen>
   String? _status;
   int? _playingTurnIdx;
   HistoryService? _historySvc;
+  String? _existingItemId;
+  int _initialTurnCount = 0;
 
   late AppButtonTheme _theme;
   late AnimationController _pulseCtrl;
@@ -97,6 +100,10 @@ class _ConversationScreenState extends State<ConversationScreen>
         });
       }
     });
+    if (widget.initialItem != null) {
+      _restoreFromItem(widget.initialItem!);
+    }
+
     SharedPreferences.getInstance().then((prefs) {
       final aIdx = (prefs.getInt('pref_conv_a') ?? 0)
           .clamp(0, kTranslationLanguages.length - 1);
@@ -108,13 +115,44 @@ class _ConversationScreenState extends State<ConversationScreen>
           .clamp(0, _kVoices.length - 1);
       if (mounted) {
         setState(() {
-          _langA = kTranslationLanguages[aIdx];
-          _langB = kTranslationLanguages[bIdx];
+          if (widget.initialItem == null) {
+            _langA = kTranslationLanguages[aIdx];
+            _langB = kTranslationLanguages[bIdx];
+          }
           _voiceA = _kVoices[vaIdx];
           _voiceB = _kVoices[vbIdx];
         });
       }
     });
+  }
+
+  void _restoreFromItem(HistoryItem item) {
+    _existingItemId = item.id;
+    try {
+      final data = jsonDecode(item.result) as Map<String, dynamic>;
+      final langAName = data['langAName'] as String? ?? '';
+      final langBName = data['langBName'] as String? ?? '';
+      _langA = kTranslationLanguages.firstWhere(
+        (l) => l.$2 == langAName,
+        orElse: () => kTranslationLanguages[0],
+      );
+      _langB = kTranslationLanguages.firstWhere(
+        (l) => l.$2 == langBName,
+        orElse: () => kTranslationLanguages[1],
+      );
+      for (final t in (data['turns'] as List)) {
+        final map = t as Map<String, dynamic>;
+        _turns.add(_Turn(
+          isA: map['isA'] as bool,
+          original: map['original'] as String? ?? '',
+          translated: map['translated'] as String? ?? '',
+          audioPath: map['audioPath'] as String? ?? '',
+        ));
+      }
+      _initialTurnCount = _turns.length;
+    } catch (_) {}
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _scrollToBottom());
   }
 
   @override
@@ -136,25 +174,32 @@ class _ConversationScreenState extends State<ConversationScreen>
   }
 
   void _saveConversation() {
-    if (_turns.isEmpty || _historySvc == null) return;
-    _historySvc!.add(HistoryItem(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      type: HistoryType.conversation,
-      createdAt: DateTime.now(),
-      result: jsonEncode({
-        'langAName': _langA.$2,
-        'langBName': _langB.$2,
-        'turns': _turns
-            .map((t) => {
-                  'isA': t.isA,
-                  'original': t.original,
-                  'translated': t.translated,
-                  'audioPath': t.audioPath,
-                })
-            .toList(),
-      }),
-      languageName: '${_langA.$2} ↔ ${_langB.$2}',
-    ));
+    if (_historySvc == null) return;
+    if (_existingItemId != null && _turns.length <= _initialTurnCount) return;
+    if (_turns.isEmpty) return;
+    final json = jsonEncode({
+      'langAName': _langA.$2,
+      'langBName': _langB.$2,
+      'turns': _turns
+          .map((t) => {
+                'isA': t.isA,
+                'original': t.original,
+                'translated': t.translated,
+                'audioPath': t.audioPath,
+              })
+          .toList(),
+    });
+    if (_existingItemId != null) {
+      _historySvc!.updateResult(_existingItemId!, json);
+    } else {
+      _historySvc!.add(HistoryItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        type: HistoryType.conversation,
+        createdAt: DateTime.now(),
+        result: json,
+        languageName: '${_langA.$2} ↔ ${_langB.$2}',
+      ));
+    }
   }
 
   Future<void> _startRecording(bool isA) async {

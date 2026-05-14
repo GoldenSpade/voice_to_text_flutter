@@ -157,6 +157,7 @@ class AppLocalizations {
   String get conversationTranslator => _t('conversationTranslator');
   String get conversationTranslatorSub => _t('conversationTranslatorSub');
   String get conversationEmpty => _t('conversationEmpty');
+  String get continueConversation => _t('continueConversation');
   String get translateBtn => _t('translateBtn');
   String get translating => _t('translating');
   String get sendingText => _t('sendingText');
@@ -246,6 +247,7 @@ class AppLocalizations {
       'conversationTranslator': 'Conversation Translator',
       'conversationTranslatorSub': 'Two-way voice translation',
       'conversationEmpty': 'Press a button below to start',
+      'continueConversation': 'Continue',
       'tryAgain': 'Try Again',
       'noMicPermission':
           'No microphone access. Please allow in phone settings.',
@@ -412,6 +414,7 @@ class AppLocalizations {
       'conversationTranslator': 'Разговорный переводчик',
       'conversationTranslatorSub': 'Голосовой переводчик для двух',
       'conversationEmpty': 'Нажмите кнопку ниже, чтобы начать',
+      'continueConversation': 'Продолжить',
       'tryAgain': 'Попробовать снова',
       'noMicPermission':
           'Нет доступа к микрофону. Разрешите в настройках телефона.',
@@ -579,6 +582,7 @@ class AppLocalizations {
       'conversationTranslator': 'Konversationsübersetzer',
       'conversationTranslatorSub': 'Zweiseitige Sprachübersetzung',
       'conversationEmpty': 'Unten tippen zum Starten',
+      'continueConversation': 'Fortsetzen',
       'tryAgain': 'Erneut versuchen',
       'noMicPermission':
           'Kein Mikrofonzugriff. Bitte in den Einstellungen erlauben.',
@@ -746,6 +750,7 @@ class AppLocalizations {
       'conversationTranslator': 'Traducteur de conversation',
       'conversationTranslatorSub': 'Traduction vocale bidirectionnelle',
       'conversationEmpty': 'Appuyez sur un bouton pour commencer',
+      'continueConversation': 'Continuer',
       'tryAgain': 'Réessayer',
       'noMicPermission':
           'Pas d\'accès au microphone. Autorisez dans les paramètres.',
@@ -914,6 +919,7 @@ class AppLocalizations {
       'conversationTranslator': 'Traductor de conversación',
       'conversationTranslatorSub': 'Traducción de voz bidireccional',
       'conversationEmpty': 'Pulse un botón para empezar',
+      'continueConversation': 'Continuar',
       'tryAgain': 'Intentar de nuevo',
       'noMicPermission':
           'Sin acceso al micrófono. Permite en los ajustes del teléfono.',
@@ -1081,6 +1087,7 @@ class AppLocalizations {
       'conversationTranslator': 'Traduttore di conversazione',
       'conversationTranslatorSub': 'Traduzione vocale bidirezionale',
       'conversationEmpty': 'Premi un pulsante per iniziare',
+      'continueConversation': 'Continua',
       'tryAgain': 'Riprova',
       'noMicPermission':
           'Nessun accesso al microfono. Consenti nelle impostazioni.',
@@ -1248,6 +1255,7 @@ class AppLocalizations {
       'conversationTranslator': 'Tradutor de conversa',
       'conversationTranslatorSub': 'Tradução de voz bidirecional',
       'conversationEmpty': 'Pressione um botão para começar',
+      'continueConversation': 'Continuar',
       'tryAgain': 'Tentar novamente',
       'noMicPermission':
           'Sem acesso ao microfone. Permita nas configurações do telefone.',
@@ -1415,6 +1423,7 @@ class AppLocalizations {
       'conversationTranslator': 'Tłumacz rozmów',
       'conversationTranslatorSub': 'Dwukierunkowe tłumaczenie głosowe',
       'conversationEmpty': 'Naciśnij przycisk, aby rozpocząć',
+      'continueConversation': 'Kontynuuj',
       'tryAgain': 'Spróbuj ponownie',
       'noMicPermission':
           'Brak dostępu do mikrofonu. Zezwól w ustawieniach telefonu.',
@@ -1581,6 +1590,7 @@ class AppLocalizations {
       'conversationTranslator': '对话翻译',
       'conversationTranslatorSub': '双向语音翻译',
       'conversationEmpty': '按下按钮开始',
+      'continueConversation': '继续',
       'tryAgain': '重试',
       'noMicPermission': '无麦克风权限，请在手机设置中允许。',
       'uploadFile': '上传文件',
@@ -1743,6 +1753,7 @@ class AppLocalizations {
       'conversationTranslator': '会話翻訳',
       'conversationTranslatorSub': '双方向音声翻訳',
       'conversationEmpty': 'ボタンを押して開始',
+      'continueConversation': '続ける',
       'tryAgain': '再試行',
       'noMicPermission': 'マイクへのアクセスがありません。設定で許可してください。',
       'uploadFile': 'ファイルを選択',
@@ -1906,6 +1917,7 @@ class AppLocalizations {
       'conversationTranslator': '대화 번역기',
       'conversationTranslatorSub': '양방향 음성 번역',
       'conversationEmpty': '아래 버튼을 눌러 시작하세요',
+      'continueConversation': '계속',
       'tryAgain': '다시 시도',
       'noMicPermission': '마이크 접근 권한이 없습니다. 설정에서 허용해주세요.',
       'uploadFile': '파일 업로드',
@@ -2070,6 +2082,7 @@ class AppLocalizations {
       'conversationTranslator': 'Konuşma Çevirmeni',
       'conversationTranslatorSub': 'İki yönlü sesli çeviri',
       'conversationEmpty': 'Başlamak için bir düğmeye basın',
+      'continueConversation': 'Devam et',
       'tryAgain': 'Tekrar dene',
       'noMicPermission':
           'Mikrofon erişimi yok. Lütfen telefon ayarlarından izin verin.',
@@ -2236,6 +2249,7 @@ class AppLocalizations {
       'conversationTranslator': 'वार्तालाप अनुवादक',
       'conversationTranslatorSub': 'दोतरफा आवाज़ अनुवाद',
       'conversationEmpty': 'शुरू करने के लिए नीचे बटन दबाएं',
+      'continueConversation': 'जारी रखें',
       'tryAgain': 'पुनः प्रयास करें',
       'noMicPermission': 'माइक्रोफ़ोन की अनुमति नहीं है। फ़ोन सेटिंग्स में अनुमति दें।',
       'uploadFile': 'फ़ाइल अपलोड करें',
@@ -2398,6 +2412,7 @@ class AppLocalizations {
       'conversationTranslator': 'مترجم المحادثة',
       'conversationTranslatorSub': 'ترجمة صوتية ثنائية الاتجاه',
       'conversationEmpty': 'اضغط على زر أدناه للبدء',
+      'continueConversation': 'متابعة',
       'tryAgain': 'حاول مجدداً',
       'noMicPermission': 'لا يوجد وصول للميكروفون. يرجى السماح في إعدادات الهاتف.',
       'uploadFile': 'رفع ملف',

@@ -132,6 +132,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     final dir = await getTemporaryDirectory();
     final path =
         '${dir.path}/fc_${DateTime.now().millisecondsSinceEpoch}.m4a';
+    HapticFeedback.mediumImpact();
     await _recorder.start(
       RecordConfig(
           encoder: AudioEncoder.aacLc, sampleRate: 16000, numChannels: 1),
@@ -167,6 +168,7 @@ class _FullCycleScreenState extends State<FullCycleScreen>
     _pulseCtrl.stop();
     _pulseCtrl.reset();
     _isPaused = false;
+    HapticFeedback.lightImpact();
     final recPath = await _recorder.stop();
     if (recPath == null || !mounted) return;
 
@@ -252,11 +254,13 @@ class _FullCycleScreenState extends State<FullCycleScreen>
   Future<void> _pauseRecording() async {
     _pulseCtrl.stop();
     _pulseCtrl.reset();
+    HapticFeedback.lightImpact();
     await _recorder.pause();
     setState(() => _isPaused = true);
   }
 
   Future<void> _resumeRecording() async {
+    HapticFeedback.mediumImpact();
     await _recorder.resume();
     _pulseCtrl.repeat(reverse: true);
     setState(() => _isPaused = false);

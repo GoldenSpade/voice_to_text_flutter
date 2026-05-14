@@ -217,6 +217,7 @@ class _ConversationScreenState extends State<ConversationScreen>
     final path =
         '${dir.path}/conv_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
+    HapticFeedback.mediumImpact();
     await _recorder.start(
       const RecordConfig(
           encoder: AudioEncoder.aacLc, sampleRate: 16000, numChannels: 1),
@@ -245,6 +246,7 @@ class _ConversationScreenState extends State<ConversationScreen>
     _pulseCtrl.stop();
     _pulseCtrl.reset();
 
+    HapticFeedback.lightImpact();
     final path = await _recorder.stop();
     if (path == null || !mounted) return;
     await _process(path, _isA);

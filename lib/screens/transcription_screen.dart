@@ -101,6 +101,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     final path =
         '${dir.path}/rec_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
+    HapticFeedback.mediumImpact();
     await _recorder.start(
       const RecordConfig(
         encoder: AudioEncoder.aacLc,
@@ -148,6 +149,7 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     _pulseController.stop();
     _pulseController.reset();
 
+    HapticFeedback.lightImpact();
     final path = await _recorder.stop();
     if (path == null) {
       final l10n = context.read<AppState>().l10n;
@@ -204,11 +206,13 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
     _timer?.cancel();
     _pulseController.stop();
     _pulseController.reset();
+    HapticFeedback.lightImpact();
     await _recorder.pause();
     setState(() => _isPaused = true);
   }
 
   Future<void> _resumeRecording() async {
+    HapticFeedback.mediumImpact();
     await _recorder.resume();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() => _seconds++);

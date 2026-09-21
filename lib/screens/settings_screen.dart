@@ -221,6 +221,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 groupValue: state.languageCode,
                 activeColor: theme.colors[0],
                 title: Text(name, style: const TextStyle(color: Colors.white)),
+                subtitle: Text(state.l10n.languageName(code),
+                    style:
+                        const TextStyle(color: Colors.white54, fontSize: 12)),
                 onChanged: (val) {
                   if (val != null) {
                     state.saveLanguage(val);

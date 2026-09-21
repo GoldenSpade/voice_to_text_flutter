@@ -911,7 +911,9 @@ class _LangPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.read<AppState>().buttonTheme;
+    final appState = context.read<AppState>();
+    final theme = appState.buttonTheme;
+    final l10n = appState.l10n;
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.4,
@@ -939,7 +941,7 @@ class _LangPicker extends StatelessWidget {
                 return ListTile(
                   title: Text(lang.$2,
                       style: const TextStyle(color: Colors.white)),
-                  subtitle: Text(lang.$3,
+                  subtitle: Text(l10n.languageName(lang.$1),
                       style: const TextStyle(
                           color: Colors.white54, fontSize: 12)),
                   trailing: isSelected

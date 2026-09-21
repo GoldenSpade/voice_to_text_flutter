@@ -924,7 +924,7 @@ class _SpeechLangPicker extends StatelessWidget {
                       style: const TextStyle(color: Colors.white)),
                   subtitle: lang.$1.isEmpty
                       ? null
-                      : Text(lang.$3,
+                      : Text(l10n.languageName(lang.$1),
                           style: const TextStyle(
                               color: Colors.white54, fontSize: 12)),
                   trailing: isSelected

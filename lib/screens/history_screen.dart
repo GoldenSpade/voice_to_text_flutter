@@ -2087,6 +2087,7 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
 
   final _player = AudioPlayer();
   int? _playingIdx;
+  int? _confirmingDeleteIdx;
   StreamSubscription<PlayerState>? _playerSub;
 
   @override
@@ -2120,6 +2121,90 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
     _playerSub?.cancel();
     _player.dispose();
     super.dispose();
+  }
+
+  Future<void> _persistTurns() async {
+    final json = jsonEncode({
+      'langAName': _langAName,
+      'langBName': _langBName,
+      'turns': _turns,
+    });
+    await widget.service.updateResult(widget.item.id, json);
+  }
+
+  void _confirmDeleteTurn(int idx) {
+    final l10n = widget.l10n;
+    final theme = context.read<AppState>().buttonTheme;
+    HapticFeedback.selectionClick();
+    setState(() => _confirmingDeleteIdx = idx);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: theme.surfaceColor,
+        title: Text(l10n.deleteRecordTitle,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.deleteRecordMsg,
+            style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteTurn(idx);
+            },
+            child: Text(l10n.delete,
+                style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    ).then((_) {
+      if (mounted) setState(() => _confirmingDeleteIdx = null);
+    });
+  }
+
+  Future<void> _deleteTurn(int idx) async {
+    if (idx < 0 || idx >= _turns.length) return;
+    final removed = _turns[idx];
+    final wasPlaying = _playingIdx == idx;
+    if (wasPlaying) await _player.stop();
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _turns.removeAt(idx);
+      if (wasPlaying) {
+        _playingIdx = null;
+      } else if (_playingIdx != null && _playingIdx! > idx) {
+        _playingIdx = _playingIdx! - 1;
+      }
+    });
+    await _persistTurns();
+    if (!mounted) return;
+    final l10n = widget.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.deleted),
+        action: SnackBarAction(
+          label: l10n.undo,
+          onPressed: () async {
+            if (!mounted) return;
+            setState(() {
+              final insertAt = idx.clamp(0, _turns.length);
+              _turns.insert(insertAt, removed);
+              if (_playingIdx != null && _playingIdx! >= insertAt) {
+                _playingIdx = _playingIdx! + 1;
+              }
+            });
+            await _persistTurns();
+          },
+        ),
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   Future<void> _playTurn(int idx) async {
@@ -2282,18 +2367,27 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
                       final audioPath = t['audioPath'] as String?;
                       final hasAudio = audioPath != null &&
                           File(audioPath).existsSync();
-                      return _ConvHistoryBubble(
-                        isA: isA,
-                        original: original,
-                        translated: translated,
-                        fromLangName: isA ? _langAName : _langBName,
-                        toLangName: isA ? _langBName : _langAName,
-                        colorA: colorA,
-                        colorB: colorB,
-                        isPlaying: _playingIdx == i,
-                        canPlay: hasAudio &&
-                            (_playingIdx == null || _playingIdx == i),
-                        onPlay: hasAudio ? () => _playTurn(i) : null,
+                      return Dismissible(
+                        key: ValueKey(
+                            audioPath ?? '$i-$original-$translated'),
+                        direction: DismissDirection.endToStart,
+                        background: _swipeDeleteBg(Alignment.centerRight),
+                        onDismissed: (_) => _deleteTurn(i),
+                        child: _ConvHistoryBubble(
+                          isA: isA,
+                          original: original,
+                          translated: translated,
+                          fromLangName: isA ? _langAName : _langBName,
+                          toLangName: isA ? _langBName : _langAName,
+                          colorA: colorA,
+                          colorB: colorB,
+                          isPlaying: _playingIdx == i,
+                          canPlay: hasAudio &&
+                              (_playingIdx == null || _playingIdx == i),
+                          onPlay: hasAudio ? () => _playTurn(i) : null,
+                          onDelete: () => _confirmDeleteTurn(i),
+                          isHighlighted: _confirmingDeleteIdx == i,
+                        ),
                       );
                     },
                   ),
@@ -2353,6 +2447,19 @@ class _ConversationDetailSheetState extends State<_ConversationDetailSheet> {
   }
 }
 
+Widget _swipeDeleteBg(Alignment alignment) {
+  return Container(
+    alignment: alignment,
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    margin: const EdgeInsets.only(bottom: 10),
+    decoration: BoxDecoration(
+      color: Colors.redAccent,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: const Icon(Icons.delete_outline, color: Colors.white),
+  );
+}
+
 class _ConvHistoryBubble extends StatelessWidget {
   final bool isA;
   final String original;
@@ -2364,6 +2471,8 @@ class _ConvHistoryBubble extends StatelessWidget {
   final bool isPlaying;
   final bool canPlay;
   final VoidCallback? onPlay;
+  final VoidCallback onDelete;
+  final bool isHighlighted;
 
   const _ConvHistoryBubble({
     required this.isA,
@@ -2376,6 +2485,8 @@ class _ConvHistoryBubble extends StatelessWidget {
     required this.isPlaying,
     required this.canPlay,
     this.onPlay,
+    required this.onDelete,
+    required this.isHighlighted,
   });
 
   void _copy(BuildContext context, String text) {
@@ -2394,7 +2505,10 @@ class _ConvHistoryBubble extends StatelessWidget {
 
     return Align(
       alignment: isA ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
+      child: GestureDetector(
+        onLongPress: onDelete,
+        child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.85,
         ),
@@ -2405,14 +2519,21 @@ class _ConvHistoryBubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: isHighlighted
+              ? Colors.redAccent.withOpacity(0.18)
+              : color.withOpacity(0.12),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(14),
             topRight: const Radius.circular(14),
             bottomLeft: isA ? Radius.zero : const Radius.circular(14),
             bottomRight: isA ? const Radius.circular(14) : Radius.zero,
           ),
-          border: Border.all(color: color.withOpacity(0.22), width: 1),
+          border: Border.all(
+            color: isHighlighted
+                ? Colors.redAccent.withOpacity(0.8)
+                : color.withOpacity(0.22),
+            width: isHighlighted ? 1.5 : 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2500,6 +2621,7 @@ class _ConvHistoryBubble extends StatelessWidget {
             ],
           ],
         ),
+      ),
       ),
     );
   }

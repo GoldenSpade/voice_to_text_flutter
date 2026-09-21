@@ -8,18 +8,29 @@ import '../models/history_item.dart';
 class TelegramService extends ChangeNotifier {
   static const _tokenKey = 'telegram_token';
   static const _chatIdKey = 'telegram_chat_id';
+  static const _sendEnabledKey = 'telegram_send_enabled';
 
   String _token = '';
   String _chatId = '';
+  bool _sendEnabled = true;
 
   String get token => _token;
   String get chatId => _chatId;
   bool get isConfigured => _token.isNotEmpty && _chatId.isNotEmpty;
+  bool get sendEnabled => _sendEnabled;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString(_tokenKey) ?? '';
     _chatId = prefs.getString(_chatIdKey) ?? '';
+    _sendEnabled = prefs.getBool(_sendEnabledKey) ?? true;
+  }
+
+  Future<void> setSendEnabled(bool value) async {
+    _sendEnabled = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sendEnabledKey, value);
+    notifyListeners();
   }
 
   Future<void> setToken(String value) async {
@@ -47,9 +58,11 @@ class TelegramService extends ChangeNotifier {
   Future<void> clear() async {
     _token = '';
     _chatId = '';
+    _sendEnabled = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_chatIdKey);
+    await prefs.remove(_sendEnabledKey);
     notifyListeners();
   }
 
@@ -60,12 +73,12 @@ class TelegramService extends ChangeNotifier {
     String? languageName,
     String? voiceName,
   }) {
-    if (!isConfigured) return;
+    if (!isConfigured || !_sendEnabled) return;
     _post(_format(type, result, original, languageName, voiceName));
   }
 
   void sendAudioResult(String filePath, {String? caption}) {
-    if (!isConfigured) return;
+    if (!isConfigured || !_sendEnabled) return;
     _postAudio(filePath, caption: caption);
   }
 

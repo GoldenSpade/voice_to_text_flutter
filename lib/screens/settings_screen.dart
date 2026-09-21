@@ -514,7 +514,12 @@ class _TelegramSectionState extends State<_TelegramSection> {
     ));
   }
 
-  Future<void> _disconnect() async {
+  Future<void> _toggleSending() async {
+    final tg = context.read<TelegramService>();
+    await tg.setSendEnabled(!tg.sendEnabled);
+  }
+
+  Future<void> _clearKeys() async {
     await context.read<TelegramService>().clear();
     _tokenCtrl.clear();
     _chatIdCtrl.clear();
@@ -643,12 +648,27 @@ class _TelegramSectionState extends State<_TelegramSection> {
         ),
         if (tg.isConfigured) ...[
           const SizedBox(height: 8),
-          TextButton(
-            onPressed: _disconnect,
-            child: Text(
-              l10n.telegramDisconnect,
-              style: const TextStyle(color: Colors.redAccent),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: _toggleSending,
+                child: Text(
+                  tg.sendEnabled ? l10n.telegramDisconnect : l10n.telegramEnable,
+                  style: TextStyle(
+                    color: tg.sendEnabled ? Colors.orangeAccent : Colors.green,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: _clearKeys,
+                child: Text(
+                  l10n.telegramClearKeys,
+                  style: const TextStyle(color: Colors.redAccent),
+                ),
+              ),
+            ],
           ),
         ],
       ],

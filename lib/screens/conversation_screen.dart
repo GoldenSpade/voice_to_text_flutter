@@ -71,6 +71,7 @@ class _ConversationScreenState extends State<ConversationScreen>
   StreamSubscription<PlayerState>? _playerSub;
   String? _status;
   int? _playingTurnIdx;
+  int? _confirmingDeleteIdx;
   HistoryService? _historySvc;
   String? _existingItemId;
   int _initialTurnCount = 0;
@@ -360,6 +361,78 @@ class _ConversationScreenState extends State<ConversationScreen>
     });
   }
 
+  void _confirmDeleteTurn(int idx) {
+    final l10n = context.read<AppState>().l10n;
+    HapticFeedback.selectionClick();
+    setState(() => _confirmingDeleteIdx = idx);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: _theme.surfaceColor,
+        title: Text(l10n.deleteRecordTitle,
+            style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.deleteRecordMsg,
+            style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel,
+                style: const TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteTurn(idx);
+            },
+            child: Text(l10n.delete,
+                style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    ).then((_) {
+      if (mounted) setState(() => _confirmingDeleteIdx = null);
+    });
+  }
+
+  void _deleteTurn(int idx) {
+    if (idx < 0 || idx >= _turns.length) return;
+    final removed = _turns[idx];
+    final wasPlaying = _playingTurnIdx == idx;
+    if (wasPlaying) _player.stop();
+    HapticFeedback.mediumImpact();
+    setState(() {
+      _turns.removeAt(idx);
+      if (wasPlaying) {
+        _playingTurnIdx = null;
+        _state = _ConvState.idle;
+      } else if (_playingTurnIdx != null && _playingTurnIdx! > idx) {
+        _playingTurnIdx = _playingTurnIdx! - 1;
+      }
+    });
+    final l10n = context.read<AppState>().l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l10n.deleted),
+        action: SnackBarAction(
+          label: l10n.undo,
+          onPressed: () {
+            if (!mounted) return;
+            setState(() {
+              final insertAt = idx.clamp(0, _turns.length);
+              _turns.insert(insertAt, removed);
+              if (_playingTurnIdx != null && _playingTurnIdx! >= insertAt) {
+                _playingTurnIdx = _playingTurnIdx! + 1;
+              }
+            });
+          },
+        ),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   Future<void> _replayTurn(int idx) async {
     final path = _turns[idx].audioPath;
     if (!File(path).existsSync()) return;
@@ -540,18 +613,31 @@ class _ConversationScreenState extends State<ConversationScreen>
                       controller: _scroll,
                       padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
                       itemCount: _turns.length,
-                      itemBuilder: (_, i) => _TurnBubble(
-                        turn: _turns[i],
-                        index: i,
-                        langA: _langA,
-                        langB: _langB,
-                        colorA: colorA,
-                        colorB: colorB,
-                        isPlaying: _playingTurnIdx == i,
-                        canReplay: _state == _ConvState.idle ||
-                            _state == _ConvState.playing,
-                        onReplay: () => _replayTurn(i),
-                      ),
+                      itemBuilder: (_, i) {
+                        final turn = _turns[i];
+                        return Dismissible(
+                          key: ValueKey(turn.audioPath.isNotEmpty
+                              ? turn.audioPath
+                              : '$i-${turn.original}'),
+                          direction: DismissDirection.endToStart,
+                          background: _swipeDeleteBg(Alignment.centerRight),
+                          onDismissed: (_) => _deleteTurn(i),
+                          child: _TurnBubble(
+                            turn: turn,
+                            index: i,
+                            langA: _langA,
+                            langB: _langB,
+                            colorA: colorA,
+                            colorB: colorB,
+                            isPlaying: _playingTurnIdx == i,
+                            canReplay: _state == _ConvState.idle ||
+                                _state == _ConvState.playing,
+                            onReplay: () => _replayTurn(i),
+                            onDelete: () => _confirmDeleteTurn(i),
+                            isHighlighted: _confirmingDeleteIdx == i,
+                          ),
+                        );
+                      },
                     ),
             ),
             if (_state == _ConvState.recording)
@@ -634,6 +720,19 @@ class _ConversationScreenState extends State<ConversationScreen>
   }
 }
 
+Widget _swipeDeleteBg(Alignment alignment) {
+  return Container(
+    alignment: alignment,
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    margin: const EdgeInsets.only(bottom: 10),
+    decoration: BoxDecoration(
+      color: Colors.redAccent,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: const Icon(Icons.delete_outline, color: Colors.white),
+  );
+}
+
 void _copy(BuildContext context, String text) {
   Clipboard.setData(ClipboardData(text: text));
   final l10n = context.read<AppState>().l10n;
@@ -655,6 +754,8 @@ class _TurnBubble extends StatelessWidget {
   final bool isPlaying;
   final bool canReplay;
   final VoidCallback onReplay;
+  final VoidCallback onDelete;
+  final bool isHighlighted;
 
   const _TurnBubble({
     required this.turn,
@@ -666,6 +767,8 @@ class _TurnBubble extends StatelessWidget {
     required this.isPlaying,
     required this.canReplay,
     required this.onReplay,
+    required this.onDelete,
+    required this.isHighlighted,
   });
 
   @override
@@ -677,7 +780,10 @@ class _TurnBubble extends StatelessWidget {
 
     return Align(
       alignment: isA ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
+      child: GestureDetector(
+        onLongPress: onDelete,
+        child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.82,
         ),
@@ -688,7 +794,9 @@ class _TurnBubble extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.13),
+          color: isHighlighted
+              ? Colors.redAccent.withOpacity(0.18)
+              : color.withOpacity(0.13),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(14),
             topRight: const Radius.circular(14),
@@ -697,7 +805,12 @@ class _TurnBubble extends StatelessWidget {
             bottomRight:
                 isA ? const Radius.circular(14) : Radius.zero,
           ),
-          border: Border.all(color: color.withOpacity(0.25), width: 1),
+          border: Border.all(
+            color: isHighlighted
+                ? Colors.redAccent.withOpacity(0.8)
+                : color.withOpacity(0.25),
+            width: isHighlighted ? 1.5 : 1,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -783,6 +896,7 @@ class _TurnBubble extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

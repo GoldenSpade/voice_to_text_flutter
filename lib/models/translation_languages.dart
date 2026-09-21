@@ -27,4 +27,5 @@ const kTranslationLanguages = <(String, String, String)>[
   ('vi', 'Tiếng Việt', 'Vietnamese'),
   ('th', 'ภาษาไทย', 'Thai'),
   ('el', 'Ελληνικά', 'Greek'),
+  ('ka', 'ქართული', 'Georgian'),
 ];

@@ -883,8 +883,8 @@ class _TranscriptionScreenState extends State<TranscriptionScreen>
 }
 
 class _SpeechLangPicker extends StatelessWidget {
-  final (String, String) selected;
-  final void Function((String, String)) onPick;
+  final (String, String, String) selected;
+  final void Function((String, String, String)) onPick;
 
   const _SpeechLangPicker({required this.selected, required this.onPick});
 
@@ -924,7 +924,7 @@ class _SpeechLangPicker extends StatelessWidget {
                       style: const TextStyle(color: Colors.white)),
                   subtitle: lang.$1.isEmpty
                       ? null
-                      : Text(lang.$1,
+                      : Text(lang.$3,
                           style: const TextStyle(
                               color: Colors.white54, fontSize: 12)),
                   trailing: isSelected

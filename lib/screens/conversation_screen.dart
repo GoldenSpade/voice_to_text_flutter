@@ -939,6 +939,9 @@ class _LangPicker extends StatelessWidget {
                 return ListTile(
                   title: Text(lang.$2,
                       style: const TextStyle(color: Colors.white)),
+                  subtitle: Text(lang.$3,
+                      style: const TextStyle(
+                          color: Colors.white54, fontSize: 12)),
                   trailing: isSelected
                       ? Icon(Icons.check, color: theme.colors[0])
                       : null,

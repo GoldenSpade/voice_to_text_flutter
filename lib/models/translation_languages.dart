@@ -10,10 +10,12 @@ const kTranslationLanguages = <(String, String, String)>[
   ('pt', 'Português', 'Portuguese'),
   ('pl', 'Polski', 'Polish'),
   ('nl', 'Nederlands', 'Dutch'),
+  ('sk', 'Slovak', 'Slovak'),
   ('sv', 'Svenska', 'Swedish'),
   ('no', 'Norsk', 'Norwegian'),
   ('da', 'Dansk', 'Danish'),
   ('fi', 'Suomi', 'Finnish'),
+  ('fil', 'Filipino', 'Filipino'),
   ('cs', 'Čeština', 'Czech'),
   ('ro', 'Română', 'Romanian'),
   ('hu', 'Magyar', 'Hungarian'),
@@ -28,5 +30,4 @@ const kTranslationLanguages = <(String, String, String)>[
   ('th', 'ภาษาไทย', 'Thai'),
   ('el', 'Ελληνικά', 'Greek'),
   ('ka', 'ქართული', 'Georgian'),
-  ('fil', 'Filipino', 'Filipino'),
 ];

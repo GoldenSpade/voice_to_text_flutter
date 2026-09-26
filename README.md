@@ -21,7 +21,7 @@
 
 **Voice Translator AI** is a Flutter application that wraps OpenAI's speech and language models (Whisper-class transcription, GPT-4o for translation/text tasks, and TTS for speech synthesis) into a single, polished mobile toolkit. It covers the full loop of spoken communication — **voice → text → translation → voice** — plus text-only translation, a two-person conversation interpreter, and text-to-speech generation, all wrapped in a themeable, fully localized interface.
 
-The project started as a personal tool and grew into a fairly complete product: persistent history with folders and favorites, optional Telegram forwarding of results, data backup/restore, Android share-intent integration, and a from-scratch localization layer supporting **29 languages**.
+The project started as a personal tool and grew into a fairly complete product: persistent history with folders and favorites, optional Telegram forwarding of results, data backup/restore, Android share-intent integration, and a from-scratch localization layer supporting **30 languages**.
 
 > 🔑 The app is a client for your own OpenAI API key — there is no backend server. All keys, history and preferences are stored **locally on the device** via `shared_preferences` / local files.
 
@@ -48,7 +48,7 @@ The project started as a personal tool and grew into a fairly complete product: 
 
 ### Core AI tools
 - **Transcribe Audio** — record or upload audio and get a transcript (Whisper-class `gpt-4o-transcribe`), with optional source-language hinting or auto-detect.
-- **Translate Text** — type or paste text and translate it into any of 29 supported languages via GPT-4o.
+- **Translate Text** — type or paste text and translate it into any of 30 supported languages via GPT-4o.
 - **Transcribe + Translate** — record speech and get both the original transcript and its translation in one pass.
 - **Full Cycle** — speech → text → translation → speech: records your voice, translates it, and speaks the translation back in a chosen AI voice.
 - **Text to Voice** — generate natural-sounding speech (9 selectable voices) from any text and export it as MP3.
@@ -66,7 +66,7 @@ The project started as a personal tool and grew into a fairly complete product: 
 
 ### Personalization
 - 24 built-in color themes (multicolor and monochrome families) for the home screen and buttons.
-- Full UI localization across **29 interface languages**, independent from the 29 languages available for translation/transcription (see [Localization](#localization)).
+- Full UI localization across **30 interface languages**, independent from the 30 languages available for translation/transcription (see [Localization](#localization)).
 - Language pickers show the localized language name as a subtitle (e.g. a Korean UI shows "일본어" under "日本語"), so unfamiliar scripts stay identifiable regardless of which interface language is active.
 
 ## Tech Stack
@@ -124,13 +124,13 @@ flowchart TD
 - **`lib/services`** — I/O and business logic: `OpenAIService` (all OpenAI HTTP calls), `TelegramService`, `HistoryService`, `FolderService`, `BackupService`, `TransformPresetsService`.
 - **`lib/providers`** — app-wide `AppState` (API key, active locale, active color theme).
 - **`lib/screens`** — one file per feature screen, following the same idle → recording/processing → result/error state-machine pattern.
-- **`lib/l10n`** — a hand-written `AppLocalizations` class (no `intl`/codegen) backing 29 interface languages.
+- **`lib/l10n`** — a hand-written `AppLocalizations` class (no `intl`/codegen) backing 30 interface languages.
 
 ## Project Structure
 
 ```
 lib/
-├── l10n/                  # AppLocalizations — 29 languages, hand-maintained string tables
+├── l10n/                  # AppLocalizations — 30 languages, hand-maintained string tables
 ├── models/                # HistoryItem, HistoryFolder, AppTheme, language tables
 ├── providers/             # AppState (API key, locale, theme)
 ├── services/              # OpenAIService, TelegramService, HistoryService,
@@ -177,8 +177,8 @@ flutter build apk --release
 
 The app ships with a hand-written localization layer (`lib/l10n/app_localizations.dart`) rather than the standard `intl`/ARB codegen pipeline, covering:
 
-- **29 interface languages**: English, Russian, Ukrainian, German, French, Spanish, Italian, Portuguese, Polish, Dutch, Swedish, Norwegian, Danish, Finnish, Czech, Romanian, Hungarian, Turkish, Arabic, Chinese, Japanese, Korean, Hindi, Indonesian, Vietnamese, Thai, Greek, Georgian, and Filipino.
-- The **same 29 languages** are available as source/target options for transcription and translation, independent of the active interface language.
+- **30 interface languages**: English, Russian, Ukrainian, German, French, Spanish, Italian, Portuguese, Polish, Dutch, Swedish, Norwegian, Danish, Finnish, Czech, Romanian, Hungarian, Turkish, Arabic, Chinese, Japanese, Korean, Hindi, Indonesian, Vietnamese, Thai, Greek, Georgian, and Filipino.
+- The **same 30 languages** are available as source/target options for transcription and translation, independent of the active interface language.
 - Every language picker shows a localized subtitle — the language's name translated into whichever interface language is currently active — so scripts you don't read (e.g. Thai, Georgian, Korean) stay identifiable.
 
 > **Translation quality note:** strings for languages beyond the original set (en/ru/de/fr/es/it/pl/pt/zh/ja/ko/tr/hi/ar) were produced with AI-assisted translation rather than reviewed by native speakers. Contributions correcting phrasing for any locale are very welcome.
